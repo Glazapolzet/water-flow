@@ -1,2 +1,1 @@
-// Export everything here
-export {};
+export { OLMap } from './components';

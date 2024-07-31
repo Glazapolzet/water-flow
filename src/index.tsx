@@ -4,6 +4,7 @@ import { createRoot } from 'react-dom/client';
 import App from '@/App';
 import Provider from '@/providers';
 import reportWebVitals from '@/report-web-vitals';
+import '@/styles/index.scss';
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
 root.render(
