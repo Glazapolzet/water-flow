@@ -30,6 +30,7 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
+    "@types/openlayers": "^4.6.23",
     "framer-motion": "^11.3.19",
     "ol": "^10.0.0",
     "react": "^18.3.1",
