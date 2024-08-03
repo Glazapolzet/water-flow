@@ -1,71 +1,30 @@
-import { Select, Stack } from '@chakra-ui/react';
-import { View } from 'ol';
-import { Attribution, defaults } from 'ol/control.js';
-import Link from 'ol/interaction/Link';
-import LayerGroup from 'ol/layer/Group';
+import { Unpacked } from '@/types';
 import Map from 'ol/Map.js';
-import { fromLonLat, toLonLat } from 'ol/proj';
-import { ChangeEvent, useEffect, useRef } from 'react';
-import { cyclOSMLayer, OSMLayer, OTMLayer } from '../../utils/setup/layers';
+import { FC, useEffect } from 'react';
 import styles from './OLMap.module.scss';
 
-export const OLMap = () => {
-  const mapRef = useRef<Map | undefined>(undefined);
-  const layerGroupRef = useRef<LayerGroup | undefined>(new LayerGroup({ layers: [OTMLayer, OSMLayer, cyclOSMLayer] }));
+interface OLMap {
+  options?: Omit<Unpacked<ConstructorParameters<typeof Map>>, 'target'>;
+  onMount?: (map: Map) => void; // map events and actions to perform after component mount
+}
+
+export const OLMap: FC<OLMap> = ({ options, onMount }) => {
+  const mapOptions = options ? options : {};
 
   useEffect(() => {
     // Code here runs after the component has mounted
-    const attribution = new Attribution({
-      collapsible: true,
-      collapsed: true,
-    });
-
     const map = new Map({
       //id of the div element where the map will be rendered
       target: 'map',
-      layers: [OTMLayer],
-      controls: defaults({ attribution: false }).extend([attribution]),
-      view: new View({
-        center: fromLonLat([0, 0]),
-        zoom: 2,
-      }),
+      ...mapOptions,
     });
 
-    mapRef.current = map;
-
-    map.addInteraction(new Link());
-
-    map.on('click', (event) => {
-      const clickedCoordinate = event.coordinate;
-      console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
-    });
+    if (onMount) {
+      onMount(map);
+    }
 
     return () => map.setTarget(undefined);
-  }, []);
+  });
 
-  const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    layerGroupRef.current?.getLayersArray().forEach((layer) => {
-      layer.getProperties()?.name === event.target.value
-        ? mapRef.current?.setLayers([layer])
-        : mapRef.current?.removeLayer(layer);
-    });
-  };
-
-  return (
-    <>
-      <div className={styles.wrapper}>
-        <div id="map" className={styles.map} />
-      </div>
-      <Stack spacing={2}>
-        <Select size="md" variant={'filled'} onChange={handleSelectChange}>
-          <option selected disabled value="">
-            Select layer
-          </option>
-          <option value={'OpenTopoMap'}>OpenTopoMap</option>
-          <option value={'OpenStreetMap'}>OpenStreetMap</option>
-          <option value={'OpenCyclMap'}>OpenCyclMap</option>
-        </Select>
-      </Stack>
-    </>
-  );
+  return <div id="map" className={styles.map} />;
 };
