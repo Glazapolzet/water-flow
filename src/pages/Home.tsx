@@ -44,7 +44,7 @@ const Home = () => {
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
     layerGroup.getLayersArray().forEach((layer) => {
       layer.getProperties()?.name === event.target.value
-        ? mapRef.current?.setLayers([layer])
+        ? mapRef.current?.addLayer(layer)
         : mapRef.current?.removeLayer(layer);
     });
   };
