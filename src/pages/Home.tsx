@@ -1,6 +1,7 @@
 import { Select } from '@/components';
 import { OLMap } from '@/features/map';
 import { LAYER_SELECT_OPTIONS, OSMLayer, OTMLayer } from '@/utils/mapSetup';
+import { OTMLayerRU } from '@/utils/mapSetup/layers';
 import { Heading, Stack, StackDivider } from '@chakra-ui/react';
 import { View } from 'ol';
 import { Attribution, defaults } from 'ol/control.js';
@@ -13,7 +14,7 @@ import styles from './Home.module.scss';
 
 const Home = () => {
   const mapRef = useRef<Map | undefined>(undefined);
-  const layerGroupRef = new LayerGroup({ layers: [OTMLayer, OSMLayer] });
+  const layerGroup = new LayerGroup({ layers: [OTMLayer, OTMLayerRU, OSMLayer] });
 
   const attribution = new Attribution({
     collapsible: true,
@@ -41,7 +42,7 @@ const Home = () => {
   };
 
   const handleSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    layerGroupRef.getLayersArray().forEach((layer) => {
+    layerGroup.getLayersArray().forEach((layer) => {
       layer.getProperties()?.name === event.target.value
         ? mapRef.current?.setLayers([layer])
         : mapRef.current?.removeLayer(layer);
