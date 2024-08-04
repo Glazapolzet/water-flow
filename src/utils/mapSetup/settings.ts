@@ -1,4 +1,4 @@
-import { OSMLayer, OTMLayer, OTMLayerRU } from './layers';
+import { OSMLayer, OTMLayer, OTMLayerRU } from './rasterLayers';
 
 export const LAYER_SELECT_OPTIONS = [
   {
