@@ -1,5 +1,6 @@
 import ImageTileSource from 'ol/source/ImageTile';
 import { ATTRIBUTION } from 'ol/source/OSM';
+import VectorSource from 'ol/source/Vector';
 import { OPEN_TOPO_MAP_ATTRIBUTION, OPEN_TOPO_MAP_RU_ATTRIBUTION } from './attributions';
 
 const generateOTMServerURL = (type: 'a' | 'b' | 'c') => `https://${type}.tile.opentopomap.org/{z}/{x}/{y}.png`;
@@ -23,3 +24,5 @@ export const OSM_LAYER_SOURCE = new ImageTileSource({
   url: generateOSMServerURL(),
   tileSize: 256,
 });
+
+export const DRAW_VECTOR_SOURCE = new VectorSource();

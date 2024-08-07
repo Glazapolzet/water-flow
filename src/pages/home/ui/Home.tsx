@@ -1,32 +1,34 @@
 import { Select } from '@/components';
 import { OLMap } from '@/features/map';
 import {
-  LAYER_SELECT_OPTIONS,
+  attributionSetting,
+  drawInteractions,
+  drawLayer,
+  interactions,
   OSMLayer,
   OTMLayer,
   OTMLayerRU,
-  attributionSetting,
-  drawLayer,
-  link,
-  polygon,
-  snap,
+  RASTER_LAYER_PROPERTIES,
   view,
-} from '@/utils/mapSetup';
-import { Checkbox, Heading, Stack, StackDivider } from '@chakra-ui/react';
+} from '@/utils/map';
+import { Heading, Stack, StackDivider } from '@chakra-ui/react';
 import LayerGroup from 'ol/layer/Group';
 import Map from 'ol/Map.js';
 import { toLonLat } from 'ol/proj';
 import { ChangeEvent, useRef } from 'react';
+import { DRAW_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
 import styles from './Home.module.scss';
 
-const Home = () => {
+export const Home = () => {
   const mapRef = useRef<Map | undefined>(undefined);
   const layerGroup = new LayerGroup({ layers: [OTMLayer, OTMLayerRU, OSMLayer] });
 
-  // The snap interaction must be added after the Modify and Draw interactions
-  // in order for its map browser event handlers to be fired first. Its handlers
-  // are responsible of doing the snapping.
-  const interactions = [polygon, link, snap];
+  const drawProps = drawInteractions.getProps();
+  const interactionsProps = interactions.getProps();
+
+  console.log(drawProps);
+
+  // polygon.setActive(false);
 
   const mapOptions = {
     layers: [OTMLayer, drawLayer],
@@ -37,9 +39,8 @@ const Home = () => {
   const handleMapMount = (map: Map) => {
     mapRef.current = map;
 
-    interactions.forEach((interaction) => map.addInteraction(interaction));
-
-    polygon.setActive(false);
+    drawInteractions.addInteractions(map, drawProps.polygon.name);
+    interactions.addInteractions(map, Object.keys(interactionsProps));
 
     map.on('click', (event) => {
       const clickedCoordinate = event.coordinate;
@@ -55,11 +56,21 @@ const Home = () => {
     });
   };
 
-  const handleDrawCheckboxChange = () => {
-    const isActive = polygon.getActive();
-
-    polygon.setActive(!isActive);
+  const handleDrawSelectChange = () => {
+    // console.log(polygon.getProperties());
+    // const isActive = polygon.getActive();
+    // polygon.setActive(!isActive);
   };
+
+  // polygon.on('drawstart', () => {
+  //   drawLayer.getSource()?.clear();
+  // });
+
+  // polygon.on('drawend', (evt) => {
+  //   const polygonFeature = evt?.feature as Feature<Polygon>;
+
+  //   console.log(polygonFeature.getGeometry()?.getCoordinates());
+  // });
 
   return (
     <section className={styles.home}>
@@ -77,7 +88,7 @@ const Home = () => {
               options={LAYER_SELECT_OPTIONS}
               size={'md'}
               variant={'outline'}
-              defaultValue={'OpenTopoMap'}
+              defaultValue={RASTER_LAYER_PROPERTIES.OTM.name}
               onChange={handleLayerSelectChange}
             />
           </Stack>
@@ -85,9 +96,13 @@ const Home = () => {
             <Heading as="h4" size="md">
               Select area
             </Heading>
-            <Checkbox colorScheme="green" onChange={handleDrawCheckboxChange}>
-              draw
-            </Checkbox>
+            <Select
+              options={DRAW_SELECT_OPTIONS}
+              size={'md'}
+              variant={'filled'}
+              defaultValue={drawProps.polygon.name}
+              onChange={handleDrawSelectChange}
+            />
           </Stack>
         </Stack>
       </Stack>
@@ -96,5 +111,3 @@ const Home = () => {
     </section>
   );
 };
-
-export default Home;
