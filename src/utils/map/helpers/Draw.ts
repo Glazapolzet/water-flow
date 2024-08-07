@@ -1,8 +1,10 @@
 import { Draw } from 'ol/interaction';
-import { Interactions } from './Interactions';
+import { Interactions, Options as InteractionsOptions } from './Interactions';
+
+type Options = InteractionsOptions;
 
 export class DrawInteractions extends Interactions {
-  constructor(drawInteractions: Draw[]) {
-    super(drawInteractions);
+  constructor(drawInteractions: Draw[], options?: Options) {
+    super(drawInteractions, options);
   }
 }

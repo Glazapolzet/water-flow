@@ -1,37 +1,24 @@
 import { Select } from '@/components';
-import { OLMap } from '@/features/map';
-import {
-  attributionSetting,
-  drawInteractions,
-  drawLayer,
-  interactions,
-  OSMLayer,
-  OTMLayer,
-  OTMLayerRU,
-  RASTER_LAYER_PROPERTIES,
-  view,
-} from '@/utils/map';
+import { GeometryType, OLMap } from '@/features/map';
+import { attributionSetting, drawInteractions, interactions, rasterLayers, vectorLayers, view } from '@/utils/map';
 import { Heading, Stack, StackDivider } from '@chakra-ui/react';
-import LayerGroup from 'ol/layer/Group';
+import { Draw } from 'ol/interaction';
+import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 import { toLonLat } from 'ol/proj';
 import { ChangeEvent, useRef } from 'react';
+import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import { DRAW_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
 import styles from './Home.module.scss';
 
 export const Home = () => {
   const mapRef = useRef<Map | undefined>(undefined);
-  const layerGroup = new LayerGroup({ layers: [OTMLayer, OTMLayerRU, OSMLayer] });
 
-  const drawProps = drawInteractions.getProps();
-  const interactionsProps = interactions.getProps();
-
-  console.log(drawProps);
-
-  // polygon.setActive(false);
+  const OTMName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
+  const drawLayer = vectorLayers.get(VECTOR_LAYERS_PROPERTIES.draw.name) as VectorLayer;
 
   const mapOptions = {
-    layers: [OTMLayer, drawLayer],
+    layers: [rasterLayers.get(OTMName), drawLayer],
     controls: attributionSetting,
     view: view,
   };
@@ -39,8 +26,7 @@ export const Home = () => {
   const handleMapMount = (map: Map) => {
     mapRef.current = map;
 
-    drawInteractions.addInteractions(map, drawProps.polygon.name);
-    interactions.addInteractions(map, Object.keys(interactionsProps));
+    interactions.getArray().forEach((interaction) => map.addInteraction(interaction));
 
     map.on('click', (event) => {
       const clickedCoordinate = event.coordinate;
@@ -49,28 +35,40 @@ export const Home = () => {
   };
 
   const handleLayerSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    layerGroup.getLayersArray().forEach((layer) => {
+    rasterLayers.getArray().forEach((layer) => {
       layer.getProperties()?.name === event.target.value
         ? mapRef.current?.addLayer(layer)
         : mapRef.current?.removeLayer(layer);
     });
   };
 
-  const handleDrawSelectChange = () => {
-    // console.log(polygon.getProperties());
-    // const isActive = polygon.getActive();
-    // polygon.setActive(!isActive);
+  const handleDrawSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    if (!event.target.value) {
+      drawInteractions.getArray().forEach((drawInteraction) => {
+        mapRef.current?.removeInteraction(drawInteraction);
+      });
+
+      return;
+    }
+
+    const selectedDrawInteraction = drawInteractions.get(event.target.value) as Draw;
+
+    drawInteractions.getArray().forEach((drawInteraction) => {
+      drawInteraction.getProperties()?.name === event.target.value
+        ? mapRef.current?.addInteraction(drawInteraction)
+        : mapRef.current?.removeInteraction(drawInteraction);
+    });
+
+    selectedDrawInteraction.on('drawstart', () => {
+      drawLayer.getSource()?.clear();
+    });
+
+    selectedDrawInteraction.on('drawend', (evt) => {
+      const geometry = evt?.feature.getGeometry() as GeometryType;
+
+      console.log(geometry.getCoordinates());
+    });
   };
-
-  // polygon.on('drawstart', () => {
-  //   drawLayer.getSource()?.clear();
-  // });
-
-  // polygon.on('drawend', (evt) => {
-  //   const polygonFeature = evt?.feature as Feature<Polygon>;
-
-  //   console.log(polygonFeature.getGeometry()?.getCoordinates());
-  // });
 
   return (
     <section className={styles.home}>
@@ -88,7 +86,7 @@ export const Home = () => {
               options={LAYER_SELECT_OPTIONS}
               size={'md'}
               variant={'outline'}
-              defaultValue={RASTER_LAYER_PROPERTIES.OTM.name}
+              defaultValue={OTMName}
               onChange={handleLayerSelectChange}
             />
           </Stack>
@@ -100,7 +98,7 @@ export const Home = () => {
               options={DRAW_SELECT_OPTIONS}
               size={'md'}
               variant={'filled'}
-              defaultValue={drawProps.polygon.name}
+              defaultValue={''}
               onChange={handleDrawSelectChange}
             />
           </Stack>
