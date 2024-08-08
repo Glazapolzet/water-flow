@@ -1,14 +1,14 @@
 import { FeatureLike } from 'ol/Feature';
 import { Draw } from 'ol/interaction';
-import { createBox } from 'ol/interaction/Draw.js';
+import { createBox, createRegularPolygon } from 'ol/interaction/Draw.js';
 import { StyleFunction } from 'ol/style/Style';
 import { DrawInteractions } from '../helpers';
 import { DRAW_VECTOR_SOURCE } from '../layers/souces';
 import { DRAW_FIGURE_STYLE } from '../styles/styles';
 
 const DRAW_INTERACTION_PROPERTIES = {
-  polygon: {
-    name: 'polygon',
+  square: {
+    name: 'square',
   },
   box: {
     name: 'box',
@@ -22,15 +22,16 @@ const styled: StyleFunction = (feature: FeatureLike) => {
   }
 };
 
-const polygon = new Draw({
+const square = new Draw({
   source: DRAW_VECTOR_SOURCE,
-  type: 'Polygon',
+  type: 'Circle',
+  geometryFunction: createRegularPolygon(4, (45 * Math.PI) / 180),
   snapTolerance: 5,
-  geometryName: DRAW_INTERACTION_PROPERTIES.polygon.name,
+  geometryName: DRAW_INTERACTION_PROPERTIES.square.name,
   style: styled,
 });
 
-polygon.setProperties(DRAW_INTERACTION_PROPERTIES.polygon);
+square.setProperties(DRAW_INTERACTION_PROPERTIES.square);
 
 const box = new Draw({
   source: DRAW_VECTOR_SOURCE,
@@ -43,4 +44,4 @@ const box = new Draw({
 
 box.setProperties(DRAW_INTERACTION_PROPERTIES.box);
 
-export const drawInteractions = new DrawInteractions([polygon, box]);
+export const drawInteractions = new DrawInteractions([square, box]);

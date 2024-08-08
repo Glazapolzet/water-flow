@@ -53,12 +53,7 @@ export const SettingsPanel: FC<SettingsPanel> = ({ layerSelect, drawSelect, show
             onChange={drawSelect.onChange}
           />
         </Stack>
-        <VisibleButton
-          colorScheme={'gray'}
-          opacity={'.75'}
-          bgColor={'whiteAlpha.400'}
-          isVisible={showConfirmAreaButton}
-        >
+        <VisibleButton colorScheme={'teal'} opacity={'.75'} bgColor={'teal.200'} isVisible={showConfirmAreaButton}>
           Calculate selected area
         </VisibleButton>
       </Stack>

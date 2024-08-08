@@ -1,10 +1,13 @@
 import { OLGeometryTypes, OLMap } from '@/features/map';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
+import bbox from '@turf/bbox';
+import isolines from '@turf/isolines';
+import pointGrid from '@turf/point-grid';
+import { GeoJSON } from 'ol/format';
 import { Draw } from 'ol/interaction';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
-import { toLonLat } from 'ol/proj';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import { DRAW_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
@@ -12,18 +15,21 @@ import styles from './Home.module.scss';
 import { SettingsPanel } from './SettingsPanel/SettingsPanel';
 
 export const Home = () => {
-  const [isConfirmAreaButtonVisible, setConfirmAreaButtonVisible] = useState<boolean>(false);
-
   const mapRef = useRef<Map | undefined>(undefined);
+
+  const [isConfirmAreaButtonVisible, setConfirmAreaButtonVisible] = useState<boolean>(false);
 
   const OTMLayerName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
   const drawLayerName: string = VECTOR_LAYERS_PROPERTIES.draw.name;
+
+  const OTMLayer = rasterLayers.get(OTMLayerName);
+  const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;
 
   // console.log(conrec.drawContour({ contourDrawer: 'shape' }));
 
   const mapOptions = useMemo(() => {
     return {
-      layers: [rasterLayers.get(OTMLayerName), drawLayers.get(drawLayerName)],
+      layers: [OTMLayer, drawLayer],
       controls: attributionSetting,
       view: view,
     };
@@ -34,10 +40,10 @@ export const Home = () => {
 
     interactions.getArray().forEach((interaction) => map.addInteraction(interaction));
 
-    map.on('click', (event) => {
-      const clickedCoordinate = event.coordinate;
-      console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
-    });
+    // map.on('click', (event) => {
+    //   const clickedCoordinate = event.coordinate;
+    //   console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
+    // });
   }, []);
 
   const handleLayerSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -66,17 +72,37 @@ export const Home = () => {
     const currentDrawInteraction = drawInteractions.get(event.target.value) as Draw;
 
     currentDrawInteraction.on('drawstart', () => {
-      const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;
+      setConfirmAreaButtonVisible(false);
 
       drawLayer?.getSource()?.clear();
-      setConfirmAreaButtonVisible(false);
     });
 
     currentDrawInteraction.on('drawend', (event: DrawEvent) => {
+      setConfirmAreaButtonVisible(true);
+
       const geometry = event?.feature.getGeometry() as OLGeometryTypes;
 
-      console.log(geometry.getCoordinates());
-      setConfirmAreaButtonVisible(true);
+      const formatter = new GeoJSON();
+
+      // const coords = geometry.getCoordinates();
+      // console.log({ x: bb[2] - bb[0], y: bb[3] - bb[1] });
+
+      const bb = bbox(formatter.writeGeometryObject(geometry));
+
+      const points = pointGrid(bb, 1000);
+      for (let i = 0; i < points.features.length; i++) {
+        points.features[i].properties.z = Math.random() * 10;
+      }
+      const breaks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      const iso = isolines(points, breaks, { zProperty: 'z' });
+
+      // const test = iso.features.map((feature) => feature.geometry);
+
+      // const grid = squareGrid(bb, 10000);
+
+      drawLayer.getSource()?.addFeatures(new GeoJSON().readFeatures(iso));
+
+      console.log(iso);
     });
   };
 
@@ -96,6 +122,7 @@ export const Home = () => {
         }}
         showConfirmAreaButton={isConfirmAreaButtonVisible}
       />
+
       <OLMap options={mapOptions} onMount={handleMapMount} />
     </section>
   );
