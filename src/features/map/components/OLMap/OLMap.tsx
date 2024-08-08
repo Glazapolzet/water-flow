@@ -1,6 +1,6 @@
 import { Unpacked } from '@/types';
 import Map from 'ol/Map.js';
-import { FC, useEffect } from 'react';
+import { memo, useEffect } from 'react';
 import styles from './OLMap.module.scss';
 
 interface OLMap {
@@ -8,7 +8,7 @@ interface OLMap {
   onMount?: (map: Map) => void; // map events and actions to perform after component mount
 }
 
-export const OLMap: FC<OLMap> = ({ options, onMount }) => {
+const Component = function ({ options, onMount }: OLMap) {
   const mapOptions = options ? options : {};
 
   useEffect(() => {
@@ -24,7 +24,9 @@ export const OLMap: FC<OLMap> = ({ options, onMount }) => {
     }
 
     return () => map.setTarget(undefined);
-  });
+  }, []);
 
   return <div id="map" className={styles.map} />;
 };
+
+export const OLMap = memo(Component);

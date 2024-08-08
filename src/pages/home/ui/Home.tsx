@@ -1,29 +1,35 @@
-import { Select } from '@/components';
-import { GeometryType, OLMap } from '@/features/map';
-import { attributionSetting, drawInteractions, interactions, rasterLayers, vectorLayers, view } from '@/utils/map';
-import { Heading, Stack, StackDivider } from '@chakra-ui/react';
+import { OLGeometryTypes, OLMap } from '@/features/map';
+import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
 import { Draw } from 'ol/interaction';
+import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 import { toLonLat } from 'ol/proj';
-import { ChangeEvent, useRef } from 'react';
+import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import { DRAW_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
 import styles from './Home.module.scss';
+import { SettingsPanel } from './SettingsPanel/SettingsPanel';
 
 export const Home = () => {
+  const [isConfirmAreaButtonVisible, setConfirmAreaButtonVisible] = useState<boolean>(false);
+
   const mapRef = useRef<Map | undefined>(undefined);
 
-  const OTMName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
-  const drawLayer = vectorLayers.get(VECTOR_LAYERS_PROPERTIES.draw.name) as VectorLayer;
+  const OTMLayerName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
+  const drawLayerName: string = VECTOR_LAYERS_PROPERTIES.draw.name;
 
-  const mapOptions = {
-    layers: [rasterLayers.get(OTMName), drawLayer],
-    controls: attributionSetting,
-    view: view,
-  };
+  // console.log(conrec.drawContour({ contourDrawer: 'shape' }));
 
-  const handleMapMount = (map: Map) => {
+  const mapOptions = useMemo(() => {
+    return {
+      layers: [rasterLayers.get(OTMLayerName), drawLayers.get(drawLayerName)],
+      controls: attributionSetting,
+      view: view,
+    };
+  }, [OTMLayerName, drawLayerName]);
+
+  const handleMapMount = useCallback((map: Map) => {
     mapRef.current = map;
 
     interactions.getArray().forEach((interaction) => map.addInteraction(interaction));
@@ -32,7 +38,7 @@ export const Home = () => {
       const clickedCoordinate = event.coordinate;
       console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
     });
-  };
+  }, []);
 
   const handleLayerSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
     rasterLayers.getArray().forEach((layer) => {
@@ -51,60 +57,45 @@ export const Home = () => {
       return;
     }
 
-    const selectedDrawInteraction = drawInteractions.get(event.target.value) as Draw;
-
     drawInteractions.getArray().forEach((drawInteraction) => {
       drawInteraction.getProperties()?.name === event.target.value
         ? mapRef.current?.addInteraction(drawInteraction)
         : mapRef.current?.removeInteraction(drawInteraction);
     });
 
-    selectedDrawInteraction.on('drawstart', () => {
-      drawLayer.getSource()?.clear();
+    const currentDrawInteraction = drawInteractions.get(event.target.value) as Draw;
+
+    currentDrawInteraction.on('drawstart', () => {
+      const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;
+
+      drawLayer?.getSource()?.clear();
+      setConfirmAreaButtonVisible(false);
     });
 
-    selectedDrawInteraction.on('drawend', (evt) => {
-      const geometry = evt?.feature.getGeometry() as GeometryType;
+    currentDrawInteraction.on('drawend', (event: DrawEvent) => {
+      const geometry = event?.feature.getGeometry() as OLGeometryTypes;
 
       console.log(geometry.getCoordinates());
+      setConfirmAreaButtonVisible(true);
     });
   };
 
   return (
     <section className={styles.home}>
-      <Stack align={'start'} direction={'column'} divider={<StackDivider borderColor="gray.500" />}>
-        <Heading as="h2" size="lg">
-          Settings
-        </Heading>
-
-        <Stack spacing={5} direction={'column'} className={styles.optionsContainer}>
-          <Stack spacing={2}>
-            <Heading as="h4" size="md">
-              Layers
-            </Heading>
-            <Select
-              options={LAYER_SELECT_OPTIONS}
-              size={'md'}
-              variant={'outline'}
-              defaultValue={OTMName}
-              onChange={handleLayerSelectChange}
-            />
-          </Stack>
-          <Stack spacing={2}>
-            <Heading as="h4" size="md">
-              Select area
-            </Heading>
-            <Select
-              options={DRAW_SELECT_OPTIONS}
-              size={'md'}
-              variant={'filled'}
-              defaultValue={''}
-              onChange={handleDrawSelectChange}
-            />
-          </Stack>
-        </Stack>
-      </Stack>
-
+      <SettingsPanel
+        mapRef={mapRef}
+        layerSelect={{
+          defaultValue: OTMLayerName,
+          options: LAYER_SELECT_OPTIONS,
+          onChange: handleLayerSelectChange,
+        }}
+        drawSelect={{
+          defaultValue: '',
+          options: DRAW_SELECT_OPTIONS,
+          onChange: handleDrawSelectChange,
+        }}
+        showConfirmAreaButton={isConfirmAreaButtonVisible}
+      />
       <OLMap options={mapOptions} onMount={handleMapMount} />
     </section>
   );

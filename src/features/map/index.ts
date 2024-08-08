@@ -1,2 +1,3 @@
 export { OLMap } from './components';
-export type { GeometryType } from './types';
+export type { OLGeometryTypes } from './types';
+export { conrec } from './utils';
