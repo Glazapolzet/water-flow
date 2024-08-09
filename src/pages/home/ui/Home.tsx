@@ -1,15 +1,12 @@
-import { OLGeometryTypes, OLMap } from '@/features/map';
+import { makeTurfSplinedIsolines, OLGeometryTypes, OLMap } from '@/features/map';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
-import bbox from '@turf/bbox';
-import isolines from '@turf/isolines';
-import pointGrid from '@turf/point-grid';
 import { GeoJSON } from 'ol/format';
 import { Draw } from 'ol/interaction';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
-import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
+import { mockPointGridWithZVal, RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import { DRAW_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
 import styles from './Home.module.scss';
 import { SettingsPanel } from './SettingsPanel/SettingsPanel';
@@ -25,7 +22,15 @@ export const Home = () => {
   const OTMLayer = rasterLayers.get(OTMLayerName);
   const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;
 
-  // console.log(conrec.drawContour({ contourDrawer: 'shape' }));
+  // const d = new VectorLayer({
+  //   source: new VectorSource(),
+  //   style: {
+  //     'fill-color': 'rgba(255, 255, 255, 0.0)',
+  //     'stroke-color': 'rgba(245, 75, 66, 0.7)',
+  //     'stroke-width': 1,
+  //   },
+  //   zIndex: 2,
+  // });
 
   const mapOptions = useMemo(() => {
     return {
@@ -75,6 +80,8 @@ export const Home = () => {
       setConfirmAreaButtonVisible(false);
 
       drawLayer?.getSource()?.clear();
+      // mapRef.current?.removeLayer(d);
+      // d.getSource()?.clear();
     });
 
     currentDrawInteraction.on('drawend', (event: DrawEvent) => {
@@ -84,25 +91,27 @@ export const Home = () => {
 
       const formatter = new GeoJSON();
 
-      // const coords = geometry.getCoordinates();
-      // console.log({ x: bb[2] - bb[0], y: bb[3] - bb[1] });
+      // console.log(geometry.getCoordinates()); //get bounds of figure
 
-      const bb = bbox(formatter.writeGeometryObject(geometry));
+      // const conrec = new Conrec([
+      //   [0, 1, 2],
+      //   [3, 2, 1],
+      // ]);
 
-      const points = pointGrid(bb, 1000);
-      for (let i = 0; i < points.features.length; i++) {
-        points.features[i].properties.z = Math.random() * 10;
-      }
+      // console.log(conrec.drawContour({ contourDrawer: 'basic' }));
+
       const breaks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      const iso = isolines(points, breaks, { zProperty: 'z' });
+      const pointGrid = mockPointGridWithZVal(formatter.writeGeometryObject(geometry));
 
-      // const test = iso.features.map((feature) => feature.geometry);
+      const splinedIsolines = makeTurfSplinedIsolines(
+        { pointGrid, breaks, options: { zProperty: 'z' } },
+        { sharpness: 0.9 },
+      );
 
-      // const grid = squareGrid(bb, 10000);
+      drawLayer.getSource()?.addFeatures(formatter.readFeatures(splinedIsolines));
 
-      drawLayer.getSource()?.addFeatures(new GeoJSON().readFeatures(iso));
-
-      console.log(iso);
+      // mapRef.current?.addLayer(d);
+      // d.getSource()?.addFeatures(splinedIso2);
     });
   };
 

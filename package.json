@@ -32,6 +32,7 @@
     "@emotion/styled": "^11.13.0",
     "@turf/bbox": "^7.0.0",
     "@turf/bezier-spline": "^7.0.0",
+    "@turf/helpers": "^7.0.0",
     "@turf/isobands": "^7.0.0",
     "@turf/isolines": "^7.0.0",
     "@turf/point-grid": "^7.0.0",

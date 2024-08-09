@@ -1,1 +1,1 @@
-export { conrec } from './conrec';
+export { makeTurfSplinedIsolines } from './makeTurfIsolines';
