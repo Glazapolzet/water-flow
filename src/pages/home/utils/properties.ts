@@ -14,7 +14,7 @@ export const mockPointGridWithZVal = (geoJSON: any) => {
   const points = pointGrid(bb, 1000);
 
   for (let i = 0; i < points.features.length; i++) {
-    points!.features[i]!.properties!.z = Math.random() * 10;
+    points!.features[i]!.properties!.zValue = Math.random() * 10;
   }
 
   return points;

@@ -2,6 +2,7 @@ import { makeTurfSplinedIsolines, OLGeometryTypes, OLMap } from '@/features/map'
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
 import bbox from '@turf/bbox';
 import { FeatureCollection, Point } from 'geojson';
+import { Conrec } from 'ml-conrec';
 import { GeoJSON } from 'ol/format';
 import { Draw } from 'ol/interaction';
 import { DrawEvent } from 'ol/interaction/Draw';
@@ -101,6 +102,7 @@ export const Home = () => {
       const pointGrid = mockPointGridWithZVal(geoJSON);
 
       console.log(bbox(pointGrid));
+      console.log(pointGrid);
 
       const toConrecMatrix = (pointGrid: FeatureCollection<Point>, options: { zProperty?: string }) => {
         const features = pointGrid.features;
@@ -111,13 +113,9 @@ export const Home = () => {
             : features[index].geometry.coordinates[2];
         };
 
-        const firstZ = getZProperty(0);
+        const matrix: number[][] = [[]];
 
-        const matrix: number[][] = Array(features.length)
-          .fill(0)
-          .map(() => Array(features.length).fill(0));
-
-        matrix[0][0] = firstZ;
+        matrix[0] = [getZProperty(0)];
 
         let xIndex = 0;
         let yIndex = 0;
@@ -129,13 +127,13 @@ export const Home = () => {
           const dx = currX - prevX;
           const dy = currY - prevY;
 
-          // console.log({ prevX, currX, dx, iszero: dx === 0 });
-          // console.log({ prevY, currY, dy, iszero: dy === 0 });
-
-          const z = getZProperty(i);
-
           if (dx === 0) {
             yIndex += 1;
+
+            if (!matrix[yIndex]) {
+              matrix[yIndex] = [getZProperty(i)];
+              continue;
+            }
           }
 
           if (dy <= 0) {
@@ -143,27 +141,31 @@ export const Home = () => {
             yIndex = 0;
           }
 
-          console.log({ xIndex, yIndex });
-
-          matrix[yIndex][xIndex] = z;
+          matrix[yIndex][xIndex] = getZProperty(i);
         }
 
         return matrix;
       };
 
-      console.log(toConrecMatrix(pointGrid, { zProperty: 'z' }));
+      const conrecMatrix = toConrecMatrix(pointGrid, { zProperty: 'zValue' });
+
+      // console.table({ conrecMatrix });
 
       // const conrec = new Conrec([
       //   [0, 1, 2],
       //   [3, 2, 1],
       // ]);
 
-      // console.log(conrec.drawContour({ contourDrawer: 'basic' }));
+      const conrec = new Conrec(conrecMatrix);
+      // console.log({ conrecComputed: conrec.drawContour({ contourDrawer: 'basic' }) });
+      console.log({ conrecComputed: conrec.drawContour({ contourDrawer: 'shape' }) });
 
       const splinedIsolines = makeTurfSplinedIsolines(
-        { pointGrid, breaks, options: { zProperty: 'z' } },
+        { pointGrid, breaks, options: { zProperty: 'zValue' } },
         { sharpness: 0.9 },
       );
+
+      console.log(splinedIsolines);
 
       drawLayer.getSource()?.addFeatures(formatter.readFeatures(splinedIsolines));
 
