@@ -98,7 +98,10 @@ export const Home = () => {
       // console.log(bbox(pointGrid));
       console.log(pointGrid);
 
-      const splinedIsolines = makeTurfSplinedIsolines({ pointGrid, breaks, options: { zProperty: 'zValue' } });
+      const splinedIsolines = makeTurfSplinedIsolines(
+        { pointGrid, breaks, options: { zProperty: 'zValue' } },
+        { sharpness: 0.9 },
+      );
       console.log({ splinedIsolines });
 
       // const conrecIsolines = makeConrecIsolines(pointGrid, { zProperty: 'zValue' });
