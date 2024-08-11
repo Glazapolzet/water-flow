@@ -104,11 +104,7 @@ export const Home = () => {
       // const conrecIsolines = makeConrecIsolines(pointGrid, { zProperty: 'zValue' });
       // console.log({ conrecIsolines });
 
-      drawLayer
-        .getSource()
-        ?.addFeatures(
-          formatter.readFeatures(splinedIsolines, { featureProjection: mapRef.current?.getView().getProjection() }),
-        );
+      drawLayer.getSource()?.addFeatures(formatter.readFeatures(splinedIsolines));
 
       console.log(drawLayer.getSource()?.getFeatures());
       // drawLayer.getSource()?.addFeatures(formatter.readFeatures(conrecIsolines));
