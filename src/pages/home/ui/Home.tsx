@@ -1,4 +1,4 @@
-import { makeTurfSplinedIsolines, OLGeometryTypes, OLMap } from '@/features/map';
+import { makeConrecIsolines, makeTurfSplinedIsolines, OLGeometryTypes, OLMap } from '@/features/map';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
 import { GeoJSON } from 'ol/format';
 import { Draw } from 'ol/interaction';
@@ -104,13 +104,13 @@ export const Home = () => {
       );
       console.log({ splinedIsolines });
 
-      // const conrecIsolines = makeConrecIsolines(pointGrid, { zProperty: 'zValue' });
+      const conrecIsolines = makeConrecIsolines(pointGrid, { zProperty: 'zValue' });
       // console.log({ conrecIsolines });
 
-      drawLayer.getSource()?.addFeatures(formatter.readFeatures(splinedIsolines));
+      // drawLayer.getSource()?.addFeatures(formatter.readFeatures(splinedIsolines));
 
-      console.log(drawLayer.getSource()?.getFeatures());
-      // drawLayer.getSource()?.addFeatures(formatter.readFeatures(conrecIsolines));
+      // console.log(drawLayer.getSource()?.getFeatures());
+      drawLayer.getSource()?.addFeatures(formatter.readFeatures(conrecIsolines));
 
       // mapRef.current?.addLayer(d);
       // d.getSource()?.addFeatures(splinedIsolines);

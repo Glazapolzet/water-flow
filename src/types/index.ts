@@ -1,1 +1,1 @@
-export { UnpackedArray as Unpacked } from './types';
+export { Unpacked as Unpacked } from './types';

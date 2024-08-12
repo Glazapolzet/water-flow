@@ -1,1 +1,1 @@
-export type UnpackedArray<T> = T extends Array<infer U> ? U : T extends ReadonlyArray<infer U> ? U : T;
+export type Unpacked<T> = T extends Array<infer U> ? U : T extends ReadonlyArray<infer U> ? U : T;
