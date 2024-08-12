@@ -8,17 +8,17 @@ type PointGrid = IsolineTupledParameters[0];
 type Breaks = IsolineTupledParameters[1];
 type Options = IsolineTupledParameters[2];
 
-type IsolineParameters = {
+type IsolineSettings = {
   pointGrid: PointGrid;
   breaks: Breaks;
-  options: Options;
+  options?: Options;
 };
 
-type SplineOptions = Parameters<typeof bezierSpline>[1];
+type SplineOptions = Omit<NonNullable<Parameters<typeof bezierSpline>[1]>, 'properties'>;
 
-type FunctionType = (isolineProps: IsolineParameters, splineOptions?: SplineOptions) => ReturnType<typeof isolines>;
+export const makeTurfSplinedIsolines = (isolineSettings: IsolineSettings, splineOptions?: SplineOptions) => {
+  const { pointGrid, breaks, options } = isolineSettings;
 
-export const makeTurfSplinedIsolines: FunctionType = ({ pointGrid, breaks, options = {} }, splineOptions) => {
   const iso = isolines(pointGrid, breaks, options);
 
   for (let i = 1; i < iso.features.length; i++) {

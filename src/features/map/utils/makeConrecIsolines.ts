@@ -1,10 +1,14 @@
-import { FeatureCollection, Point } from 'geojson';
-import { ConrecHelper } from './ConrecHelper';
+import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
+import { ConrecHelper, ContourSettings } from './ConrecHelper';
 
-export const makeConrecIsolines = (pointGrid: FeatureCollection<Point>, options?: { zProperty?: string }) => {
-  const c = new ConrecHelper(pointGrid, options ?? {});
+export const makeConrecIsolines = (
+  pointGrid: FeatureCollection<Point>,
+  contourSettings?: ContourSettings,
+  options?: { zProperty?: string; commonProperties?: GeoJsonProperties },
+) => {
+  const { zProperty, commonProperties } = options ?? {};
 
-  const features = c.drawFeatures();
+  const c = new ConrecHelper(pointGrid, { zProperty });
 
-  return features;
+  return c.drawFeatures(contourSettings, { commonProperties });
 };

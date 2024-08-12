@@ -96,7 +96,7 @@ export const Home = () => {
       const pointGrid = mockPointGridWithZVal(formatter.writeGeometryObject(geometry));
 
       // console.log(bbox(pointGrid));
-      console.log(pointGrid);
+      // console.log(pointGrid);
 
       const splinedIsolines = makeTurfSplinedIsolines(
         { pointGrid, breaks, options: { zProperty: 'zValue' } },
@@ -104,12 +104,11 @@ export const Home = () => {
       );
       console.log({ splinedIsolines });
 
-      const conrecIsolines = makeConrecIsolines(pointGrid, { zProperty: 'zValue' });
+      const conrecIsolines = makeConrecIsolines(pointGrid, {}, { zProperty: 'zValue' });
       console.log({ conrecIsolines });
 
       // drawLayer.getSource()?.addFeatures(formatter.readFeatures(splinedIsolines));
 
-      // console.log(drawLayer.getSource()?.getFeatures());
       drawLayer.getSource()?.addFeatures(formatter.readFeatures(conrecIsolines));
 
       // mapRef.current?.addLayer(d);

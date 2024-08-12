@@ -1,13 +1,13 @@
 import { Unpacked } from '@/types';
 import { featureCollection, multiLineString } from '@turf/helpers';
-import { FeatureCollection, Point } from 'geojson';
+import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
 import { Conrec } from 'ml-conrec';
 
 export type ConrecHelperOptions = NonNullable<ConstructorParameters<typeof Conrec>[1]> & {
   zProperty?: string;
 };
 
-export type DrawFeaturesOptions = Omit<Unpacked<Parameters<Conrec['drawContour']>>, 'contourDrawer'>;
+export type ContourSettings = Omit<Unpacked<Parameters<Conrec['drawContour']>>, 'contourDrawer'>;
 
 export class ConrecHelper extends Conrec {
   matrixHelper: MatrixHelper;
@@ -23,9 +23,16 @@ export class ConrecHelper extends Conrec {
     this.options = options;
   }
 
-  drawFeatures(options?: DrawFeaturesOptions) {
-    const contour = this.drawContour({ contourDrawer: 'shape', ...options });
-    const { zProperty } = this.options;
+  drawFeatures(
+    contourSettings?: ContourSettings,
+    options?: {
+      commonProperties?: GeoJsonProperties;
+    },
+  ) {
+    const { commonProperties } = options ?? {};
+    const { zProperty = 'elevation' } = this.options;
+
+    const contour = this.drawContour({ contourDrawer: 'shape', ...contourSettings });
 
     const features = [];
 
@@ -35,7 +42,7 @@ export class ConrecHelper extends Conrec {
         return this._restoreCoordinates(x, y);
       });
 
-      const feature = multiLineString([lines], { [`${zProperty}`]: contour.contours[i].level });
+      const feature = multiLineString([lines], { [`${zProperty}`]: contour.contours[i].level, ...commonProperties });
 
       features.push(feature);
     }
@@ -91,7 +98,6 @@ class MatrixHelper {
   }
 
   private initMatrix(pointGrid: FeatureCollection<Point>, options?: { zProperty?: string }) {
-    //TODO: add sort for feature coordinates
     const features = pointGrid.features;
 
     const getXY = (index: number): [number, number] => {
