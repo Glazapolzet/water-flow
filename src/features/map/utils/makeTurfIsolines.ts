@@ -32,7 +32,7 @@ export const makeTurfSplinedIsolines: FunctionType = ({ pointGrid, breaks, optio
       newMultiline.push(splinedLineStr.geometry.coordinates);
     }
 
-    iso.features[i] = multiLineString(newMultiline);
+    iso.features[i] = multiLineString(newMultiline, iso.features[i].properties);
   }
 
   return iso;

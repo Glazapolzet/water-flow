@@ -11,6 +11,7 @@ export type DrawFeaturesOptions = Omit<Unpacked<Parameters<Conrec['drawContour']
 
 export class ConrecHelper extends Conrec {
   matrixHelper: MatrixHelper;
+  options: ConrecHelperOptions;
 
   constructor(pointGrid: FeatureCollection<Point>, options: ConrecHelperOptions) {
     const { zProperty, ...conrecOptions } = options;
@@ -18,10 +19,13 @@ export class ConrecHelper extends Conrec {
 
     super(matrixHelper.getZmatrix(), conrecOptions);
     this.matrixHelper = matrixHelper;
+
+    this.options = options;
   }
 
   drawFeatures(options?: DrawFeaturesOptions) {
     const contour = this.drawContour({ contourDrawer: 'shape', ...options });
+    const { zProperty } = this.options;
 
     const features = [];
 
@@ -31,7 +35,7 @@ export class ConrecHelper extends Conrec {
         return this._restoreCoordinates(x, y);
       });
 
-      const feature = multiLineString([lines], { zValue: contour.contours[i].level });
+      const feature = multiLineString([lines], { [`${zProperty}`]: contour.contours[i].level });
 
       features.push(feature);
     }

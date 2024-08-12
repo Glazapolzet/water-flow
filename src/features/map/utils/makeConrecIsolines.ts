@@ -6,6 +6,5 @@ export const makeConrecIsolines = (pointGrid: FeatureCollection<Point>, options?
 
   const features = c.drawFeatures();
 
-  console.log(features);
   return features;
 };

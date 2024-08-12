@@ -105,7 +105,7 @@ export const Home = () => {
       console.log({ splinedIsolines });
 
       const conrecIsolines = makeConrecIsolines(pointGrid, { zProperty: 'zValue' });
-      // console.log({ conrecIsolines });
+      console.log({ conrecIsolines });
 
       // drawLayer.getSource()?.addFeatures(formatter.readFeatures(splinedIsolines));
 
