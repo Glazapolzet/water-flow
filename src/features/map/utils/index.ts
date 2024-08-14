@@ -1,2 +1,2 @@
-export { makeConrecIsolines } from './makeConrecIsolines';
-export { makeTurfSplinedIsolines } from './makeTurfIsolines';
+export { makeConrecIsolines } from './isolines/conrec/makeConrecIsolines';
+export { makeTurfIsolines } from './isolines/turf/makeTurfIsolines';

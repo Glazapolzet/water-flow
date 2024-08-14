@@ -1,10 +1,11 @@
-import { makeConrecIsolines, makeTurfSplinedIsolines, OLGeometryTypes, OLMap } from '@/features/map';
+import { makeConrecIsolines, makeTurfIsolines, OLGeometryTypes, OLMap } from '@/features/map';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
 import { GeoJSON } from 'ol/format';
 import { Draw } from 'ol/interaction';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
+import VectorSource from 'ol/source/Vector';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { mockPointGridWithZVal, RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import { DRAW_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
@@ -22,15 +23,15 @@ export const Home = () => {
   const OTMLayer = rasterLayers.get(OTMLayerName);
   const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;
 
-  // const d = new VectorLayer({
-  //   source: new VectorSource(),
-  //   style: {
-  //     'fill-color': 'rgba(255, 255, 255, 0.0)',
-  //     'stroke-color': 'rgba(245, 75, 66, 0.7)',
-  //     'stroke-width': 1,
-  //   },
-  //   zIndex: 2,
-  // });
+  const d = new VectorLayer({
+    source: new VectorSource(),
+    style: {
+      'fill-color': 'rgba(255, 255, 255, 0.0)',
+      'stroke-color': 'rgba(245, 75, 66, 0.7)',
+      'stroke-width': 1,
+    },
+    zIndex: 2,
+  });
 
   const mapOptions = useMemo(() => {
     return {
@@ -80,8 +81,9 @@ export const Home = () => {
       setConfirmAreaButtonVisible(false);
 
       drawLayer?.getSource()?.clear();
-      // mapRef.current?.removeLayer(d);
-      // d.getSource()?.clear();
+
+      mapRef.current?.removeLayer(d);
+      d.getSource()?.clear();
     });
 
     currentDrawInteraction.on('drawend', (event: DrawEvent) => {
@@ -98,21 +100,23 @@ export const Home = () => {
       // console.log(bbox(pointGrid));
       // console.log(pointGrid);
 
-      const splinedIsolines = makeTurfSplinedIsolines(
-        { pointGrid, breaks, options: { zProperty: 'zValue' } },
-        { sharpness: 0.9 },
-      );
-      console.log({ splinedIsolines });
+      const turfIsolines = makeTurfIsolines({ pointGrid, breaks, splined: true, options: { zProperty: 'zValue' } });
+      console.log({ splinedIsolines: turfIsolines });
 
-      const conrecIsolines = makeConrecIsolines(pointGrid, {}, { zProperty: 'zValue' });
+      const conrecIsolines = makeConrecIsolines({
+        pointGrid,
+        breaks,
+        splined: false,
+        options: { zProperty: 'zValue' },
+      });
       console.log({ conrecIsolines });
 
-      // drawLayer.getSource()?.addFeatures(formatter.readFeatures(splinedIsolines));
+      drawLayer.getSource()?.addFeatures(formatter.readFeatures(turfIsolines));
 
-      drawLayer.getSource()?.addFeatures(formatter.readFeatures(conrecIsolines));
+      // drawLayer.getSource()?.addFeatures(formatter.readFeatures(conrecIsolines));
 
-      // mapRef.current?.addLayer(d);
-      // d.getSource()?.addFeatures(splinedIsolines);
+      mapRef.current?.addLayer(d);
+      d.getSource()?.addFeatures(formatter.readFeatures(conrecIsolines));
     });
   };
 
