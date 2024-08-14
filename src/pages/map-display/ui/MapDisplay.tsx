@@ -9,7 +9,8 @@ import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 import VectorSource from 'ol/source/Vector';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
-import { mockPointGridWithZVal, RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
+import { mockPointGridWithZVal } from '../utils/mockPointGrid';
+import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import { DRAW_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
 import styles from './MapDisplay.module.scss';
 
@@ -96,7 +97,7 @@ export const MapDisplay = () => {
       // console.log(geometry.getCoordinates()); //get bounds of figure
 
       const breaks = [0, 0.3, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      const pointGrid = mockPointGridWithZVal(formatter.writeGeometryObject(geometry));
+      const pointGrid = mockPointGridWithZVal(formatter.writeGeometryObject(geometry), { zProperty: 'zValue' });
 
       const turfIsolines = makeTurfIsolines({
         pointGrid,

@@ -1,4 +1,7 @@
-import { DRAW_INTERACTIONS_PROPERTIES, RASTER_LAYERS_PROPERTIES } from './properties';
+import { drawInteractions, rasterLayers } from '@/utils/map';
+
+const RASTER_LAYERS_PROPERTIES = rasterLayers.getProperties();
+const DRAW_INTERACTIONS_PROPERTIES = drawInteractions.getProperties();
 
 const layerItems = Object.values(RASTER_LAYERS_PROPERTIES).map((rasterLayerProps) => {
   return {
