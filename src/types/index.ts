@@ -1,1 +1,1 @@
-export { Unpacked as Unpacked } from './types';
+export { Unpacked } from './types';

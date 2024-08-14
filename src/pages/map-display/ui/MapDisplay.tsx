@@ -1,4 +1,6 @@
-import { makeConrecIsolines, makeTurfIsolines, OLGeometryTypes, OLMap } from '@/features/map';
+import { makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
+import { OLGeometryTypes, OLMap } from '@/features/ol-map';
+import { SettingsPanel } from '@/features/settings';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
 import { GeoJSON } from 'ol/format';
 import { Draw } from 'ol/interaction';
@@ -9,10 +11,9 @@ import VectorSource from 'ol/source/Vector';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
 import { mockPointGridWithZVal, RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import { DRAW_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
-import styles from './Home.module.scss';
-import { SettingsPanel } from './SettingsPanel/SettingsPanel';
+import styles from './MapDisplay.module.scss';
 
-export const Home = () => {
+export const MapDisplay = () => {
   const mapRef = useRef<Map | undefined>(undefined);
 
   const [isConfirmAreaButtonVisible, setConfirmAreaButtonVisible] = useState<boolean>(false);
@@ -94,14 +95,16 @@ export const Home = () => {
 
       // console.log(geometry.getCoordinates()); //get bounds of figure
 
-      const breaks = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+      const breaks = [0, 0.3, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
       const pointGrid = mockPointGridWithZVal(formatter.writeGeometryObject(geometry));
 
-      // console.log(bbox(pointGrid));
-      // console.log(pointGrid);
-
-      const turfIsolines = makeTurfIsolines({ pointGrid, breaks, splined: true, options: { zProperty: 'zValue' } });
-      console.log({ splinedIsolines: turfIsolines });
+      const turfIsolines = makeTurfIsolines({
+        pointGrid,
+        breaks,
+        splined: true,
+        options: { zProperty: 'zValue' },
+      });
+      console.log({ turfIsolines });
 
       const conrecIsolines = makeConrecIsolines({
         pointGrid,
@@ -113,15 +116,13 @@ export const Home = () => {
 
       drawLayer.getSource()?.addFeatures(formatter.readFeatures(turfIsolines));
 
-      // drawLayer.getSource()?.addFeatures(formatter.readFeatures(conrecIsolines));
-
       mapRef.current?.addLayer(d);
       d.getSource()?.addFeatures(formatter.readFeatures(conrecIsolines));
     });
   };
 
   return (
-    <section className={styles.home}>
+    <section className={styles.mapDisplay}>
       <SettingsPanel
         mapRef={mapRef}
         layerSelect={{

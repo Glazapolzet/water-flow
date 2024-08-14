@@ -2,7 +2,7 @@ import { FeatureLike } from 'ol/Feature';
 import { Draw } from 'ol/interaction';
 import { createBox, createRegularPolygon } from 'ol/interaction/Draw.js';
 import { StyleFunction } from 'ol/style/Style';
-import { DrawInteractions } from '../helpers';
+import { DrawInteractions } from '../helpers/DrawInteractions';
 import { DRAW_VECTOR_SOURCE } from '../layers/souces';
 import { DRAW_FIGURE_STYLE } from '../styles/styles';
 

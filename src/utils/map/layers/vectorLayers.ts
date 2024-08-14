@@ -1,5 +1,5 @@
 import VectorLayer from 'ol/layer/Vector';
-import { Layers } from '../helpers';
+import { Layers } from '../helpers/Layers';
 import { DRAW_VECTOR_SOURCE } from './souces';
 
 const VECTOR_LAYER_PROPERTIES = {

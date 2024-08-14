@@ -1,9 +1,9 @@
 import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
-import { makeBreaks, makeSplinedIsolines } from '../helpers';
+import { makeBreaks, makeSplinedIsolines } from '../common';
 import { ConrecHelper } from './ConrecHelper';
 
 export const makeConrecIsolines = (settings: {
-  pointGrid: FeatureCollection<Point>;
+  pointGrid: FeatureCollection<Point, GeoJsonProperties>;
   breaks?: number[];
   options?: { zProperty?: string; commonProperties?: GeoJsonProperties };
   splined?: boolean;

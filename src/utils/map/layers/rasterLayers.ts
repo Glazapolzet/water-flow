@@ -1,5 +1,5 @@
 import WebGLTileLayer from 'ol/layer/WebGLTile';
-import { Layers } from '../helpers';
+import { Layers } from '../helpers/Layers';
 import { OSM_LAYER_SOURCE, OTM_LAYER_RU_SOURCE, OTM_LAYER_SOURCE } from './souces';
 
 const RASTER_LAYER_PROPERTIES = {

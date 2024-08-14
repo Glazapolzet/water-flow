@@ -1,19 +1,14 @@
 import { Select, VisibleButton } from '@/components';
 import { Heading, Stack, StackDivider } from '@chakra-ui/react';
 import { Map } from 'ol';
-import { ChangeEvent, ComponentProps, FC, MutableRefObject } from 'react';
+import { FC, MutableRefObject } from 'react';
+import { SelectOptions } from '../../types';
 import styles from './SettingsPanel.module.scss';
-
-type SelectOpts = {
-  defaultValue?: string;
-  options: ComponentProps<'option'>[];
-  onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
-};
 
 interface SettingsPanel {
   mapRef: MutableRefObject<Map | undefined>;
-  layerSelect: SelectOpts;
-  drawSelect: SelectOpts;
+  layerSelect: SelectOptions;
+  drawSelect: SelectOptions;
   showConfirmAreaButton: boolean;
 }
 
