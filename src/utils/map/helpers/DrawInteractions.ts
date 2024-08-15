@@ -3,7 +3,7 @@ import { Interactions, Options as InteractionsOptions } from './Interactions';
 
 type Options = InteractionsOptions;
 
-export class DrawInteractions extends Interactions {
+export class DrawInteractions extends Interactions<Draw> {
   constructor(drawInteractions: Draw[], options?: Options) {
     super(drawInteractions, options);
   }

@@ -6,6 +6,7 @@ import { GeoJSON } from 'ol/format';
 import { Draw } from 'ol/interaction';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
+import WebGLTileLayer from 'ol/layer/WebGLTile';
 import Map from 'ol/Map.js';
 import VectorSource from 'ol/source/Vector';
 import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
@@ -23,7 +24,7 @@ export const MapDisplay = () => {
   const drawLayerName: string = VECTOR_LAYERS_PROPERTIES.draw.name;
 
   const OTMLayer = rasterLayers.get(OTMLayerName);
-  const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;
+  const drawLayer = drawLayers.get(drawLayerName);
 
   const d = new VectorLayer({
     source: new VectorSource(),
@@ -46,7 +47,7 @@ export const MapDisplay = () => {
   const handleMapMount = useCallback((map: Map) => {
     mapRef.current = map;
 
-    interactions.getArray().forEach((interaction) => map.addInteraction(interaction));
+    interactions.addInteractions(map, interactions.getArray());
 
     // map.on('click', (event) => {
     //   const clickedCoordinate = event.coordinate;
@@ -55,31 +56,31 @@ export const MapDisplay = () => {
   }, []);
 
   const handleLayerSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    rasterLayers.getArray().forEach((layer) => {
-      layer.getProperties()?.name === event.target.value
-        ? mapRef.current?.addLayer(layer)
-        : mapRef.current?.removeLayer(layer);
-    });
+    if (!mapRef.current) {
+      return;
+    }
+    rasterLayers.removeLayers(mapRef.current, rasterLayers.getArray());
+
+    if (!event.target.value || !rasterLayers.get(event.target.value)) {
+      return;
+    }
+    const currentLayer = rasterLayers.get(event.target.value) as WebGLTileLayer;
+    rasterLayers.addLayers(mapRef.current, [currentLayer]);
   };
 
   const handleDrawSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    if (!event.target.value) {
-      drawInteractions.getArray().forEach((drawInteraction) => {
-        mapRef.current?.removeInteraction(drawInteraction);
-      });
-
+    if (!mapRef.current) {
       return;
     }
+    drawInteractions.removeInteractions(mapRef.current, drawInteractions.getArray());
 
-    drawInteractions.getArray().forEach((drawInteraction) => {
-      drawInteraction.getProperties()?.name === event.target.value
-        ? mapRef.current?.addInteraction(drawInteraction)
-        : mapRef.current?.removeInteraction(drawInteraction);
-    });
+    if (!event.target.value || !drawInteractions.get(event.target.value)) {
+      return;
+    }
+    const currentDraw = drawInteractions.get(event.target.value) as Draw;
+    drawInteractions.addInteractions(mapRef.current, [currentDraw]);
 
-    const currentDrawInteraction = drawInteractions.get(event.target.value) as Draw;
-
-    currentDrawInteraction.on('drawstart', () => {
+    currentDraw.on('drawstart', () => {
       setConfirmAreaButtonVisible(false);
 
       drawLayer?.getSource()?.clear();
@@ -88,16 +89,16 @@ export const MapDisplay = () => {
       d.getSource()?.clear();
     });
 
-    currentDrawInteraction.on('drawend', (event: DrawEvent) => {
+    currentDraw.on('drawend', (event: DrawEvent) => {
       setConfirmAreaButtonVisible(true);
 
       const geometry = event?.feature.getGeometry() as OLGeometryTypes;
-      const formatter = new GeoJSON();
+      const geojson = new GeoJSON();
 
       // console.log(geometry.getCoordinates()); //get bounds of figure
 
       const breaks = [0, 0.3, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      const pointGrid = mockPointGridWithZVal(formatter.writeGeometryObject(geometry), { zProperty: 'zValue' });
+      const pointGrid = mockPointGridWithZVal(geojson.writeGeometryObject(geometry), { zProperty: 'zValue' });
 
       const turfIsolines = makeTurfIsolines({
         pointGrid,
@@ -115,10 +116,10 @@ export const MapDisplay = () => {
       });
       console.log({ conrecIsolines });
 
-      drawLayer.getSource()?.addFeatures(formatter.readFeatures(turfIsolines));
+      drawLayer?.getSource()?.addFeatures(geojson.readFeatures(turfIsolines));
 
       mapRef.current?.addLayer(d);
-      d.getSource()?.addFeatures(formatter.readFeatures(conrecIsolines));
+      d.getSource()?.addFeatures(geojson.readFeatures(conrecIsolines));
     });
   };
 

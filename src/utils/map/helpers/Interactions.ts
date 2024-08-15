@@ -1,46 +1,27 @@
+import { Map } from 'ol';
 import Interaction from 'ol/interaction/Interaction';
 import { PropertiedCollection, Options as PropertiedCollectionOptions } from './PropertiedCollection';
 
 export type Options = PropertiedCollectionOptions;
 
-export class Interactions extends PropertiedCollection<Interaction> {
-  interactions: Interaction[];
+export class Interactions<T extends Interaction> extends PropertiedCollection<T> {
+  interactions: T[];
 
-  constructor(interactions: Interaction[], options?: Options) {
+  constructor(interactions: T[], options?: Options) {
     super(interactions, options);
 
     this.interactions = interactions;
   }
 
-  get(name?: string) {
-    if (!name) {
-      return this.interactions;
-    }
-
+  get(name: string) {
     return this.interactions.find((interaction) => interaction.getProperties()?.name === name);
   }
 
-  // addInteractions(map: Map, names: string[]) {
-  //   const interactions = names.map((name) => this.get(name) as Interaction | undefined);
+  addInteractions(map: Map, interactions: T[]) {
+    interactions.forEach((interaction) => map.addInteraction(interaction));
+  }
 
-  //   interactions.forEach((interaction) => {
-  //     if (!interaction) {
-  //       return;
-  //     }
-
-  //     map.addInteraction(interaction);
-  //   });
-  // }
-
-  // removeInteractions(map: Map, names: string[]) {
-  //   const interactions = names.map((name) => this.get(name) as Interaction | undefined);
-
-  //   interactions.forEach((interaction) => {
-  //     if (!interaction) {
-  //       return;
-  //     }
-
-  //     map.removeInteraction(interaction);
-  //   });
-  // }
+  removeInteractions(map: Map, interactions: T[]) {
+    interactions.forEach((interaction) => map.removeInteraction(interaction));
+  }
 }
