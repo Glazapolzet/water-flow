@@ -11,6 +11,14 @@ const layerItems = Object.values(RASTER_LAYERS_PROPERTIES).map((rasterLayerProps
   };
 });
 
+const drawItems = Object.values(DRAW_INTERACTIONS_PROPERTIES).map((drawInteractionProps) => {
+  return {
+    id: drawInteractionProps.name,
+    value: drawInteractionProps.name,
+    children: drawInteractionProps.name,
+  };
+});
+
 export const LAYER_SELECT_OPTIONS = [
   {
     id: 'Select layer',
@@ -21,15 +29,7 @@ export const LAYER_SELECT_OPTIONS = [
   ...layerItems,
 ];
 
-const drawItems = Object.values(DRAW_INTERACTIONS_PROPERTIES).map((drawInteractionProps) => {
-  return {
-    id: drawInteractionProps.name,
-    value: drawInteractionProps.name,
-    children: drawInteractionProps.name,
-  };
-});
-
-export const DRAW_SELECT_OPTIONS = [
+export const FIGURE_SELECT_OPTIONS = [
   {
     id: 'Select figure',
     disabled: true,
@@ -42,4 +42,23 @@ export const DRAW_SELECT_OPTIONS = [
     children: 'none',
   },
   ...drawItems,
+];
+
+export const ISOLINE_SELECT_OPTIONS = [
+  {
+    id: 'Select isoline type',
+    disabled: true,
+    value: '',
+    children: 'Select isoline type',
+  },
+  {
+    id: 'turf',
+    value: 'turf',
+    children: 'turf',
+  },
+  {
+    id: 'conrec',
+    value: 'conrec',
+    children: 'CONREC',
+  },
 ];

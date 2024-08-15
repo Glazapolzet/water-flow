@@ -6,35 +6,69 @@ import { GeoJSON } from 'ol/format';
 import { Draw } from 'ol/interaction';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
-import WebGLTileLayer from 'ol/layer/WebGLTile';
 import Map from 'ol/Map.js';
-import VectorSource from 'ol/source/Vector';
-import { ChangeEvent, useCallback, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { clearLayerSource } from '../utils/drawEvents';
 import { mockPointGridWithZVal } from '../utils/mockPointGrid';
 import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
-import { DRAW_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
+import { FIGURE_SELECT_OPTIONS, ISOLINE_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
   const mapRef = useRef<Map | undefined>(undefined);
 
-  const [isConfirmAreaButtonVisible, setConfirmAreaButtonVisible] = useState<boolean>(false);
+  const [isConfirmButtonVisible, setIsConfirmButtonVisible] = useState<boolean>(false);
+  const [isolinesType, setIsolinesType] = useState<string | undefined>(undefined);
+  const [isIsolineSplined, setIsolineSplined] = useState<boolean>(false);
+  const [currentDraw, setCurrentDraw] = useState<Draw | undefined>(undefined);
 
   const OTMLayerName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
   const drawLayerName: string = VECTOR_LAYERS_PROPERTIES.draw.name;
 
   const OTMLayer = rasterLayers.get(OTMLayerName);
-  const drawLayer = drawLayers.get(drawLayerName);
+  const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;
 
-  const d = new VectorLayer({
-    source: new VectorSource(),
-    style: {
-      'fill-color': 'rgba(255, 255, 255, 0.0)',
-      'stroke-color': 'rgba(245, 75, 66, 0.7)',
-      'stroke-width': 1,
-    },
-    zIndex: 2,
-  });
+  const handleDrawStart = () => {
+    setIsConfirmButtonVisible(false);
+
+    clearLayerSource(drawLayer);
+  };
+
+  const handleDrawEnd = (drawEvent: DrawEvent) => {
+    setIsConfirmButtonVisible(true);
+
+    const geometry = drawEvent?.feature.getGeometry() as OLGeometryTypes;
+    const geojson = new GeoJSON();
+
+    if (!isolinesType) {
+      return;
+    }
+
+    // console.log(geometry.getCoordinates()); //get bounds of figure
+    console.log({ isolinesType, getInteractions: mapRef.current?.getInteractions() });
+
+    const breaks = [0, 0.3, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const pointGrid = mockPointGridWithZVal(geojson.writeGeometryObject(geometry), { zProperty: 'zValue' });
+    const isolineSettings = { pointGrid, breaks, splined: isIsolineSplined, options: { zProperty: 'zValue' } };
+
+    const isolines = isolinesType === 'turf' ? makeTurfIsolines(isolineSettings) : makeConrecIsolines(isolineSettings);
+
+    drawLayer?.getSource()?.addFeatures(geojson.readFeatures(isolines));
+  };
+
+  useEffect(() => {
+    if (!currentDraw) {
+      return;
+    }
+
+    currentDraw.on('drawstart', handleDrawStart);
+    currentDraw.on('drawend', handleDrawEnd);
+
+    return () => {
+      currentDraw.un('drawstart', handleDrawStart);
+      currentDraw.un('drawend', handleDrawEnd);
+    };
+  }, [currentDraw, isIsolineSplined, isolinesType]);
 
   const mapOptions = useMemo(() => {
     return {
@@ -47,7 +81,7 @@ export const MapDisplay = () => {
   const handleMapMount = useCallback((map: Map) => {
     mapRef.current = map;
 
-    interactions.addInteractions(map, interactions.getArray());
+    interactions.getArray().forEach((interaction) => map.addInteraction(interaction));
 
     // map.on('click', (event) => {
     //   const clickedCoordinate = event.coordinate;
@@ -55,72 +89,53 @@ export const MapDisplay = () => {
     // });
   }, []);
 
-  const handleLayerSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    if (!mapRef.current) {
-      return;
-    }
-    rasterLayers.removeLayers(mapRef.current, rasterLayers.getArray());
-
-    if (!event.target.value || !rasterLayers.get(event.target.value)) {
-      return;
-    }
-    const currentLayer = rasterLayers.get(event.target.value) as WebGLTileLayer;
-    rasterLayers.addLayers(mapRef.current, [currentLayer]);
+  const handleLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    rasterLayers.getArray().forEach((layer) => {
+      layer.getProperties()?.name === event.target.value
+        ? mapRef.current?.addLayer(layer)
+        : mapRef.current?.removeLayer(layer);
+    });
   };
 
-  const handleDrawSelectChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    if (!mapRef.current) {
-      return;
-    }
-    drawInteractions.removeInteractions(mapRef.current, drawInteractions.getArray());
+  const handleFigureChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    drawInteractions.getArray().forEach((draw) => {
+      draw.getProperties()?.name === event.target.value
+        ? mapRef.current?.addInteraction(draw)
+        : mapRef.current?.removeInteraction(draw);
+    });
 
-    if (!event.target.value || !drawInteractions.get(event.target.value)) {
-      return;
-    }
     const currentDraw = drawInteractions.get(event.target.value) as Draw;
-    drawInteractions.addInteractions(mapRef.current, [currentDraw]);
 
-    currentDraw.on('drawstart', () => {
-      setConfirmAreaButtonVisible(false);
+    if (!currentDraw) {
+      return;
+    }
 
-      drawLayer?.getSource()?.clear();
+    currentDraw.un('drawstart', handleDrawStart);
+    currentDraw.un('drawend', handleDrawEnd);
 
-      mapRef.current?.removeLayer(d);
-      d.getSource()?.clear();
-    });
+    setCurrentDraw(currentDraw);
+  };
 
-    currentDraw.on('drawend', (event: DrawEvent) => {
-      setConfirmAreaButtonVisible(true);
+  const handleIsolinesTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
+    if (currentDraw) {
+      currentDraw.un('drawstart', handleDrawStart);
+      currentDraw.un('drawend', handleDrawEnd);
+    }
 
-      const geometry = event?.feature.getGeometry() as OLGeometryTypes;
-      const geojson = new GeoJSON();
+    setIsolinesType(event.target.value);
+  };
 
-      // console.log(geometry.getCoordinates()); //get bounds of figure
+  const handleSplineChange = () => {
+    if (currentDraw) {
+      currentDraw.un('drawstart', handleDrawStart);
+      currentDraw.un('drawend', handleDrawEnd);
+    }
 
-      const breaks = [0, 0.3, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-      const pointGrid = mockPointGridWithZVal(geojson.writeGeometryObject(geometry), { zProperty: 'zValue' });
+    setIsolineSplined(!isIsolineSplined);
+  };
 
-      const turfIsolines = makeTurfIsolines({
-        pointGrid,
-        breaks,
-        splined: true,
-        options: { zProperty: 'zValue' },
-      });
-      console.log({ turfIsolines });
-
-      const conrecIsolines = makeConrecIsolines({
-        pointGrid,
-        breaks,
-        splined: false,
-        options: { zProperty: 'zValue' },
-      });
-      console.log({ conrecIsolines });
-
-      drawLayer?.getSource()?.addFeatures(geojson.readFeatures(turfIsolines));
-
-      mapRef.current?.addLayer(d);
-      d.getSource()?.addFeatures(geojson.readFeatures(conrecIsolines));
-    });
+  const handleConfirmButtonClick = () => {
+    return;
   };
 
   return (
@@ -128,16 +143,31 @@ export const MapDisplay = () => {
       <SettingsPanel
         mapRef={mapRef}
         layerSelect={{
+          heading: 'Active layer',
           defaultValue: OTMLayerName,
           options: LAYER_SELECT_OPTIONS,
-          onChange: handleLayerSelectChange,
+          onChange: handleLayerChange,
         }}
-        drawSelect={{
+        figureSelect={{
+          heading: 'Selection type',
           defaultValue: '',
-          options: DRAW_SELECT_OPTIONS,
-          onChange: handleDrawSelectChange,
+          options: FIGURE_SELECT_OPTIONS,
+          onChange: handleFigureChange,
         }}
-        showConfirmAreaButton={isConfirmAreaButtonVisible}
+        isolineSelect={{
+          heading: 'Isoline method',
+          defaultValue: '',
+          options: ISOLINE_SELECT_OPTIONS,
+          onChange: handleIsolinesTypeChange,
+          splineCheckbox: {
+            onChange: handleSplineChange,
+            isChecked: isIsolineSplined,
+          },
+        }}
+        confirmButton={{
+          onClick: handleConfirmButtonClick,
+          isVisible: isConfirmButtonVisible,
+        }}
       />
 
       <OLMap options={mapOptions} onMount={handleMapMount} />

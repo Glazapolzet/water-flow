@@ -1,4 +1,3 @@
-import { Map } from 'ol';
 import Interaction from 'ol/interaction/Interaction';
 import { PropertiedCollection, Options as PropertiedCollectionOptions } from './PropertiedCollection';
 
@@ -15,13 +14,5 @@ export class Interactions<T extends Interaction> extends PropertiedCollection<T>
 
   get(name: string) {
     return this.interactions.find((interaction) => interaction.getProperties()?.name === name);
-  }
-
-  addInteractions(map: Map, interactions: T[]) {
-    interactions.forEach((interaction) => map.addInteraction(interaction));
-  }
-
-  removeInteractions(map: Map, interactions: T[]) {
-    interactions.forEach((interaction) => map.removeInteraction(interaction));
   }
 }

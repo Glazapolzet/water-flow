@@ -1,4 +1,3 @@
-import { Map } from 'ol';
 import BaseLayer from 'ol/layer/Base';
 import { PropertiedCollection, Options as PropertiedCollectionOptions } from './PropertiedCollection';
 
@@ -15,13 +14,5 @@ export class Layers<T extends BaseLayer> extends PropertiedCollection<T> {
 
   get(name: string) {
     return this.layers.find((layer) => layer.getProperties()?.name === name);
-  }
-
-  addLayers(map: Map, layers: T[]) {
-    layers.forEach((layer) => map.addLayer(layer));
-  }
-
-  removeLayers(map: Map, layers: T[]) {
-    layers.forEach((layer) => map.removeLayer(layer));
   }
 }

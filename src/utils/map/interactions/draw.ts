@@ -6,7 +6,7 @@ import { DrawInteractions } from '../helpers/DrawInteractions';
 import { DRAW_VECTOR_SOURCE } from '../layers/souces';
 import { DRAW_FIGURE_STYLE } from '../styles/styles';
 
-const DRAW_INTERACTION_PROPERTIES = {
+const properties = {
   square: {
     name: 'square',
   },
@@ -27,21 +27,21 @@ const square = new Draw({
   type: 'Circle',
   geometryFunction: createRegularPolygon(4, (45 * Math.PI) / 180),
   snapTolerance: 5,
-  geometryName: DRAW_INTERACTION_PROPERTIES.square.name,
+  geometryName: properties.square.name,
   style: styled,
 });
 
-square.setProperties(DRAW_INTERACTION_PROPERTIES.square);
+square.setProperties(properties.square);
 
 const box = new Draw({
   source: DRAW_VECTOR_SOURCE,
   type: 'Circle',
   geometryFunction: createBox(),
   snapTolerance: 5,
-  geometryName: DRAW_INTERACTION_PROPERTIES.box.name,
+  geometryName: properties.box.name,
   style: styled,
 });
 
-box.setProperties(DRAW_INTERACTION_PROPERTIES.box);
+box.setProperties(properties.box);
 
 export const drawInteractions = new DrawInteractions([square, box]);

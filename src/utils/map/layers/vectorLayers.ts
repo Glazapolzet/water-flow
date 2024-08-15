@@ -2,7 +2,7 @@ import VectorLayer from 'ol/layer/Vector';
 import { Layers } from '../helpers/Layers';
 import { DRAW_VECTOR_SOURCE } from './souces';
 
-const VECTOR_LAYER_PROPERTIES = {
+const properties = {
   draw: {
     name: 'draw',
   },
@@ -16,7 +16,7 @@ const drawLayer = new VectorLayer({
     'stroke-width': 2,
   },
   zIndex: 1,
-  properties: VECTOR_LAYER_PROPERTIES.draw,
+  properties: properties.draw,
 });
 
 export const drawLayers = new Layers([drawLayer]);

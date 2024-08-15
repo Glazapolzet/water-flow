@@ -21,7 +21,5 @@ export const makeTurfIsolines = (settings: {
   const breaks = defaultBreaks ? defaultBreaks : makeBreaks(pointGrid, { zProperty: options?.zProperty });
   const iso = isolines(pointGrid, breaks, options);
 
-  console.log({ breaks: makeBreaks(pointGrid, { zProperty: options?.zProperty }) });
-
   return splined ? makeSplinedIsolines(iso, splineOptions) : iso;
 };
