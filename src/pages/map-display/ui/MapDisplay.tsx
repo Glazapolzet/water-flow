@@ -1,27 +1,21 @@
-import { makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
 import { OLGeometryTypes, OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
-import bbox from '@turf/bbox';
-import bboxPolygon from '@turf/bbox-polygon';
-import { GeoJSON } from 'ol/format';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { clearLayerSource } from '../utils/drawEvents';
-import { mockPointGridWithZVal } from '../utils/mockPointGrid';
+import { clearLayerSource, drawIsolines, IsolinesType } from '../utils/helpers';
 import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
-import { FIGURE_SELECT_OPTIONS, ISOLINE_SELECT_OPTIONS, LAYER_SELECT_OPTIONS } from '../utils/settings';
+import { ISOLINE_TYPE_SELECT_OPTIONS, LAYER_SELECT_OPTIONS, SELECTION_TYPE_SELECT_OPTIONS } from '../utils/settings';
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
   const mapRef = useRef<Map | undefined>(undefined);
 
   const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
-  const [isolinesType, setIsolinesType] = useState<string | undefined>(undefined);
-  const [isIsolineSplined, setIsolineSplined] = useState<boolean>(false);
-
+  const [isolinesType, setIsolinesType] = useState<IsolinesType | undefined>(undefined);
+  const [isIsolinesSplined, setIsolinesSplined] = useState<boolean>(false);
   const [geometry, setGeometry] = useState<OLGeometryTypes | undefined>(undefined);
 
   const OTMLayerName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
@@ -80,76 +74,63 @@ export const MapDisplay = () => {
     });
   };
 
-  const handleSelectionFigureChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleSelectionTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
     drawInteractions.getArray().forEach((draw) => {
       draw.getProperties()?.name !== event.target.value
         ? mapRef.current?.removeInteraction(draw)
         : mapRef.current?.addInteraction(draw);
-      // setCurrentDraw(drawInteractions.get(event.target.value) as Draw);
     });
   };
 
   const handleIsolinesTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setIsolinesType(event.target.value);
+    setIsolinesType(event.target.value as IsolinesType);
   };
 
   const handleSplineChange = () => {
-    setIsolineSplined(!isIsolineSplined);
+    setIsolinesSplined(!isIsolinesSplined);
   };
 
   const handleConfirmButtonClick = () => {
-    const geojson = new GeoJSON();
-
     if (!isolinesType || !geometry) {
       return;
     }
 
     clearLayerSource(drawLayer);
-
+    drawIsolines(drawLayer, geometry, { isolinesType, isIsolinesSplined, bboxWrap: true });
     // console.log(geometry.getCoordinates()); //get bounds of figure
-    const geometryJSON = geojson.writeGeometryObject(geometry);
-
-    const breaks = [0, 0.3, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const pointGrid = mockPointGridWithZVal(geometryJSON, { zProperty: 'zValue' });
-    const isolineSettings = { pointGrid, breaks, splined: isIsolineSplined, options: { zProperty: 'zValue' } };
-
-    const isolines = isolinesType === 'turf' ? makeTurfIsolines(isolineSettings) : makeConrecIsolines(isolineSettings);
-
-    console.log({ bbox: bboxPolygon(bbox(pointGrid)), geometryJSON });
-
-    drawLayer?.getSource()?.addFeatures(geojson.readFeatures(bboxPolygon(bbox(isolines))));
-    drawLayer?.getSource()?.addFeatures(geojson.readFeatures(isolines));
   };
 
   return (
     <section className={styles.mapDisplay}>
       <SettingsPanel
         mapRef={mapRef}
-        layerSelect={{
+        layer={{
           heading: 'Active layer',
           defaultValue: OTMLayerName,
           options: LAYER_SELECT_OPTIONS,
           onChange: handleLayerChange,
         }}
-        figureSelect={{
+        selectionType={{
           heading: 'Selection type',
           defaultValue: '',
-          options: FIGURE_SELECT_OPTIONS,
-          onChange: handleSelectionFigureChange,
+          options: SELECTION_TYPE_SELECT_OPTIONS,
+          onChange: handleSelectionTypeChange,
         }}
-        isolineSelect={{
+        isolinesType={{
           heading: 'Isoline method',
           defaultValue: '',
-          options: ISOLINE_SELECT_OPTIONS,
+          options: ISOLINE_TYPE_SELECT_OPTIONS,
           onChange: handleIsolinesTypeChange,
           splineCheckbox: {
+            heading: 'Spline isolines',
             onChange: handleSplineChange,
-            isChecked: isIsolineSplined,
+            isChecked: isIsolinesSplined,
           },
         }}
         confirmButton={{
+          heading: 'Calculate selected area',
           onClick: handleConfirmButtonClick,
-          isVisible: isDrawEnd,
+          isVisible: isDrawEnd && !!isolinesType,
         }}
       />
 

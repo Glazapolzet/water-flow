@@ -7,14 +7,16 @@ export type SelectOptions = {
   onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
 };
 
-export type IsolineSelectOptions = SelectOptions & {
+export type IsolinesSelectOptions = SelectOptions & {
   splineCheckbox: {
+    heading: string;
     onChange: (event: ChangeEvent<HTMLInputElement>) => void;
     isChecked: boolean;
   };
 };
 
 export type ConfirmButtonOptions = {
+  heading: string;
   isVisible: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 };

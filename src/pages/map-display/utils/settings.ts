@@ -1,7 +1,7 @@
-import { drawInteractions, rasterLayers } from '@/utils/map';
+import { IsolinesType } from './helpers';
+import { DRAW_INTERACTIONS_PROPERTIES, RASTER_LAYERS_PROPERTIES } from './properties';
 
-const RASTER_LAYERS_PROPERTIES = rasterLayers.getProperties();
-const DRAW_INTERACTIONS_PROPERTIES = drawInteractions.getProperties();
+const ISOLINES_TYPE_OPTIONS: IsolinesType[] = ['turf', 'conrec'];
 
 const layerItems = Object.values(RASTER_LAYERS_PROPERTIES).map((rasterLayerProps) => {
   return {
@@ -11,11 +11,19 @@ const layerItems = Object.values(RASTER_LAYERS_PROPERTIES).map((rasterLayerProps
   };
 });
 
-const drawItems = Object.values(DRAW_INTERACTIONS_PROPERTIES).map((drawInteractionProps) => {
+const selectionItems = Object.values(DRAW_INTERACTIONS_PROPERTIES).map((drawInteractionProps) => {
   return {
     id: drawInteractionProps.name,
     value: drawInteractionProps.name,
     children: drawInteractionProps.name,
+  };
+});
+
+const isolinesItems = ISOLINES_TYPE_OPTIONS.map((option) => {
+  return {
+    id: option,
+    value: option,
+    children: option.toUpperCase(),
   };
 });
 
@@ -29,36 +37,27 @@ export const LAYER_SELECT_OPTIONS = [
   ...layerItems,
 ];
 
-export const FIGURE_SELECT_OPTIONS = [
+export const SELECTION_TYPE_SELECT_OPTIONS = [
   {
-    id: 'Select figure',
+    id: 'Select selection area type',
     disabled: true,
     value: '',
-    children: 'Select figure',
+    children: 'Select selection area type',
   },
   {
     id: 'none',
     value: '',
     children: 'none',
   },
-  ...drawItems,
+  ...selectionItems,
 ];
 
-export const ISOLINE_SELECT_OPTIONS = [
+export const ISOLINE_TYPE_SELECT_OPTIONS = [
   {
     id: 'Select isoline type',
     disabled: true,
     value: '',
     children: 'Select isoline type',
   },
-  {
-    id: 'turf',
-    value: 'turf',
-    children: 'turf',
-  },
-  {
-    id: 'conrec',
-    value: 'conrec',
-    children: 'CONREC',
-  },
+  ...isolinesItems,
 ];

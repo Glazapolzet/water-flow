@@ -7,14 +7,14 @@ import styles from './SettingsPanel.module.scss';
 
 interface SettingsPanel {
   mapRef: MutableRefObject<Map | undefined>;
-  layerSelect: SelectOptions;
-  figureSelect: SelectOptions;
-  isolineSelect: IsolineSelectOptions;
+  layer: SelectOptions;
+  selectionType: SelectOptions;
+  isolinesType: IsolineSelectOptions;
   confirmButton: ConfirmButtonOptions;
 }
 
-export const SettingsPanel: FC<SettingsPanel> = ({ layerSelect, figureSelect, isolineSelect, confirmButton }) => {
-  const selectItems = [layerSelect, figureSelect, isolineSelect];
+export const SettingsPanel: FC<SettingsPanel> = ({ layer, selectionType, isolinesType, confirmButton }) => {
+  const selectItems = [layer, selectionType, isolinesType];
 
   return (
     <Stack align={'start'} direction={'column'} divider={<StackDivider borderColor={'gray.500'} />}>
@@ -42,10 +42,10 @@ export const SettingsPanel: FC<SettingsPanel> = ({ layerSelect, figureSelect, is
 
         <Checkbox
           colorScheme="teal"
-          onChange={isolineSelect.splineCheckbox.onChange}
-          isChecked={isolineSelect.splineCheckbox.isChecked}
+          onChange={isolinesType.splineCheckbox.onChange}
+          isChecked={isolinesType.splineCheckbox.isChecked}
         >
-          Spline isolines
+          {isolinesType.splineCheckbox.heading}
         </Checkbox>
 
         <VisibleButton
@@ -55,7 +55,7 @@ export const SettingsPanel: FC<SettingsPanel> = ({ layerSelect, figureSelect, is
           isVisible={confirmButton.isVisible}
           onClick={confirmButton.onClick}
         >
-          Calculate selected area
+          {confirmButton.heading}
         </VisibleButton>
       </Stack>
     </Stack>
