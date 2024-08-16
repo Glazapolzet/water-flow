@@ -2,8 +2,9 @@ import { makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
 import { OLGeometryTypes, OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
+import bbox from '@turf/bbox';
+import bboxPolygon from '@turf/bbox-polygon';
 import { GeoJSON } from 'ol/format';
-import { Draw } from 'ol/interaction';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
@@ -17,10 +18,11 @@ import styles from './MapDisplay.module.scss';
 export const MapDisplay = () => {
   const mapRef = useRef<Map | undefined>(undefined);
 
-  const [isConfirmButtonVisible, setIsConfirmButtonVisible] = useState<boolean>(false);
+  const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
   const [isolinesType, setIsolinesType] = useState<string | undefined>(undefined);
   const [isIsolineSplined, setIsolineSplined] = useState<boolean>(false);
-  const [currentDraw, setCurrentDraw] = useState<Draw | undefined>(undefined);
+
+  const [geometry, setGeometry] = useState<OLGeometryTypes | undefined>(undefined);
 
   const OTMLayerName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
   const drawLayerName: string = VECTOR_LAYERS_PROPERTIES.draw.name;
@@ -28,47 +30,28 @@ export const MapDisplay = () => {
   const OTMLayer = rasterLayers.get(OTMLayerName);
   const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;
 
-  const handleDrawStart = () => {
-    setIsConfirmButtonVisible(false);
-
+  const handleDrawStart = (_drawEvent: DrawEvent) => {
+    setIsDrawEnd(false);
     clearLayerSource(drawLayer);
   };
 
   const handleDrawEnd = (drawEvent: DrawEvent) => {
-    setIsConfirmButtonVisible(true);
-
-    const geometry = drawEvent?.feature.getGeometry() as OLGeometryTypes;
-    const geojson = new GeoJSON();
-
-    if (!isolinesType) {
-      return;
-    }
-
-    // console.log(geometry.getCoordinates()); //get bounds of figure
-    console.log({ isolinesType, getInteractions: mapRef.current?.getInteractions() });
-
-    const breaks = [0, 0.3, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    const pointGrid = mockPointGridWithZVal(geojson.writeGeometryObject(geometry), { zProperty: 'zValue' });
-    const isolineSettings = { pointGrid, breaks, splined: isIsolineSplined, options: { zProperty: 'zValue' } };
-
-    const isolines = isolinesType === 'turf' ? makeTurfIsolines(isolineSettings) : makeConrecIsolines(isolineSettings);
-
-    drawLayer?.getSource()?.addFeatures(geojson.readFeatures(isolines));
+    setIsDrawEnd(true);
+    setGeometry(drawEvent?.feature.getGeometry() as OLGeometryTypes);
   };
 
   useEffect(() => {
-    if (!currentDraw) {
-      return;
-    }
+    drawInteractions.getArray().forEach((draw) => {
+      draw.on('drawstart', handleDrawStart);
+      draw.on('drawend', handleDrawEnd);
+    });
 
-    currentDraw.on('drawstart', handleDrawStart);
-    currentDraw.on('drawend', handleDrawEnd);
-
-    return () => {
-      currentDraw.un('drawstart', handleDrawStart);
-      currentDraw.un('drawend', handleDrawEnd);
-    };
-  }, [currentDraw, isIsolineSplined, isolinesType]);
+    return () =>
+      drawInteractions.getArray().forEach((draw) => {
+        draw.un('drawstart', handleDrawStart);
+        draw.un('drawend', handleDrawEnd);
+      });
+  }, []);
 
   const mapOptions = useMemo(() => {
     return {
@@ -91,51 +74,51 @@ export const MapDisplay = () => {
 
   const handleLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
     rasterLayers.getArray().forEach((layer) => {
-      layer.getProperties()?.name === event.target.value
-        ? mapRef.current?.addLayer(layer)
-        : mapRef.current?.removeLayer(layer);
+      layer.getProperties()?.name !== event.target.value
+        ? mapRef.current?.removeLayer(layer)
+        : mapRef.current?.addLayer(layer);
     });
   };
 
-  const handleFigureChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleSelectionFigureChange = (event: ChangeEvent<HTMLSelectElement>) => {
     drawInteractions.getArray().forEach((draw) => {
-      draw.getProperties()?.name === event.target.value
-        ? mapRef.current?.addInteraction(draw)
-        : mapRef.current?.removeInteraction(draw);
+      draw.getProperties()?.name !== event.target.value
+        ? mapRef.current?.removeInteraction(draw)
+        : mapRef.current?.addInteraction(draw);
+      // setCurrentDraw(drawInteractions.get(event.target.value) as Draw);
     });
-
-    const currentDraw = drawInteractions.get(event.target.value) as Draw;
-
-    if (!currentDraw) {
-      return;
-    }
-
-    currentDraw.un('drawstart', handleDrawStart);
-    currentDraw.un('drawend', handleDrawEnd);
-
-    setCurrentDraw(currentDraw);
   };
 
   const handleIsolinesTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    if (currentDraw) {
-      currentDraw.un('drawstart', handleDrawStart);
-      currentDraw.un('drawend', handleDrawEnd);
-    }
-
     setIsolinesType(event.target.value);
   };
 
   const handleSplineChange = () => {
-    if (currentDraw) {
-      currentDraw.un('drawstart', handleDrawStart);
-      currentDraw.un('drawend', handleDrawEnd);
-    }
-
     setIsolineSplined(!isIsolineSplined);
   };
 
   const handleConfirmButtonClick = () => {
-    return;
+    const geojson = new GeoJSON();
+
+    if (!isolinesType || !geometry) {
+      return;
+    }
+
+    clearLayerSource(drawLayer);
+
+    // console.log(geometry.getCoordinates()); //get bounds of figure
+    const geometryJSON = geojson.writeGeometryObject(geometry);
+
+    const breaks = [0, 0.3, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+    const pointGrid = mockPointGridWithZVal(geometryJSON, { zProperty: 'zValue' });
+    const isolineSettings = { pointGrid, breaks, splined: isIsolineSplined, options: { zProperty: 'zValue' } };
+
+    const isolines = isolinesType === 'turf' ? makeTurfIsolines(isolineSettings) : makeConrecIsolines(isolineSettings);
+
+    console.log({ bbox: bboxPolygon(bbox(pointGrid)), geometryJSON });
+
+    drawLayer?.getSource()?.addFeatures(geojson.readFeatures(bboxPolygon(bbox(isolines))));
+    drawLayer?.getSource()?.addFeatures(geojson.readFeatures(isolines));
   };
 
   return (
@@ -152,7 +135,7 @@ export const MapDisplay = () => {
           heading: 'Selection type',
           defaultValue: '',
           options: FIGURE_SELECT_OPTIONS,
-          onChange: handleFigureChange,
+          onChange: handleSelectionFigureChange,
         }}
         isolineSelect={{
           heading: 'Isoline method',
@@ -166,7 +149,7 @@ export const MapDisplay = () => {
         }}
         confirmButton={{
           onClick: handleConfirmButtonClick,
-          isVisible: isConfirmButtonVisible,
+          isVisible: isDrawEnd,
         }}
       />
 
