@@ -1,5 +1,6 @@
 {
   "name": "water-flow",
+  "homepage": "https://github.com/Glazapolzet/water-flow",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

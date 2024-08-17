@@ -4,6 +4,6 @@ const MapDisplay = lazy(() => import('@/pages/map-display'));
 
 export const appRoutes: RouteObject = {
   id: 'i',
-  path: '/',
+  path: '/water-flow/',
   element: <MapDisplay />,
 };

@@ -44,6 +44,7 @@ const vitePluginPWA = () =>
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), eslint(), vitePluginPWA()],
+  base: '/water-flow/',
   server: {
     host: '0.0.0.0',
     port: parseInt(PORT, 10),
