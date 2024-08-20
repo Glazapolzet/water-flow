@@ -8,13 +8,13 @@ import styles from './SettingsPanel.module.scss';
 interface SettingsPanel {
   mapRef: MutableRefObject<Map | undefined>;
   layer: SelectOptions;
-  selectionType: SelectOptions;
-  isolinesType: IsolineSelectOptions;
+  selection: SelectOptions;
+  isolines: IsolineSelectOptions;
   confirmButton: ConfirmButtonOptions;
 }
 
-export const SettingsPanel: FC<SettingsPanel> = ({ layer, selectionType, isolinesType, confirmButton }) => {
-  const selectItems = [layer, selectionType, isolinesType];
+export const SettingsPanel: FC<SettingsPanel> = ({ layer, selection, isolines, confirmButton }) => {
+  const selectItems = [layer, selection, isolines];
 
   return (
     <Stack align={'start'} direction={'column'} divider={<StackDivider borderColor={'gray.500'} />}>
@@ -42,10 +42,10 @@ export const SettingsPanel: FC<SettingsPanel> = ({ layer, selectionType, isoline
 
         <Checkbox
           colorScheme="teal"
-          onChange={isolinesType.splineCheckbox.onChange}
-          isChecked={isolinesType.splineCheckbox.isChecked}
+          onChange={isolines.splineCheckbox.onChange}
+          isChecked={isolines.splineCheckbox.isChecked}
         >
-          {isolinesType.splineCheckbox.heading}
+          {isolines.splineCheckbox.heading}
         </Checkbox>
 
         <VisibleButton

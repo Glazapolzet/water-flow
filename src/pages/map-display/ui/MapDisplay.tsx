@@ -110,13 +110,13 @@ export const MapDisplay = () => {
           options: LAYER_SELECT_OPTIONS,
           onChange: handleLayerChange,
         }}
-        selectionType={{
+        selection={{
           heading: 'Selection type',
           defaultValue: '',
           options: SELECTION_TYPE_SELECT_OPTIONS,
           onChange: handleSelectionTypeChange,
         }}
-        isolinesType={{
+        isolines={{
           heading: 'Isoline method',
           defaultValue: '',
           options: ISOLINE_TYPE_SELECT_OPTIONS,
