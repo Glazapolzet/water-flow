@@ -1,4 +1,4 @@
-import { makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
+import { IsolinesTypeLiteral, makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
 import { OLGeometryTypes } from '@/features/ol-map';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
@@ -10,13 +10,11 @@ export const clearLayerSource = (layer: VectorLayer) => {
   layer?.getSource()?.clear();
 };
 
-export type IsolinesType = 'turf' | 'conrec';
-
 export const drawIsolines = (
   layer: VectorLayer,
   geometry: OLGeometryTypes,
   options?: {
-    isolinesType?: IsolinesType;
+    isolinesType?: IsolinesTypeLiteral;
     isIsolinesSplined?: boolean;
     bboxWrap?: boolean;
   },

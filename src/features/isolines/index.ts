@@ -1,2 +1,2 @@
-export { makeConrecIsolines } from './utils/conrec/makeConrecIsolines';
-export { makeTurfIsolines } from './utils/turf/makeTurfIsolines';
+export type { IsolinesTypeLiteral } from './types';
+export { makeConrecIsolines, makeTurfIsolines } from './utils';

@@ -17,6 +17,7 @@ const properties = {
 
 const styled: StyleFunction = (feature: FeatureLike) => {
   const geometryType = feature.getGeometry()?.getType();
+
   if (geometryType === 'Polygon' || geometryType === 'Circle' || geometryType === 'Point') {
     return DRAW_FIGURE_STYLE;
   }

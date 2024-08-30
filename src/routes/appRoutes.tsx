@@ -3,7 +3,7 @@ import { RouteObject } from 'react-router-dom';
 const MapDisplay = lazy(() => import('@/pages/map-display'));
 
 export const appRoutes: RouteObject = {
-  id: 'i',
+  id: 'map',
   path: '/water-flow/',
   element: <MapDisplay />,
 };

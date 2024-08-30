@@ -1,3 +1,4 @@
+import { IsolinesTypeLiteral } from '@/features/isolines';
 import { OLGeometryTypes, OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
@@ -5,7 +6,7 @@ import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { clearLayerSource, drawIsolines, IsolinesType } from '../utils/helpers';
+import { clearLayerSource, drawIsolines } from '../utils/helpers';
 import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import { ISOLINE_TYPE_SELECT_OPTIONS, LAYER_SELECT_OPTIONS, SELECTION_TYPE_SELECT_OPTIONS } from '../utils/settings';
 import styles from './MapDisplay.module.scss';
@@ -14,7 +15,7 @@ export const MapDisplay = () => {
   const mapRef = useRef<Map | undefined>(undefined);
 
   const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
-  const [isolinesType, setIsolinesType] = useState<IsolinesType | undefined>(undefined);
+  const [isolinesType, setIsolinesType] = useState<IsolinesTypeLiteral | undefined>(undefined);
   const [isIsolinesSplined, setIsolinesSplined] = useState<boolean>(false);
   const [geometry, setGeometry] = useState<OLGeometryTypes | undefined>(undefined);
 
@@ -83,7 +84,7 @@ export const MapDisplay = () => {
   };
 
   const handleIsolinesTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setIsolinesType(event.target.value as IsolinesType);
+    setIsolinesType(event.target.value as IsolinesTypeLiteral);
   };
 
   const handleSplineChange = () => {

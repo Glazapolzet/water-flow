@@ -7,7 +7,7 @@ export type SelectOptions = {
   onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
 };
 
-export type IsolinesSelectOptions = SelectOptions & {
+export type IsolineSelectOptions = SelectOptions & {
   splineCheckbox: {
     heading: string;
     onChange: (event: ChangeEvent<HTMLInputElement>) => void;

@@ -1,7 +1,7 @@
-import { IsolinesType } from './helpers';
+import { IsolinesTypeLiteral } from '@/features/isolines';
 import { DRAW_INTERACTIONS_PROPERTIES, RASTER_LAYERS_PROPERTIES } from './properties';
 
-const ISOLINES_TYPE_OPTIONS: IsolinesType[] = ['turf', 'conrec'];
+const ISOLINES_TYPE_OPTIONS: IsolinesTypeLiteral[] = ['turf', 'conrec'];
 
 const layerItems = Object.values(RASTER_LAYERS_PROPERTIES).map((rasterLayerProps) => {
   return {
