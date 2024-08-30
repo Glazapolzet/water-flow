@@ -4,8 +4,8 @@ import { Conrec } from 'ml-conrec';
 import { MatrixHelper } from './MatrixHelper';
 
 export class ConrecHelper extends Conrec {
-  matrixHelper: MatrixHelper;
-  options: {
+  private matrixHelper: MatrixHelper;
+  private options: {
     zProperty?: string;
   };
 
