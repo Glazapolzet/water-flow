@@ -1,1 +1,0 @@
-export { OLGeometryTypes } from './types';

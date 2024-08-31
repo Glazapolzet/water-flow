@@ -1,1 +1,1 @@
-export { Unpacked } from './types';
+export { GeoJSONBBoxLikeGeometry, OLBBoxLikeGeometry, Unpacked } from './types';

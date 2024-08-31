@@ -1,6 +1,7 @@
 import { IsolinesTypeLiteral } from '@/features/isolines';
-import { OLGeometryTypes, OLMap } from '@/features/ol-map';
+import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings';
+import { OLBBoxLikeGeometry } from '@/types';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
@@ -17,7 +18,7 @@ export const MapDisplay = () => {
   const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
   const [isolinesType, setIsolinesType] = useState<IsolinesTypeLiteral | undefined>(undefined);
   const [isIsolinesSplined, setIsolinesSplined] = useState<boolean>(false);
-  const [geometry, setGeometry] = useState<OLGeometryTypes | undefined>(undefined);
+  const [geometry, setGeometry] = useState<OLBBoxLikeGeometry | undefined>(undefined);
 
   const OTMLayerName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
   const drawLayerName: string = VECTOR_LAYERS_PROPERTIES.draw.name;
@@ -32,7 +33,7 @@ export const MapDisplay = () => {
 
   const handleDrawEnd = (drawEvent: DrawEvent) => {
     setIsDrawEnd(true);
-    setGeometry(drawEvent?.feature.getGeometry() as OLGeometryTypes);
+    setGeometry(drawEvent?.feature.getGeometry() as OLBBoxLikeGeometry);
   };
 
   useEffect(() => {

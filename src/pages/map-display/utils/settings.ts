@@ -23,7 +23,7 @@ const isolinesItems = ISOLINES_TYPE_OPTIONS.map((option) => {
   return {
     id: option,
     value: option,
-    children: option.toUpperCase(),
+    children: option,
   };
 });
 
