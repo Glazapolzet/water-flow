@@ -1,1 +1,1 @@
-export type { ConfirmButtonOptions, IsolineSelectOptions, SelectOptions } from './types';
+export type { CheckboxOptions, ConfirmButtonOptions, SelectOptions } from './types';

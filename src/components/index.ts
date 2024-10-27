@@ -1,3 +1,3 @@
-export { Loader } from './Loader/Loader';
-export { Select } from './Select/Select';
-export { VisibleButton } from './VisibleButton/VisibleButton';
+export { CustomButton } from './CustomButton/CustomButton';
+export { CustomSelect } from './CustomSelect/CustomSelect';
+export { CustomSpinner } from './CustomSpinner/CustomSpinner';

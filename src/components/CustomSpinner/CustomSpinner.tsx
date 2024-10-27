@@ -1,8 +1,8 @@
 import { Spinner } from '@chakra-ui/react';
 import { FC } from 'react';
-import styles from './Loader.module.scss';
+import styles from './CustomSpinner.module.scss';
 
-export const Loader: FC = () => {
+export const CustomSpinner: FC = () => {
   return (
     <Spinner
       thickness="4px"

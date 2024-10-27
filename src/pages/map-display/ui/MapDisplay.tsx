@@ -8,8 +8,8 @@ import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { clearLayerSource, drawIsolines } from '../utils/helpers';
+import { ACTIVE_LAYER_OPTIONS, ISOLINES_TYPE_OPTIONS, SELECTION_AREA_OPTIONS } from '../utils/options';
 import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
-import { ISOLINE_TYPE_SELECT_OPTIONS, LAYER_SELECT_OPTIONS, SELECTION_TYPE_SELECT_OPTIONS } from '../utils/settings';
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
@@ -17,7 +17,7 @@ export const MapDisplay = () => {
 
   const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
   const [isolinesType, setIsolinesType] = useState<IsolinesTypeLiteral | undefined>(undefined);
-  const [isIsolinesSplined, setIsolinesSplined] = useState<boolean>(false);
+  const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
   const [geometry, setGeometry] = useState<OLBBoxLikeGeometry | undefined>(undefined);
 
   const OTMLayerName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
@@ -68,7 +68,7 @@ export const MapDisplay = () => {
     // });
   }, []);
 
-  const handleLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleActiveLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
     rasterLayers.getArray().forEach((layer) => {
       layer.getProperties()?.name !== event.target.value
         ? mapRef.current?.removeLayer(layer)
@@ -76,7 +76,7 @@ export const MapDisplay = () => {
     });
   };
 
-  const handleSelectionTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
+  const handleSelectionAreaChange = (event: ChangeEvent<HTMLSelectElement>) => {
     drawInteractions.getArray().forEach((draw) => {
       draw.getProperties()?.name !== event.target.value
         ? mapRef.current?.removeInteraction(draw)
@@ -88,8 +88,8 @@ export const MapDisplay = () => {
     setIsolinesType(event.target.value as IsolinesTypeLiteral);
   };
 
-  const handleSplineChange = () => {
-    setIsolinesSplined(!isIsolinesSplined);
+  const handleSplineIsolinesChange = () => {
+    setIsIsolinesSplined(!isIsolinesSplined);
   };
 
   const handleConfirmButtonClick = () => {
@@ -106,33 +106,33 @@ export const MapDisplay = () => {
     <section className={styles.mapDisplay}>
       <SettingsPanel
         mapRef={mapRef}
-        layer={{
+        activeLayer={{
           heading: 'Active layer',
           defaultValue: OTMLayerName,
-          options: LAYER_SELECT_OPTIONS,
-          onChange: handleLayerChange,
+          options: ACTIVE_LAYER_OPTIONS,
+          onChange: handleActiveLayerChange,
         }}
-        selection={{
-          heading: 'Selection type',
+        isolinesType={{
+          heading: 'Isolines type',
           defaultValue: '',
-          options: SELECTION_TYPE_SELECT_OPTIONS,
-          onChange: handleSelectionTypeChange,
-        }}
-        isolines={{
-          heading: 'Isoline method',
-          defaultValue: '',
-          options: ISOLINE_TYPE_SELECT_OPTIONS,
+          options: ISOLINES_TYPE_OPTIONS,
           onChange: handleIsolinesTypeChange,
-          splineCheckbox: {
-            heading: 'Spline isolines',
-            onChange: handleSplineChange,
-            isChecked: isIsolinesSplined,
-          },
+        }}
+        selectionArea={{
+          heading: 'Selection area type',
+          defaultValue: '',
+          options: SELECTION_AREA_OPTIONS,
+          onChange: handleSelectionAreaChange,
+        }}
+        splineIsolines={{
+          title: 'Spline isolines',
+          isChecked: isIsolinesSplined,
+          onChange: handleSplineIsolinesChange,
         }}
         confirmButton={{
           heading: 'Calculate selected area',
-          onClick: handleConfirmButtonClick,
           isVisible: isDrawEnd && !!isolinesType,
+          onClick: handleConfirmButtonClick,
         }}
       />
 

@@ -1,21 +1,30 @@
-import { Select, VisibleButton } from '@/components';
-import { Checkbox, Heading, Stack, StackDivider } from '@chakra-ui/react';
+import { CustomButton } from '@/components';
+import { Heading, Stack, StackDivider } from '@chakra-ui/react';
 import { Map } from 'ol';
 import { FC, MutableRefObject } from 'react';
-import { ConfirmButtonOptions, IsolineSelectOptions, SelectOptions } from '../../types';
+import { CheckboxOptions, ConfirmButtonOptions, SelectOptions } from '../../types';
+import { ActiveLayerSelect } from '../ActiveLayerSelect/ActiveLayerSelect';
+import { IsolinesTypeSelect } from '../IsolinesTypeSelect/IsolinesTypeSelect';
+import { SelectionAreaSelect } from '../SelectionAreaSelect/SelectionAreaSelect';
+import { SplineIsolinesCheckbox } from '../SplineIsolinesCheckbox/SplineIsolinesCheckbox';
 import styles from './SettingsPanel.module.scss';
 
 interface SettingsPanel {
   mapRef: MutableRefObject<Map | undefined>;
-  layer: SelectOptions;
-  selection: SelectOptions;
-  isolines: IsolineSelectOptions;
+  activeLayer: SelectOptions;
+  isolinesType: SelectOptions;
+  selectionArea: SelectOptions;
+  splineIsolines: CheckboxOptions;
   confirmButton: ConfirmButtonOptions;
 }
 
-export const SettingsPanel: FC<SettingsPanel> = ({ layer, selection, isolines, confirmButton }) => {
-  const selectItems = [layer, selection, isolines];
-
+export const SettingsPanel: FC<SettingsPanel> = ({
+  activeLayer,
+  isolinesType,
+  selectionArea,
+  splineIsolines,
+  confirmButton,
+}) => {
   return (
     <Stack align={'start'} direction={'column'} divider={<StackDivider borderColor={'gray.500'} />}>
       <Heading as={'h2'} size={'lg'}>
@@ -23,32 +32,34 @@ export const SettingsPanel: FC<SettingsPanel> = ({ layer, selection, isolines, c
       </Heading>
 
       <Stack spacing={5} direction={'column'} className={styles.optionsContainer}>
-        {selectItems.map((item, index) => (
-          <Stack spacing={2} key={index}>
-            <Heading as={'h4'} size={'md'}>
-              {item.heading}
-            </Heading>
-            <Select
-              borderColor={'gray.500'}
-              borderWidth={'1px'}
-              options={item.options}
-              size={'md'}
-              variant={'filled'}
-              defaultValue={item.defaultValue ?? ''}
-              onChange={item.onChange}
-            />
-          </Stack>
-        ))}
+        <ActiveLayerSelect
+          heading={activeLayer.heading}
+          options={activeLayer.options}
+          onChange={activeLayer.onChange}
+          defaultValue={activeLayer.defaultValue ?? ''}
+        />
 
-        <Checkbox
-          colorScheme="teal"
-          onChange={isolines.splineCheckbox.onChange}
-          isChecked={isolines.splineCheckbox.isChecked}
-        >
-          {isolines.splineCheckbox.heading}
-        </Checkbox>
+        <IsolinesTypeSelect
+          heading={isolinesType.heading}
+          options={isolinesType.options}
+          onChange={isolinesType.onChange}
+          defaultValue={isolinesType.defaultValue ?? ''}
+        />
 
-        <VisibleButton
+        <SelectionAreaSelect
+          heading={selectionArea.heading}
+          options={selectionArea.options}
+          onChange={selectionArea.onChange}
+          defaultValue={selectionArea.defaultValue ?? ''}
+        />
+
+        <SplineIsolinesCheckbox
+          title={splineIsolines.title}
+          onChange={splineIsolines.onChange}
+          isChecked={splineIsolines.isChecked}
+        />
+
+        <CustomButton
           colorScheme={'teal'}
           opacity={'1'}
           bgColor={'teal.200'}
@@ -56,7 +67,7 @@ export const SettingsPanel: FC<SettingsPanel> = ({ layer, selection, isolines, c
           onClick={confirmButton.onClick}
         >
           {confirmButton.heading}
-        </VisibleButton>
+        </CustomButton>
       </Stack>
     </Stack>
   );

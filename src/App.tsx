@@ -2,11 +2,11 @@ import { Suspense } from 'react';
 
 import '@/theme';
 
-import { Loader } from '@/components';
+import { CustomSpinner } from '@/components';
 import Router from '@/routes';
 
 const App = () => (
-  <Suspense fallback={<Loader />}>
+  <Suspense fallback={<CustomSpinner />}>
     <Router />
   </Suspense>
 );
