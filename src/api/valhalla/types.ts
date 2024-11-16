@@ -21,7 +21,7 @@ export interface TElevationResponse {
   shape?: LonLatCoordinates[];
   encoded_polyline?: string;
   range_height?: [x: Range, y: Height][];
-  height?: [Height][];
+  height: [Height][];
   warnings?: unknown;
 }
 

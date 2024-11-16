@@ -1,13 +1,14 @@
 import { IsolinesTypeLiteral } from '@/features/isolines';
 import { OLMap } from '@/features/ol-map';
-import { SettingsPanel } from '@/features/settings';
+import { SettingsPanel } from '@/features/settings-panel';
 import { OLBBoxLikeGeometry } from '@/types';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { clearLayerSource, drawIsolines } from '../utils/helpers';
+import { clearLayerSource } from '../utils/helpers/clearLayerSource';
+import { drawIsolines } from '../utils/helpers/drawIsolines';
 import { ACTIVE_LAYER_OPTIONS, ISOLINES_TYPE_OPTIONS, SELECTION_AREA_OPTIONS } from '../utils/options';
 import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import styles from './MapDisplay.module.scss';
@@ -100,6 +101,7 @@ export const MapDisplay = () => {
     clearLayerSource(drawLayer);
     drawIsolines(drawLayer, geometry, { isolinesType, isIsolinesSplined, bboxWrap: true });
     // console.log(geometry.getCoordinates()); //get bounds of figure
+    // console.log(geometry.getExtent());
   };
 
   return (

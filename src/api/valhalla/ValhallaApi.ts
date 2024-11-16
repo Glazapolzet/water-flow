@@ -1,17 +1,11 @@
 import { Api } from '../Api';
 import { TElevationError } from './types';
 
-const API_BASE_URL = 'https://valhalla1.openstreetmap.de';
-
-const headers = {
-  'Content-Type': 'application/json',
-};
-
 const isResponseError = <S, E extends TElevationError>(res: S | E): res is E => {
   return (res as E).error_code !== undefined;
 };
 
-class ValhallaApi extends Api {
+export class ValhallaApi extends Api {
   constructor(baseUrl: string, headers: HeadersInit) {
     super(baseUrl, headers);
   }
@@ -32,5 +26,3 @@ class ValhallaApi extends Api {
     return data;
   }
 }
-
-export const apiInstance = new ValhallaApi(API_BASE_URL, headers);

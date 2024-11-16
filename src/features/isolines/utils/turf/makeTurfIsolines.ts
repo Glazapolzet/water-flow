@@ -3,7 +3,7 @@ import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
 import { makeBreaks, makeSplinedIsolines } from '../common';
 
 export const makeTurfIsolines = (settings: {
-  pointGrid: FeatureCollection<Point, GeoJsonProperties>;
+  points: FeatureCollection<Point, GeoJsonProperties>;
   breaks?: number[];
   options?: {
     zProperty?: string;
@@ -16,10 +16,11 @@ export const makeTurfIsolines = (settings: {
     sharpness?: number;
   };
 }) => {
-  const { pointGrid, breaks: defaultBreaks, options, splined = false, splineOptions } = settings;
+  const { points, breaks: defaultBreaks, options, splined = false, splineOptions } = settings;
+  console.log({ POINTS: points });
 
-  const breaks = defaultBreaks ? defaultBreaks : makeBreaks(pointGrid, { zProperty: options?.zProperty });
-  const iso = isolines(pointGrid, breaks, options);
+  const breaks = defaultBreaks ? defaultBreaks : makeBreaks();
+  const iso = isolines(points, breaks, options);
 
   return splined ? makeSplinedIsolines(iso, splineOptions) : iso;
 };

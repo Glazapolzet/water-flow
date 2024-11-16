@@ -1,6 +1,6 @@
 import bezierSpline from '@turf/bezier-spline';
 import { lineString, multiLineString } from '@turf/helpers';
-import { FeatureCollection, GeoJsonProperties, MultiLineString, Point } from 'geojson';
+import { FeatureCollection, GeoJsonProperties, MultiLineString } from 'geojson';
 
 export const makeSplinedIsolines = (
   isolines: FeatureCollection<MultiLineString, GeoJsonProperties>,
@@ -26,18 +26,28 @@ export const makeSplinedIsolines = (
   return isolines;
 };
 
-export const makeBreaks = (
-  pointGrid: FeatureCollection<Point, GeoJsonProperties>,
-  options?: { zProperty?: string },
-) => {
+export const makeBreaks = () => {
   const breaks: number[] = [];
-  const { zProperty } = options ?? {};
 
-  for (let i = 0; i < pointGrid.features.length; i++) {
-    breaks.push(
-      zProperty ? pointGrid.features[i].properties?.[`${zProperty}`] : pointGrid.features[i].geometry.coordinates?.[2],
-    );
+  for (let br = 30; br < 9000; br += 30) {
+    breaks.push(br);
   }
 
-  return breaks.sort((a, b) => a - b);
+  return breaks;
 };
+
+// export const makeBreaks = (
+//   pointGrid: FeatureCollection<Point, GeoJsonProperties>,
+//   options?: { zProperty?: string },
+// ) => {
+//   const breaks: number[] = [];
+//   const { zProperty } = options ?? {};
+
+//   for (let i = 0; i < pointGrid.features.length; i++) {
+//     breaks.push(
+//       zProperty ? pointGrid.features[i].properties?.[`${zProperty}`] : pointGrid.features[i].geometry.coordinates?.[2],
+//     );
+//   }
+
+//   return breaks.sort((a, b) => a - b);
+// };

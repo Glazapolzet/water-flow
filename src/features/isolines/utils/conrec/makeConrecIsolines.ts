@@ -3,7 +3,7 @@ import { makeBreaks, makeSplinedIsolines } from '../common';
 import { ConrecHelper } from './ConrecHelper';
 
 export const makeConrecIsolines = (settings: {
-  pointGrid: FeatureCollection<Point, GeoJsonProperties>;
+  points: FeatureCollection<Point, GeoJsonProperties>;
   breaks?: number[];
   options?: { zProperty?: string; commonProperties?: GeoJsonProperties };
   splined?: boolean;
@@ -13,10 +13,10 @@ export const makeConrecIsolines = (settings: {
   };
   timeout?: number;
 }) => {
-  const { pointGrid, breaks: defaultBreaks, options, splined = false, splineOptions, timeout } = settings;
+  const { points, breaks: defaultBreaks, options, splined = false, splineOptions, timeout } = settings;
   const { zProperty, commonProperties } = options ?? {};
 
-  const breaks = defaultBreaks ? defaultBreaks : makeBreaks(pointGrid, { zProperty: options?.zProperty });
+  const breaks = defaultBreaks ? defaultBreaks : makeBreaks();
 
   const contourSettings = {
     levels: breaks,
@@ -24,7 +24,7 @@ export const makeConrecIsolines = (settings: {
     timeout,
   };
 
-  const c = new ConrecHelper(pointGrid, { zProperty });
+  const c = new ConrecHelper(points, { zProperty });
   const iso = c.drawFeatures(contourSettings, { commonProperties });
 
   return splined ? makeSplinedIsolines(iso, splineOptions) : iso;
