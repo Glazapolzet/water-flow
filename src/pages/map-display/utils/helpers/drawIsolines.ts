@@ -31,7 +31,7 @@ const makePointsWithZ = async (geoJSON: GeoJSONBBoxLikeGeometry, options: { zPro
   const { zProperty } = options;
 
   const bb = bbox(geoJSON);
-  const points = pointGrid(bb, 1000);
+  const points = pointGrid(bb, 90);
 
   const lonLatList = makeLonLatList(points, { zProperty });
   const mappedData = makeValhallaMappings(lonLatList);
