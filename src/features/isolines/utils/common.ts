@@ -26,10 +26,11 @@ export const makeSplinedIsolines = (
   return isolines;
 };
 
-export const makeBreaks = () => {
+export const makeBreaks = (breaksDelta: number) => {
+  const MAX_EARTH_HEIGHT = 9999;
   const breaks: number[] = [];
 
-  for (let br = 30; br < 9000; br += 30) {
+  for (let br = breaksDelta; br < MAX_EARTH_HEIGHT; br += breaksDelta) {
     breaks.push(br);
   }
 

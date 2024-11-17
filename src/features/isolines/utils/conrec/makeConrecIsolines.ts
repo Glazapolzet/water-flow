@@ -5,7 +5,8 @@ import { ConrecHelper } from './ConrecHelper';
 export const makeConrecIsolines = (settings: {
   points: FeatureCollection<Point, GeoJsonProperties>;
   breaks?: number[];
-  options?: { zProperty?: string; commonProperties?: GeoJsonProperties };
+  breaksDelta?: number;
+  isolinesOptions?: { zProperty?: string; commonProperties?: GeoJsonProperties };
   splined?: boolean;
   splineOptions?: {
     resolution?: number;
@@ -13,10 +14,18 @@ export const makeConrecIsolines = (settings: {
   };
   timeout?: number;
 }) => {
-  const { points, breaks: defaultBreaks, options, splined = false, splineOptions, timeout } = settings;
-  const { zProperty, commonProperties } = options ?? {};
+  const {
+    points,
+    breaks: defaultBreaks,
+    breaksDelta = 90,
+    isolinesOptions,
+    splined = false,
+    splineOptions,
+    timeout,
+  } = settings;
+  const { zProperty, commonProperties } = isolinesOptions ?? {};
 
-  const breaks = defaultBreaks ? defaultBreaks : makeBreaks();
+  const breaks = defaultBreaks ? defaultBreaks : makeBreaks(breaksDelta);
 
   const contourSettings = {
     levels: breaks,

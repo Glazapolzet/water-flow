@@ -27,27 +27,48 @@ const makeLonLatList = (points: FeatureCollection<Point, GeoJsonProperties>, opt
   return lonLatList;
 };
 
-const makePointsWithZ = async (geoJSON: GeoJSONBBoxLikeGeometry, options: { zProperty: string }) => {
-  const { zProperty } = options;
-
+const makePointsFromBBox = (geoJSON: GeoJSONBBoxLikeGeometry, pointsDelta: number) => {
   const bb = bbox(geoJSON);
-  const points = pointGrid(bb, 90);
+  if (geoJSON.type === 'MultiLineString') {
+    return pointGrid(bb, pointsDelta, { units: 'kilometers' });
+  }
+
+  console.log(bb);
+
+  return pointGrid(bb, pointsDelta, { units: 'kilometers' });
+};
+
+const getPointsElevationData = async (
+  points: FeatureCollection<Point, GeoJsonProperties>,
+  options: { zProperty: string },
+) => {
+  const { zProperty } = options;
 
   const lonLatList = makeLonLatList(points, { zProperty });
   const mappedData = makeValhallaMappings(lonLatList);
 
   const elevationData = await vallhalaApi.getElevation(mappedData);
 
-  //нужно переписать на async await все взаимодействия с вальхаллой
-  for (let i = 0; i < points.features.length; i++) {
-    if (points.features[i].properties?.[`${zProperty}`]) {
+  return elevationData;
+};
+
+const makePointsWithZValues = (
+  points: FeatureCollection<Point, GeoJsonProperties>,
+  ZValues: [number | null][],
+  options: { zProperty: string },
+) => {
+  const { zProperty } = options;
+  const pointsWithZ = JSON.parse(JSON.stringify(points));
+
+  for (let i = 0; i < pointsWithZ.features.length; i++) {
+    if (pointsWithZ.features[i].properties?.[`${zProperty}`]) {
       continue;
     }
 
-    points.features[i].properties![`${zProperty}`] = elevationData.height[i];
+    pointsWithZ.features[i].properties![`${zProperty}`] = ZValues[i];
   }
 
-  return points;
+  return pointsWithZ;
 };
 
 export const drawIsolines = async (
@@ -65,9 +86,9 @@ export const drawIsolines = async (
   const g = new GeoJSON();
   const geoJSON = g.writeGeometryObject(geometry) as GeoJSONBBoxLikeGeometry;
 
-  // const breaks = [0, 100, 200, 1000, 2000, 3000, 4000, 5000];
-
-  const pointsWithZ = await makePointsWithZ(geoJSON, { zProperty: Z_PROPERTY_NAME });
+  const points = makePointsFromBBox(geoJSON, 200);
+  const elevationData = await getPointsElevationData(points, { zProperty: Z_PROPERTY_NAME });
+  const pointsWithZ = makePointsWithZValues(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });
   // const pointsMock = makeMockPointsWithZ(geoJSON, { zProperty: Z_PROPERTY_NAME });
 
   // console.log({ pointsMock });
@@ -77,8 +98,9 @@ export const drawIsolines = async (
 
   const isolineSettings = {
     points: pointsWithZ,
+    breaksDelta: 10,
     splined: isIsolinesSplined,
-    options: { zProperty: Z_PROPERTY_NAME },
+    isolinesOptions: { zProperty: Z_PROPERTY_NAME },
   };
 
   let isolines;
@@ -98,7 +120,7 @@ export const drawIsolines = async (
   //     points: pointsMock,
   //     breaks,
   //     splined: isIsolinesSplined,
-  //     options: { zProperty: Z_PROPERTY_NAME },
+  //     isolinesOptions: { zProperty: Z_PROPERTY_NAME },
   //   }),
   // });
 
