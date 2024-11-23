@@ -1,2 +1,2 @@
 export { clearLayerSource } from './helpers/clearLayerSource';
-export { drawIsolines } from './helpers/drawIsolines';
+export { makeIsolines as drawIsolines } from './helpers/makeIsolines';

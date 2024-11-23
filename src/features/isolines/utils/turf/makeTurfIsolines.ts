@@ -18,7 +18,6 @@ export const makeTurfIsolines = (settings: {
   };
 }) => {
   const { points, breaks: defaultBreaks, breaksDelta = 90, isolinesOptions, splined = false, splineOptions } = settings;
-  console.log({ POINTS: points });
 
   const breaks = defaultBreaks ? defaultBreaks : makeBreaks(breaksDelta);
   const iso = isolines(points, breaks, isolinesOptions);

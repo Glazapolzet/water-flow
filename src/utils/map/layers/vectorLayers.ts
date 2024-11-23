@@ -1,5 +1,6 @@
 import VectorLayer from 'ol/layer/Vector';
 import { Layers } from '../helpers/Layers';
+import { baseStyle } from '../styles/styles';
 import { DRAW_VECTOR_SOURCE } from './souces';
 
 const properties = {
@@ -10,11 +11,7 @@ const properties = {
 
 const drawLayer = new VectorLayer({
   source: DRAW_VECTOR_SOURCE,
-  style: {
-    'fill-color': 'rgba(255, 255, 255, 0.5)',
-    'stroke-color': 'rgba(35, 78, 82, 0.7)',
-    'stroke-width': 2,
-  },
+  style: baseStyle,
   zIndex: 1,
   properties: properties.draw,
 });

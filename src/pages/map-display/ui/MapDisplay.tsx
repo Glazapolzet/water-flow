@@ -3,18 +3,20 @@ import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
 import { OLBBoxLikeGeometry } from '@/types';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
+import { GeoJSON } from 'ol/format';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { clearLayerSource } from '../utils/helpers/clearLayerSource';
-import { drawIsolines } from '../utils/helpers/drawIsolines';
+import { makeIsolines, makePointsFromBBox } from '../utils/helpers/makeIsolines';
 import { ACTIVE_LAYER_OPTIONS, ISOLINES_TYPE_OPTIONS, SELECTION_AREA_OPTIONS } from '../utils/options';
 import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
   const mapRef = useRef<Map | undefined>(undefined);
+  const g = new GeoJSON();
 
   const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
   const [isolinesType, setIsolinesType] = useState<IsolinesTypeLiteral | undefined>(undefined);
@@ -34,7 +36,15 @@ export const MapDisplay = () => {
 
   const handleDrawEnd = (drawEvent: DrawEvent) => {
     setIsDrawEnd(true);
-    setGeometry(drawEvent?.feature.getGeometry() as OLBBoxLikeGeometry);
+
+    const geometry = drawEvent?.feature.getGeometry() as OLBBoxLikeGeometry;
+
+    setGeometry(geometry);
+
+    //TEST
+    const points = makePointsFromBBox(geometry.getExtent(), 20, { units: 'meters' });
+
+    drawLayer?.getSource()?.addFeatures(g.readFeatures(points));
   };
 
   useEffect(() => {
@@ -99,9 +109,9 @@ export const MapDisplay = () => {
     }
 
     clearLayerSource(drawLayer);
-    drawIsolines(drawLayer, geometry, { isolinesType, isIsolinesSplined, bboxWrap: true });
-    // console.log(geometry.getCoordinates()); //get bounds of figure
-    // console.log(geometry.getExtent());
+
+    const points = makePointsFromBBox(geometry.getExtent(), 20, { units: 'meters' });
+    makeIsolines(drawLayer, points, isolinesType, { isIsolinesSplined, bboxWrap: true });
   };
 
   return (

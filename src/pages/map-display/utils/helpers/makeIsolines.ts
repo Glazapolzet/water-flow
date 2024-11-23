@@ -1,10 +1,11 @@
 import { vallhalaApi } from '@/api/valhalla';
 import { IsolinesTypeLiteral, makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
-import { GeoJSONBBoxLikeGeometry, OLBBoxLikeGeometry } from '@/types';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
+import { Units } from '@turf/helpers';
 import pointGrid from '@turf/point-grid';
-import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
+import { toMercator } from '@turf/projection';
+import { Feature, FeatureCollection, GeoJsonProperties, MultiPolygon, Point, Polygon } from 'geojson';
 import { GeoJSON } from 'ol/format';
 import VectorLayer from 'ol/layer/Vector';
 import { toLonLat } from 'ol/proj';
@@ -27,15 +28,23 @@ const makeLonLatList = (points: FeatureCollection<Point, GeoJsonProperties>, opt
   return lonLatList;
 };
 
-const makePointsFromBBox = (geoJSON: GeoJSONBBoxLikeGeometry, pointsDelta: number) => {
-  const bb = bbox(geoJSON);
-  if (geoJSON.type === 'MultiLineString') {
-    return pointGrid(bb, pointsDelta, { units: 'kilometers' });
-  }
+export const makePointsFromBBox = (
+  bbox: [number, number, number, number] | number[],
+  cellSide: number,
+  options?:
+    | {
+        units?: Units;
+        mask?: Feature<Polygon | MultiPolygon>;
+        properties?: GeoJsonProperties | undefined;
+      }
+    | undefined,
+) => {
+  const [x1, y1] = toLonLat([bbox[0], bbox[1]]) as [number, number];
+  const [x2, y2] = toLonLat([bbox[2], bbox[3]]) as [number, number];
 
-  console.log(bb);
+  const bb_lonlat: [number, number, number, number] = [x1, y1, x2, y2];
 
-  return pointGrid(bb, pointsDelta, { units: 'kilometers' });
+  return toMercator(pointGrid(bb_lonlat, cellSide, options));
 };
 
 const getPointsElevationData = async (
@@ -47,12 +56,10 @@ const getPointsElevationData = async (
   const lonLatList = makeLonLatList(points, { zProperty });
   const mappedData = makeValhallaMappings(lonLatList);
 
-  const elevationData = await vallhalaApi.getElevation(mappedData);
-
-  return elevationData;
+  return await vallhalaApi.getElevation(mappedData);
 };
 
-const makePointsWithZValues = (
+const addZValuesToPoints = (
   points: FeatureCollection<Point, GeoJsonProperties>,
   ZValues: [number | null][],
   options: { zProperty: string },
@@ -71,58 +78,39 @@ const makePointsWithZValues = (
   return pointsWithZ;
 };
 
-export const drawIsolines = async (
+export const makeIsolines = async (
   layer: VectorLayer,
-  geometry: OLBBoxLikeGeometry,
+  points: FeatureCollection<
+    Point,
+    {
+      [name: string]: any;
+    } | null
+  >,
+  isolinesType: IsolinesTypeLiteral,
   options?: {
-    isolinesType?: IsolinesTypeLiteral;
+    zProperty?: string;
     isIsolinesSplined?: boolean;
     bboxWrap?: boolean;
   },
 ) => {
   //TODO: fixme!
-  const Z_PROPERTY_NAME = 'zValue';
+  const { zProperty = 'zValue', isIsolinesSplined = false, bboxWrap = true } = options ?? {};
 
-  const g = new GeoJSON();
-  const geoJSON = g.writeGeometryObject(geometry) as GeoJSONBBoxLikeGeometry;
+  const elevationData = await getPointsElevationData(points, { zProperty });
+  const pointsWithZ = addZValuesToPoints(points, elevationData.height, { zProperty });
 
-  const points = makePointsFromBBox(geoJSON, 200);
-  const elevationData = await getPointsElevationData(points, { zProperty: Z_PROPERTY_NAME });
-  const pointsWithZ = makePointsWithZValues(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });
-  // const pointsMock = makeMockPointsWithZ(geoJSON, { zProperty: Z_PROPERTY_NAME });
-
-  // console.log({ pointsMock });
   console.log({ pointsWithZ });
-
-  const { isolinesType = 'turf', isIsolinesSplined = false, bboxWrap = false } = options ?? {};
 
   const isolineSettings = {
     points: pointsWithZ,
-    breaksDelta: 10,
+    breaksDelta: 20,
     splined: isIsolinesSplined,
-    isolinesOptions: { zProperty: Z_PROPERTY_NAME },
+    isolinesOptions: { zProperty },
   };
 
-  let isolines;
+  const isolines = isolinesType === 'turf' ? makeTurfIsolines(isolineSettings) : makeConrecIsolines(isolineSettings);
 
-  switch (isolinesType) {
-    case 'turf':
-      isolines = makeTurfIsolines(isolineSettings);
-      break;
-    case 'conrec':
-      isolines = makeConrecIsolines(isolineSettings);
-      break;
-  }
-
-  console.log({ isolines });
-  // console.log({
-  //   mock: makeTurfIsolines({
-  //     points: pointsMock,
-  //     breaks,
-  //     splined: isIsolinesSplined,
-  //     isolinesOptions: { zProperty: Z_PROPERTY_NAME },
-  //   }),
-  // });
+  const g = new GeoJSON();
 
   if (bboxWrap) {
     layer?.getSource()?.addFeatures(g.readFeatures(bboxPolygon(bbox(isolines))));
