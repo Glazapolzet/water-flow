@@ -1,13 +1,9 @@
 import { vallhalaApi } from '@/api/valhalla';
 import { IsolinesTypeLiteral, makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
-import bbox from '@turf/bbox';
-import bboxPolygon from '@turf/bbox-polygon';
 import { Units } from '@turf/helpers';
 import pointGrid from '@turf/point-grid';
 import { toMercator } from '@turf/projection';
 import { Feature, FeatureCollection, GeoJsonProperties, MultiPolygon, Point, Polygon } from 'geojson';
-import { GeoJSON } from 'ol/format';
-import VectorLayer from 'ol/layer/Vector';
 import { toLonLat } from 'ol/proj';
 import { makeValhallaMappings } from './mappings';
 
@@ -79,7 +75,6 @@ const addZValuesToPoints = (
 };
 
 export const makeIsolines = async (
-  layer: VectorLayer,
   points: FeatureCollection<
     Point,
     {
@@ -90,11 +85,10 @@ export const makeIsolines = async (
   options?: {
     zProperty?: string;
     isIsolinesSplined?: boolean;
-    bboxWrap?: boolean;
   },
 ) => {
   //TODO: fixme!
-  const { zProperty = 'zValue', isIsolinesSplined = false, bboxWrap = true } = options ?? {};
+  const { zProperty = 'zValue', isIsolinesSplined = false } = options ?? {};
 
   const elevationData = await getPointsElevationData(points, { zProperty });
   const pointsWithZ = addZValuesToPoints(points, elevationData.height, { zProperty });
@@ -110,11 +104,5 @@ export const makeIsolines = async (
 
   const isolines = isolinesType === 'turf' ? makeTurfIsolines(isolineSettings) : makeConrecIsolines(isolineSettings);
 
-  const g = new GeoJSON();
-
-  if (bboxWrap) {
-    layer?.getSource()?.addFeatures(g.readFeatures(bboxPolygon(bbox(isolines))));
-  }
-
-  layer?.getSource()?.addFeatures(g.readFeatures(isolines));
+  return isolines;
 };

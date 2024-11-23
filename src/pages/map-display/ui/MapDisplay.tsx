@@ -3,6 +3,8 @@ import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
 import { OLBBoxLikeGeometry } from '@/types';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
+import bbox from '@turf/bbox';
+import bboxPolygon from '@turf/bbox-polygon';
 import { GeoJSON } from 'ol/format';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
@@ -111,7 +113,11 @@ export const MapDisplay = () => {
     clearLayerSource(drawLayer);
 
     const points = makePointsFromBBox(geometry.getExtent(), 20, { units: 'meters' });
-    makeIsolines(drawLayer, points, isolinesType, { isIsolinesSplined, bboxWrap: true });
+
+    makeIsolines(points, isolinesType, { isIsolinesSplined }).then((isolines) => {
+      drawLayer?.getSource()?.addFeatures(g.readFeatures(bboxPolygon(bbox(isolines))));
+      drawLayer?.getSource()?.addFeatures(g.readFeatures(isolines));
+    });
   };
 
   return (
