@@ -1,8 +1,3 @@
-type TResponseSuccess<S> = S;
-type TResponseError<E> = E;
-
-type JSONResponse<S, E> = TResponseSuccess<S> | TResponseError<E>;
-
 export class Api {
   private baseUrl: string;
   private headers: HeadersInit;
@@ -22,6 +17,6 @@ export class Api {
       return Promise.reject(new Error(res.statusText));
     }
 
-    return (await res.json()) as JSONResponse<S, E>;
+    return await res.json();
   }
 }
