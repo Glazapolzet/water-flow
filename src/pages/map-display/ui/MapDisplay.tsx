@@ -1,3 +1,11 @@
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { FeatureCollection, Point } from 'geojson';
+import { GeoJSON } from 'ol/format';
+import { DrawEvent } from 'ol/interaction/Draw';
+import VectorLayer from 'ol/layer/Vector';
+import Map from 'ol/Map.js';
+
 import { IsolinesTypeLiteral } from '@/features/isolines';
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
@@ -5,11 +13,7 @@ import { OLBBoxLikeGeometry } from '@/types';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
-import { GeoJSON } from 'ol/format';
-import { DrawEvent } from 'ol/interaction/Draw';
-import VectorLayer from 'ol/layer/Vector';
-import Map from 'ol/Map.js';
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
 import { clearLayerSource } from '../utils/helpers/clearLayerSource';
 import { makeIsolines, makePointsFromBBox } from '../utils/helpers/makeIsolines';
 import { ACTIVE_LAYER_OPTIONS, ISOLINES_TYPE_OPTIONS, SELECTION_AREA_OPTIONS } from '../utils/options';
@@ -24,6 +28,7 @@ export const MapDisplay = () => {
   const [isolinesType, setIsolinesType] = useState<IsolinesTypeLiteral | undefined>(undefined);
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
   const [geometry, setGeometry] = useState<OLBBoxLikeGeometry | undefined>(undefined);
+  const [points, setPoints] = useState<FeatureCollection<Point> | undefined>(undefined);
 
   const OTMLayerName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
   const drawLayerName: string = VECTOR_LAYERS_PROPERTIES.draw.name;
@@ -40,11 +45,11 @@ export const MapDisplay = () => {
     setIsDrawEnd(true);
 
     const geometry = drawEvent?.feature.getGeometry() as OLBBoxLikeGeometry;
-
     setGeometry(geometry);
 
     //TEST
     const points = makePointsFromBBox(geometry.getExtent(), 20, { units: 'meters' });
+    setPoints(points);
 
     drawLayer?.getSource()?.addFeatures(g.readFeatures(points));
   };
@@ -112,9 +117,11 @@ export const MapDisplay = () => {
 
     clearLayerSource(drawLayer);
 
-    const points = makePointsFromBBox(geometry.getExtent(), 20, { units: 'meters' });
-
     makeIsolines(points, isolinesType, { isIsolinesSplined }).then((isolines) => {
+      if (!isolines) {
+        return;
+      }
+
       drawLayer?.getSource()?.addFeatures(g.readFeatures(bboxPolygon(bbox(isolines))));
       drawLayer?.getSource()?.addFeatures(g.readFeatures(isolines));
     });
