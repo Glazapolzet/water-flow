@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { FeatureCollection, Point } from 'geojson';
 import { GeoJSON } from 'ol/format';
@@ -67,15 +67,13 @@ export const MapDisplay = () => {
       });
   }, []);
 
-  const mapOptions = useMemo(() => {
-    return {
-      layers: [drawLayer, OTMLayer],
-      controls: attributionSetting,
-      view: view,
-    };
-  }, [OTMLayerName, drawLayerName]);
+  const mapOptions = {
+    layers: [drawLayer, OTMLayer],
+    controls: attributionSetting,
+    view: view,
+  };
 
-  const handleMapMount = useCallback((map: Map) => {
+  const handleMapMount = (map: Map) => {
     mapRef.current = map;
 
     interactions.getArray().forEach((interaction) => map.addInteraction(interaction));
@@ -84,7 +82,7 @@ export const MapDisplay = () => {
     //   const clickedCoordinate = event.coordinate;
     //   console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
     // });
-  }, []);
+  };
 
   const handleActiveLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
     rasterLayers.getArray().forEach((layer) => {
@@ -161,7 +159,7 @@ export const MapDisplay = () => {
         }}
       />
 
-      <OLMap options={mapOptions} onMount={handleMapMount} />
+      <OLMap containerId={'map'} options={mapOptions} onMount={handleMapMount} />
     </section>
   );
 };
