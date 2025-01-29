@@ -1,21 +1,25 @@
-import { Unpacked } from '@/types';
-import Map from 'ol/Map.js';
 import { memo, useEffect } from 'react';
+
+import Map from 'ol/Map.js';
+
+import { Unpacked } from '@/types';
+
 import styles from './OLMap.module.scss';
 
 interface OLMap {
+  containerId: string;
   options?: Omit<Unpacked<ConstructorParameters<typeof Map>>, 'target'>;
   onMount?: (map: Map) => void; // map events and actions to perform after component mount
 }
 
-const Component = function ({ options, onMount }: OLMap) {
+const Component = function ({ containerId, options, onMount }: OLMap) {
   const mapOptions = options ? options : {};
 
   useEffect(() => {
     // Code here runs after the component has mounted
     const map = new Map({
       //id of the div element where the map will be rendered
-      target: 'map',
+      target: containerId,
       ...mapOptions,
     });
 
@@ -26,7 +30,7 @@ const Component = function ({ options, onMount }: OLMap) {
     return () => map.setTarget(undefined);
   }, []);
 
-  return <div id="map" className={styles.map} />;
+  return <div id={containerId} className={styles.map} />;
 };
 
 export const OLMap = memo(Component);
