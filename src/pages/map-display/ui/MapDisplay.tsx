@@ -7,14 +7,14 @@ import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 
 import { IsolinesTypeLiteral } from '@/features/isolines';
+import { clearLayerSource } from '@/features/map-tools';
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
 import { OLBBoxLikeGeometry } from '@/types';
-import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map';
+import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map-config';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 
-import { clearLayerSource } from '../utils/helpers/clearLayerSource';
 import { makeIsolines, makePointsFromBBox } from '../utils/helpers/makeIsolines';
 import { ACTIVE_LAYER_OPTIONS, ISOLINES_TYPE_OPTIONS, SELECTION_AREA_OPTIONS } from '../utils/options';
 import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';

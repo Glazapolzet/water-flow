@@ -1,5 +1,7 @@
 import { Link, Snap } from 'ol/interaction';
-import { Interactions } from '../helpers/Interactions';
+
+import { Interactions } from '@/features/map-tools';
+
 import { DRAW_VECTOR_SOURCE } from '../layers/souces';
 
 const properties = {

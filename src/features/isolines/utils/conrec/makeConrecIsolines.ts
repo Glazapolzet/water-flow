@@ -1,5 +1,6 @@
 import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
-import { makeBreaks, makeSplinedIsolines } from '../common';
+
+import { makeBreaks, makeSplinedIsolines } from '../helpers';
 import { ConrecHelper } from './ConrecHelper';
 
 export const makeConrecIsolines = (settings: {

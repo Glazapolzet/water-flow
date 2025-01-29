@@ -1,5 +1,7 @@
 import WebGLTileLayer from 'ol/layer/WebGLTile';
-import { Layers } from '../helpers/Layers';
+
+import { Layers } from '@/features/map-tools';
+
 import { OSM_LAYER_SOURCE, OTM_LAYER_RU_SOURCE, OTM_LAYER_SOURCE } from './souces';
 
 const properties = {

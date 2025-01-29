@@ -1,5 +1,7 @@
 import VectorLayer from 'ol/layer/Vector';
-import { Layers } from '../helpers/Layers';
+
+import { Layers } from '@/features/map-tools';
+
 import { baseStyle } from '../styles/styles';
 import { DRAW_VECTOR_SOURCE } from './souces';
 

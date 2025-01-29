@@ -1,4 +1,5 @@
 import Interaction from 'ol/interaction/Interaction';
+
 import { PropertiedCollection, Options as PropertiedCollectionOptions } from './PropertiedCollection';
 
 export type Options = PropertiedCollectionOptions;

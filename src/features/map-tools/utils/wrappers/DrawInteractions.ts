@@ -1,4 +1,5 @@
 import { Draw } from 'ol/interaction';
+
 import { Interactions, Options as InteractionsOptions } from './Interactions';
 
 type Options = InteractionsOptions;

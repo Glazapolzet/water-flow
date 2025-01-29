@@ -1,4 +1,5 @@
 import BaseLayer from 'ol/layer/Base';
+
 import { PropertiedCollection, Options as PropertiedCollectionOptions } from './PropertiedCollection';
 
 export type Options = PropertiedCollectionOptions;

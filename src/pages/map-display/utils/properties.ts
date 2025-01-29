@@ -1,4 +1,4 @@
-import { drawInteractions, drawLayers, interactions, rasterLayers } from '@/utils/map';
+import { drawInteractions, drawLayers, interactions, rasterLayers } from '@/utils/map-config';
 
 export const RASTER_LAYERS_PROPERTIES = rasterLayers.getProperties();
 export const VECTOR_LAYERS_PROPERTIES = drawLayers.getProperties();

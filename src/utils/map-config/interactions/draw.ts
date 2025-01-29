@@ -1,6 +1,8 @@
 import { Draw } from 'ol/interaction';
 import { createBox, createRegularPolygon } from 'ol/interaction/Draw.js';
-import { DrawInteractions } from '../helpers/DrawInteractions';
+
+import { DrawInteractions } from '@/features/map-tools';
+
 import { DRAW_VECTOR_SOURCE } from '../layers/souces';
 import { styledSelection } from '../styles/styles';
 
