@@ -54,17 +54,13 @@ const addZValuesToPoints = (
 };
 
 export const makeIsolines = async (
-  points: FeatureCollection<Point> | undefined,
+  points: FeatureCollection<Point>,
   isolinesType: IsolinesTypeLiteral,
   options?: {
     zProperty?: string;
     isIsolinesSplined?: boolean;
   },
 ) => {
-  if (!points) {
-    return;
-  }
-
   //TODO: fixme!
   const { zProperty = 'zValue', isIsolinesSplined = false } = options ?? {};
 

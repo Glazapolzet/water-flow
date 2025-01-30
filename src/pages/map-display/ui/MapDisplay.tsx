@@ -2,26 +2,23 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { FeatureCollection, Point } from 'geojson';
 import { GeoJSON } from 'ol/format';
-import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 
 import { IsolinesTypeLiteral } from '@/features/isolines';
 import { clearLayerSource } from '@/features/map-tools';
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
-import { OLBBoxLikeGeometry } from '@/types';
 import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map-config';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 
-import { DrawEvent } from 'ol/interaction/Draw';
 import {
   ACTIVE_LAYER_OPTIONS,
   ISOLINES_TYPE_OPTIONS,
   makeIsolines,
-  makePointsFromBBox,
   SELECTION_AREA_OPTIONS,
-} from '../utils/helpers';
+  useDrawHandlers,
+} from '../utils';
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
@@ -31,32 +28,20 @@ export const MapDisplay = () => {
   const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
   const [isolinesType, setIsolinesType] = useState<IsolinesTypeLiteral | undefined>(undefined);
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
-  const [geometry, setGeometry] = useState<OLBBoxLikeGeometry | undefined>(undefined);
+  // const [geometry, setGeometry] = useState<OLBBoxLikeGeometry | undefined>(undefined);
   const [points, setPoints] = useState<FeatureCollection<Point> | undefined>(undefined);
 
   const OTMLayerName: string = rasterLayers.getProperties().OpenTopoMap.name;
   const drawLayerName: string = drawLayers.getProperties().draw.name;
 
   const OTMLayer = rasterLayers.get(OTMLayerName);
-  const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;
+  const drawLayer = drawLayers.get(drawLayerName);
 
-  const handleDrawStart = () => {
-    setIsDrawEnd(false);
-    clearLayerSource(drawLayer);
-  };
+  if (!drawLayer || !OTMLayer) {
+    return;
+  }
 
-  const handleDrawEnd = (drawEvent: DrawEvent) => {
-    setIsDrawEnd(true);
-
-    const geometry = drawEvent?.feature.getGeometry() as OLBBoxLikeGeometry;
-    setGeometry(geometry);
-
-    //TEST
-    const points = makePointsFromBBox(geometry.getExtent(), 20, { units: 'meters' });
-    setPoints(points);
-
-    drawLayer?.getSource()?.addFeatures(g.readFeatures(points));
-  };
+  const { handleDrawStart, handleDrawEnd } = useDrawHandlers(drawLayer, setIsDrawEnd, setPoints);
 
   useEffect(() => {
     drawInteractions.getArray().forEach((draw) => {
@@ -113,7 +98,7 @@ export const MapDisplay = () => {
   };
 
   const handleConfirmButtonClick = () => {
-    if (!isolinesType || !geometry) {
+    if (!isolinesType || !points) {
       return;
     }
 
