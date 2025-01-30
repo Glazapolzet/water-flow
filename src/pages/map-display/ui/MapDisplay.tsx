@@ -17,7 +17,6 @@ import bboxPolygon from '@turf/bbox-polygon';
 
 import { makeIsolines, makePointsFromBBox } from '../utils/helpers/makeIsolines';
 import { ACTIVE_LAYER_OPTIONS, ISOLINES_TYPE_OPTIONS, SELECTION_AREA_OPTIONS } from '../utils/options';
-import { RASTER_LAYERS_PROPERTIES, VECTOR_LAYERS_PROPERTIES } from '../utils/properties';
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
@@ -30,8 +29,8 @@ export const MapDisplay = () => {
   const [geometry, setGeometry] = useState<OLBBoxLikeGeometry | undefined>(undefined);
   const [points, setPoints] = useState<FeatureCollection<Point> | undefined>(undefined);
 
-  const OTMLayerName: string = RASTER_LAYERS_PROPERTIES.OpenTopoMap.name;
-  const drawLayerName: string = VECTOR_LAYERS_PROPERTIES.draw.name;
+  const OTMLayerName: string = rasterLayers.getProperties().OpenTopoMap.name;
+  const drawLayerName: string = drawLayers.getProperties().draw.name;
 
   const OTMLayer = rasterLayers.get(OTMLayerName);
   const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;

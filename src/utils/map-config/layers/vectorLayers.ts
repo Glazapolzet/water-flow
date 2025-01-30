@@ -3,7 +3,7 @@ import VectorLayer from 'ol/layer/Vector';
 import { Layers } from '@/features/map-tools';
 
 import { baseStyle } from '../styles/styles';
-import { DRAW_VECTOR_SOURCE } from './souces';
+import { DRAW_SOURCE } from './souces';
 
 const properties = {
   draw: {
@@ -12,7 +12,7 @@ const properties = {
 };
 
 const drawLayer = new VectorLayer({
-  source: DRAW_VECTOR_SOURCE,
+  source: DRAW_SOURCE,
   style: baseStyle,
   zIndex: 1,
   properties: properties.draw,

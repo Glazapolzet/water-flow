@@ -2,7 +2,7 @@ import { Link, Snap } from 'ol/interaction';
 
 import { Interactions } from '@/features/map-tools';
 
-import { DRAW_VECTOR_SOURCE } from '../layers/souces';
+import { DRAW_SOURCE } from '../layers/souces';
 
 const properties = {
   snap: {
@@ -14,7 +14,7 @@ const properties = {
 };
 
 const snap = new Snap({
-  source: DRAW_VECTOR_SOURCE,
+  source: DRAW_SOURCE,
 });
 
 snap.setProperties(properties.snap);

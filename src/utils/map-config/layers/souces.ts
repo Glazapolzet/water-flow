@@ -25,4 +25,4 @@ export const OSM_LAYER_SOURCE = new ImageTileSource({
   tileSize: 256,
 });
 
-export const DRAW_VECTOR_SOURCE = new VectorSource();
+export const DRAW_SOURCE = new VectorSource();
