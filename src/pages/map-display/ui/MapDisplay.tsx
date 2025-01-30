@@ -2,7 +2,6 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { FeatureCollection, Point } from 'geojson';
 import { GeoJSON } from 'ol/format';
-import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
 import Map from 'ol/Map.js';
 
@@ -15,6 +14,7 @@ import { attributionSetting, drawInteractions, drawLayers, interactions, rasterL
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 
+import { DrawEvent } from 'ol/interaction/Draw';
 import {
   ACTIVE_LAYER_OPTIONS,
   ISOLINES_TYPE_OPTIONS,
