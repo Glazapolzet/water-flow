@@ -128,7 +128,6 @@ export const MapDisplay = () => {
   return (
     <section className={styles.mapDisplay}>
       <SettingsPanel
-        mapRef={mapRef}
         activeLayer={{
           heading: 'Active layer',
           defaultValue: OTMLayerName,

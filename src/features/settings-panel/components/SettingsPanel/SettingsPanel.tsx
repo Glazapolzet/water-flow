@@ -1,7 +1,6 @@
 import { CustomButton } from '@/components';
 import { Heading, Stack, StackDivider } from '@chakra-ui/react';
-import { Map } from 'ol';
-import { FC, MutableRefObject } from 'react';
+import { FC } from 'react';
 import { CheckboxOptions, ConfirmButtonOptions, SelectOptions } from '../../types';
 import { ActiveLayerSelect } from '../ActiveLayerSelect/ActiveLayerSelect';
 import { IsolinesTypeSelect } from '../IsolinesTypeSelect/IsolinesTypeSelect';
@@ -10,7 +9,6 @@ import { SplineIsolinesCheckbox } from '../SplineIsolinesCheckbox/SplineIsolines
 import styles from './SettingsPanel.module.scss';
 
 interface SettingsPanel {
-  mapRef: MutableRefObject<Map | undefined>;
   activeLayer: SelectOptions;
   isolinesType: SelectOptions;
   selectionArea: SelectOptions;
