@@ -15,8 +15,13 @@ import { attributionSetting, drawInteractions, drawLayers, interactions, rasterL
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 
-import { makeIsolines, makePointsFromBBox } from '../utils/helpers/makeIsolines';
-import { ACTIVE_LAYER_OPTIONS, ISOLINES_TYPE_OPTIONS, SELECTION_AREA_OPTIONS } from '../utils/options';
+import {
+  ACTIVE_LAYER_OPTIONS,
+  ISOLINES_TYPE_OPTIONS,
+  makeIsolines,
+  makePointsFromBBox,
+  SELECTION_AREA_OPTIONS,
+} from '../utils';
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
@@ -35,7 +40,7 @@ export const MapDisplay = () => {
   const OTMLayer = rasterLayers.get(OTMLayerName);
   const drawLayer = drawLayers.get(drawLayerName) as VectorLayer;
 
-  const handleDrawStart = (_drawEvent: DrawEvent) => {
+  const handleDrawStart = () => {
     setIsDrawEnd(false);
     clearLayerSource(drawLayer);
   };
