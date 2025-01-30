@@ -1,6 +1,6 @@
 import { Checkbox } from '@chakra-ui/react';
 import { FC } from 'react';
-import { CheckboxOptions } from '../../types/types';
+import { CheckboxOptions } from '../../types';
 
 export const SplineIsolinesCheckbox: FC<CheckboxOptions> = ({ title, isChecked, onChange }) => {
   return (
