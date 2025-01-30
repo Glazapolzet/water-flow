@@ -21,7 +21,7 @@ import {
   makeIsolines,
   makePointsFromBBox,
   SELECTION_AREA_OPTIONS,
-} from '../utils';
+} from '../utils/helpers';
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {

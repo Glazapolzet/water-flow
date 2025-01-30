@@ -3,7 +3,7 @@ import { toLonLat } from 'ol/proj';
 
 import { vallhalaApi } from '@/api/valhalla';
 import { IsolinesTypeLiteral, makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
-import { makeValhallaMappings } from '@/utils/helpers/mappings';
+import { makeValhallaMappings } from '@/utils/helpers/makeValhallaMappings';
 
 const makeLonLatList = (points: FeatureCollection<Point, GeoJsonProperties>, options: { zProperty: string }) => {
   const lonLatList = [];

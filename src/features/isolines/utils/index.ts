@@ -1,2 +1,3 @@
-export { makeConrecIsolines } from './conrec/makeConrecIsolines';
-export { makeTurfIsolines } from './turf/makeTurfIsolines';
+export { makeBreaks } from './helpers/makeBreaks';
+export { makeSplinedIsolines } from './helpers/makeSplinedIsolines';
+export { MatrixHelper } from './helpers/MatrixHelper';

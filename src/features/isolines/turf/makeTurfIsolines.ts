@@ -1,8 +1,7 @@
 import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
 
 import isolines from '@turf/isolines';
-
-import { makeBreaks, makeSplinedIsolines } from '../helpers';
+import { makeBreaks, makeSplinedIsolines } from '../utils';
 
 export const makeTurfIsolines = (settings: {
   points: FeatureCollection<Point, GeoJsonProperties>;

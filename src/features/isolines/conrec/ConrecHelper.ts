@@ -1,7 +1,7 @@
 import { featureCollection, multiLineString } from '@turf/helpers';
 import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
 import { Conrec } from 'ml-conrec';
-import { MatrixHelper } from './MatrixHelper';
+import { MatrixHelper } from '../utils';
 
 export class ConrecHelper extends Conrec {
   private matrixHelper: MatrixHelper;
