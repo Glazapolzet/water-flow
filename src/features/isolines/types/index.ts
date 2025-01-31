@@ -1,1 +1,0 @@
-export { IsolinesTypeLiteral } from './types';

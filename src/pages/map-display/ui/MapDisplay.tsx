@@ -4,16 +4,17 @@ import { FeatureCollection, Point } from 'geojson';
 import { GeoJSON } from 'ol/format';
 import Map from 'ol/Map.js';
 
-import { IsolinesTypeLiteral } from '@/features/isolines';
-import { clearLayerSource } from '@/features/map-tools';
+import { clearLayer } from '@/features/map-tools';
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
-import { attributionSetting, drawInteractions, drawLayers, interactions, rasterLayers, view } from '@/utils/map-config';
+import { drawInteractions, drawLayers, interactions, rasterLayers } from '@/utils/map-config';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 
+import { addFeaturesToLayer } from '@/features/map-tools';
 import {
   ACTIVE_LAYER_OPTIONS,
+  getMapOptions,
   ISOLINES_TYPE_OPTIONS,
   makeIsolines,
   SELECTION_AREA_OPTIONS,
@@ -26,7 +27,7 @@ export const MapDisplay = () => {
   const g = new GeoJSON();
 
   const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
-  const [isolinesType, setIsolinesType] = useState<IsolinesTypeLiteral | undefined>(undefined);
+  const [isolinesType, setIsolinesType] = useState<string | undefined>(undefined);
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
   // const [geometry, setGeometry] = useState<OLBBoxLikeGeometry | undefined>(undefined);
   const [points, setPoints] = useState<FeatureCollection<Point> | undefined>(undefined);
@@ -56,11 +57,7 @@ export const MapDisplay = () => {
       });
   }, []);
 
-  const mapOptions = {
-    layers: [drawLayer, OTMLayer],
-    controls: attributionSetting,
-    view: view,
-  };
+  const mapOptions = getMapOptions([drawLayer, OTMLayer]);
 
   const handleMapMount = (map: Map) => {
     mapRef.current = map;
@@ -90,28 +87,28 @@ export const MapDisplay = () => {
   };
 
   const handleIsolinesTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setIsolinesType(event.target.value as IsolinesTypeLiteral);
+    setIsolinesType(event.target.value);
   };
 
   const handleSplineIsolinesChange = () => {
     setIsIsolinesSplined(!isIsolinesSplined);
   };
 
-  const handleConfirmButtonClick = () => {
+  const handleConfirmButtonClick = async () => {
     if (!isolinesType || !points) {
       return;
     }
 
-    clearLayerSource(drawLayer);
+    clearLayer(drawLayer);
 
-    makeIsolines(points, isolinesType, { isIsolinesSplined }).then((isolines) => {
-      if (!isolines) {
-        return;
-      }
+    const isolines = await makeIsolines(points, isolinesType, { isIsolinesSplined });
 
-      drawLayer?.getSource()?.addFeatures(g.readFeatures(bboxPolygon(bbox(isolines))));
-      drawLayer?.getSource()?.addFeatures(g.readFeatures(isolines));
-    });
+    if (!isolines) {
+      return;
+    }
+
+    addFeaturesToLayer(drawLayer, g.readFeatures(bboxPolygon(bbox(isolines))));
+    addFeaturesToLayer(drawLayer, g.readFeatures(isolines));
   };
 
   return (

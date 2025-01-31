@@ -1,7 +1,6 @@
-import { IsolinesTypeLiteral } from '@/features/isolines';
 import { drawInteractions, rasterLayers } from '@/utils/map-config';
 
-const isolines: IsolinesTypeLiteral[] = ['turf', 'conrec'];
+const isolines = ['turf', 'conrec'];
 
 const isolinesItems = isolines.map((option) => {
   return {

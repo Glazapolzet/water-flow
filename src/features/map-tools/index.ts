@@ -1,1 +1,1 @@
-export { clearLayerSource, DrawInteractions, Interactions, Layers } from './utils';
+export { addFeaturesToLayer, clearLayer, DrawInteractions, Interactions, Layers } from './utils';

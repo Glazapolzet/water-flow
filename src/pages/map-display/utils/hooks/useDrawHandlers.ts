@@ -1,4 +1,4 @@
-import { clearLayerSource } from '@/features/map-tools';
+import { clearLayer } from '@/features/map-tools';
 import { makePointsFromBBox } from '@/utils/helpers';
 import { FeatureCollection, Point } from 'geojson';
 import { GeoJSON } from 'ol/format';
@@ -16,7 +16,7 @@ export const useDrawHandlers = (
 
   const handleDrawStart = useCallback(() => {
     setIsDrawEnd(false);
-    clearLayerSource(drawLayer);
+    clearLayer(drawLayer);
   }, [drawLayer, setIsDrawEnd]);
 
   const handleDrawEnd = useCallback(

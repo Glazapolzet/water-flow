@@ -1,35 +1,13 @@
 import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
-import { toLonLat } from 'ol/proj';
 
 import { vallhalaApi } from '@/api/valhalla';
-import { IsolinesTypeLiteral, makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
-import { makeValhallaMappings } from '@/utils/helpers/makeValhallaMappings';
+import { makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
+import { makeValhallaMappings, transformXYToLonLat } from '@/utils/helpers';
+import { coordAll } from '@turf/meta';
 
-const makeLonLatList = (points: FeatureCollection<Point, GeoJsonProperties>, options: { zProperty: string }) => {
-  const lonLatList = [];
-  const { zProperty } = options;
-
-  for (let i = 0; i < points.features.length; i++) {
-    if (points.features[i].properties?.[`${zProperty}`]) {
-      continue;
-    }
-
-    const [lon, lat] = toLonLat(points.features[i].geometry.coordinates);
-
-    lonLatList.push({ lon, lat });
-  }
-
-  return lonLatList;
-};
-
-const getPointsElevationData = async (
-  points: FeatureCollection<Point, GeoJsonProperties>,
-  options: { zProperty: string },
-) => {
-  const { zProperty } = options;
-
-  const lonLatList = makeLonLatList(points, { zProperty });
-  const mappedData = makeValhallaMappings(lonLatList);
+const getPointsElevationData = async (points: FeatureCollection<Point, GeoJsonProperties>) => {
+  const coordinates = transformXYToLonLat(coordAll(points));
+  const mappedData = makeValhallaMappings(coordinates);
 
   return await vallhalaApi.getElevation(mappedData);
 };
@@ -43,10 +21,6 @@ const addZValuesToPoints = (
   const pointsWithZ = JSON.parse(JSON.stringify(points));
 
   for (let i = 0; i < pointsWithZ.features.length; i++) {
-    if (pointsWithZ.features[i].properties?.[`${zProperty}`]) {
-      continue;
-    }
-
     pointsWithZ.features[i].properties![`${zProperty}`] = ZValues[i];
   }
 
@@ -55,16 +29,15 @@ const addZValuesToPoints = (
 
 export const makeIsolines = async (
   points: FeatureCollection<Point>,
-  isolinesType: IsolinesTypeLiteral,
+  isolinesType: string,
   options?: {
     zProperty?: string;
     isIsolinesSplined?: boolean;
   },
 ) => {
-  //TODO: fixme!
   const { zProperty = 'zValue', isIsolinesSplined = false } = options ?? {};
 
-  const elevationData = await getPointsElevationData(points, { zProperty });
+  const elevationData = await getPointsElevationData(points);
   const pointsWithZ = addZValuesToPoints(points, elevationData.height, { zProperty });
 
   console.log({ pointsWithZ });
