@@ -12,9 +12,12 @@ import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 
 import { addFeaturesToLayer } from '@/features/map-tools';
+import { addZValueToEachPoint } from '@/utils/helpers';
+import { findMaxZValue } from '@/utils/helpers/findMaxZValue';
 import {
   ACTIVE_LAYER_OPTIONS,
   getMapOptions,
+  getPointsElevationData,
   ISOLINES_TYPE_OPTIONS,
   makeIsolines,
   SELECTION_AREA_OPTIONS,
@@ -101,7 +104,9 @@ export const MapDisplay = () => {
 
     clearLayer(drawLayer);
 
-    const isolines = await makeIsolines(points, isolinesType, { isIsolinesSplined });
+    const elevationData = await getPointsElevationData(points);
+    const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: 'zValue' });
+    const isolines = await makeIsolines(pointsWithZValue, isolinesType, { isIsolinesSplined });
 
     if (!isolines) {
       return;
@@ -109,6 +114,11 @@ export const MapDisplay = () => {
 
     addFeaturesToLayer(drawLayer, g.readFeatures(bboxPolygon(bbox(isolines))));
     addFeaturesToLayer(drawLayer, g.readFeatures(isolines));
+
+    console.log({ pointsWithZValue });
+    console.log({ isolines });
+
+    console.log(findMaxZValue(pointsWithZValue, { zProperty: 'zValue' }));
   };
 
   return (
