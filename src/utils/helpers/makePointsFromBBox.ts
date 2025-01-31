@@ -7,13 +7,11 @@ import { toLonLat } from 'ol/proj';
 export const makePointsFromBBox = (
   bbox: [number, number, number, number] | number[],
   cellSide: number,
-  options?:
-    | {
-        units?: Units;
-        mask?: Feature<Polygon | MultiPolygon>;
-        properties?: GeoJsonProperties | undefined;
-      }
-    | undefined,
+  options?: {
+    units?: Units;
+    mask?: Feature<Polygon | MultiPolygon>;
+    properties?: GeoJsonProperties | undefined;
+  },
 ) => {
   const [x1, y1] = toLonLat([bbox[0], bbox[1]]) as [number, number];
   const [x2, y2] = toLonLat([bbox[2], bbox[3]]) as [number, number];
