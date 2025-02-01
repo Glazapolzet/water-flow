@@ -11,6 +11,7 @@ import { drawInteractions, drawLayers, interactions, rasterLayers } from '@/util
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 
+import { makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
 import { addFeaturesToLayer } from '@/features/map-tools';
 import { addZValueToEachPoint } from '@/utils/helpers';
 import { findPointWithMaxZValue } from '@/utils/helpers/findMaxZValue';
@@ -19,7 +20,6 @@ import {
   getMapOptions,
   getPointsElevationData,
   ISOLINES_TYPE_OPTIONS,
-  makeIsolines,
   SELECTION_AREA_OPTIONS,
   useDrawHandlers,
 } from '../utils';
@@ -106,7 +106,21 @@ export const MapDisplay = () => {
 
     const elevationData = await getPointsElevationData(points);
     const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: 'zValue' });
-    const isolines = await makeIsolines(pointsWithZValue, isolinesType, { isIsolinesSplined });
+
+    const isolines =
+      isolinesType === 'turf'
+        ? makeTurfIsolines({
+            points: pointsWithZValue,
+            breaksDelta: 10,
+            isolinesOptions: { zProperty: 'zValue' },
+            splined: isIsolinesSplined,
+          })
+        : makeConrecIsolines({
+            points: pointsWithZValue,
+            breaksDelta: 10,
+            isolinesOptions: { zProperty: 'zValue' },
+            splined: isIsolinesSplined,
+          });
 
     if (!isolines) {
       return;

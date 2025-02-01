@@ -5,8 +5,8 @@ import { makeBreaks, makeSplinedIsolines } from '../utils';
 
 export const makeTurfIsolines = (settings: {
   points: FeatureCollection<Point, GeoJsonProperties>;
+  breaksDelta: number;
   breaks?: number[];
-  breaksDelta?: number;
   isolinesOptions?: {
     zProperty?: string;
     commonProperties?: GeoJsonProperties;
@@ -18,7 +18,7 @@ export const makeTurfIsolines = (settings: {
     sharpness?: number;
   };
 }) => {
-  const { points, breaks: defaultBreaks, breaksDelta = 90, isolinesOptions, splined = false, splineOptions } = settings;
+  const { points, breaks: defaultBreaks, breaksDelta, isolinesOptions, splined = false, splineOptions } = settings;
 
   const breaks = defaultBreaks ? defaultBreaks : makeBreaks(breaksDelta);
   const iso = isolines(points, breaks, isolinesOptions);
