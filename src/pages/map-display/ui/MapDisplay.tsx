@@ -13,7 +13,7 @@ import bboxPolygon from '@turf/bbox-polygon';
 
 import { addFeaturesToLayer } from '@/features/map-tools';
 import { addZValueToEachPoint } from '@/utils/helpers';
-import { findMaxZValue } from '@/utils/helpers/findMaxZValue';
+import { findPointWithMaxZValue } from '@/utils/helpers/findMaxZValue';
 import {
   ACTIVE_LAYER_OPTIONS,
   getMapOptions,
@@ -118,7 +118,10 @@ export const MapDisplay = () => {
     console.log({ pointsWithZValue });
     console.log({ isolines });
 
-    console.log(findMaxZValue(pointsWithZValue, { zProperty: 'zValue' }));
+    const maxZValuePoint = findPointWithMaxZValue(pointsWithZValue, { zProperty: 'zValue' });
+    console.log(maxZValuePoint);
+
+    addFeaturesToLayer(drawLayer, g.readFeatures(maxZValuePoint));
   };
 
   return (

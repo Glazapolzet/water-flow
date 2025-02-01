@@ -1,19 +1,21 @@
-import { propEach } from '@turf/meta';
-import { FeatureCollection, Point } from 'geojson';
+import { featureEach } from '@turf/meta';
+import { Feature, FeatureCollection, Point } from 'geojson';
 
-export const findMaxZValue = (points: FeatureCollection<Point>, options: { zProperty: string }) => {
+export const findPointWithMaxZValue = (feature: FeatureCollection<Point>, options: { zProperty: string }) => {
   const { zProperty } = options;
+  let maxZValuePoint: Feature<Point> | null = null;
   let maxZValue: number | null = null;
 
-  propEach(points, (properties) => {
-    if (!properties || typeof properties[`${zProperty}`] !== 'number') {
+  featureEach(feature, (currentFeature) => {
+    if (!currentFeature.properties || typeof currentFeature.properties[`${zProperty}`] !== 'number') {
       return;
     }
 
-    if (maxZValue === null || properties[`${zProperty}`] > maxZValue) {
-      maxZValue = properties[`${zProperty}`];
+    if (maxZValue === null || currentFeature.properties[`${zProperty}`] > maxZValue) {
+      maxZValue = currentFeature.properties[`${zProperty}`];
+      maxZValuePoint = currentFeature;
     }
   });
 
-  return maxZValue;
+  return maxZValuePoint;
 };
