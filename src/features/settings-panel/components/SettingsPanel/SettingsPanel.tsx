@@ -1,7 +1,7 @@
 import { CustomButton } from '@/components';
 import { Heading, Stack, StackDivider } from '@chakra-ui/react';
 import { FC } from 'react';
-import { CheckboxOptions, ConfirmButtonOptions, SelectOptions } from '../../types';
+import { ButtonOptions, CheckboxOptions, SelectOptions } from '../../types';
 import { ActiveLayerSelect } from '../ActiveLayerSelect/ActiveLayerSelect';
 import { IsolinesTypeSelect } from '../IsolinesTypeSelect/IsolinesTypeSelect';
 import { SelectionAreaSelect } from '../SelectionAreaSelect/SelectionAreaSelect';
@@ -13,7 +13,8 @@ interface SettingsPanel {
   isolinesType: SelectOptions;
   selectionArea: SelectOptions;
   splineIsolines: CheckboxOptions;
-  confirmButton: ConfirmButtonOptions;
+  clearButton: ButtonOptions;
+  confirmButton: ButtonOptions;
 }
 
 export const SettingsPanel: FC<SettingsPanel> = ({
@@ -21,6 +22,7 @@ export const SettingsPanel: FC<SettingsPanel> = ({
   isolinesType,
   selectionArea,
   splineIsolines,
+  clearButton,
   confirmButton,
 }) => {
   return (
@@ -56,6 +58,16 @@ export const SettingsPanel: FC<SettingsPanel> = ({
           onChange={splineIsolines.onChange}
           isChecked={splineIsolines.isChecked}
         />
+
+        <CustomButton
+          colorScheme={'teal'}
+          opacity={'1'}
+          bgColor={'teal.100'}
+          isVisible={clearButton.isVisible}
+          onClick={clearButton.onClick}
+        >
+          {clearButton.title}
+        </CustomButton>
 
         <CustomButton
           colorScheme={'teal'}

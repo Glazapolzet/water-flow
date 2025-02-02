@@ -13,7 +13,7 @@ export type CheckboxOptions = {
   isChecked: boolean;
 };
 
-export type ConfirmButtonOptions = {
+export type ButtonOptions = {
   title: string;
   isVisible: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;

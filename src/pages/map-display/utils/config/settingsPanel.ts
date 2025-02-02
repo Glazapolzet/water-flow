@@ -80,4 +80,7 @@ export const SETTINGS_PANEL_BASE_CONFIG = {
   confirmButton: {
     title: 'Calculate selected area',
   },
+  clearButton: {
+    title: 'Clear all',
+  },
 };

@@ -1,4 +1,3 @@
-import { clearLayer } from '@/features/map-tools';
 import { makePointsFromBBox } from '@/utils/helpers';
 import { FeatureCollection, Point } from 'geojson';
 import { GeoJSON } from 'ol/format';
@@ -9,14 +8,14 @@ import { useCallback } from 'react';
 export const useDrawHandlers = (
   drawLayer: VectorLayer,
   setIsDrawEnd: (isDrawEnd: boolean) => void,
-  // setGeometry: (geometry: OLBBoxLikeGeometry) => void,
   setPoints: (points: FeatureCollection<Point>) => void,
 ) => {
   const g = new GeoJSON();
 
   const handleDrawStart = useCallback(() => {
     setIsDrawEnd(false);
-    clearLayer(drawLayer);
+
+    drawLayer?.getSource()?.clear();
   }, [drawLayer, setIsDrawEnd]);
 
   const handleDrawEnd = useCallback(
@@ -28,8 +27,6 @@ export const useDrawHandlers = (
       if (!geometry) {
         return;
       }
-
-      // setGeometry(geometry);
 
       const points = makePointsFromBBox(geometry.getExtent(), 20, { units: 'meters' });
       setPoints(points);

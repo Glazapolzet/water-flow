@@ -4,7 +4,7 @@ import { FeatureCollection, Point } from 'geojson';
 import { GeoJSON } from 'ol/format';
 import Map from 'ol/Map.js';
 
-import { addFeaturesToLayer, clearLayer, createOverlayFromTemplate, setOverlayMessage } from '@/features/map-tools';
+import { createOverlayFromTemplate, setOverlayMessage } from '@/features/map-tools';
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
 import { drawInteractions, drawLayers, interactions, rasterLayers } from '@/utils/map-config';
@@ -31,7 +31,6 @@ export const MapDisplay = () => {
   const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
   const [isolinesType, setIsolinesType] = useState<string | undefined>(undefined);
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
-  // const [geometry, setGeometry] = useState<OLBBoxLikeGeometry | undefined>(undefined);
   const [points, setPoints] = useState<FeatureCollection<Point> | undefined>(undefined);
 
   const OTMLayerName: string = rasterLayers.getProperties().OpenTopoMap.name;
@@ -99,13 +98,18 @@ export const MapDisplay = () => {
     setIsIsolinesSplined(!isIsolinesSplined);
   };
 
+  const handleClearButtonClick = async () => {
+    mapRef.current?.getOverlays().forEach((overlay) => mapRef.current?.removeOverlay(overlay));
+    drawLayer?.getSource()?.clear();
+  };
+
   const handleConfirmButtonClick = async () => {
     if (!isolinesType || !points) {
       return;
     }
 
-    clearLayer(drawLayer);
     mapRef.current?.getOverlays().forEach((overlay) => mapRef.current?.removeOverlay(overlay));
+    drawLayer?.getSource()?.clear();
 
     const elevationData = await getPointsElevationData(points);
     const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });
@@ -131,21 +135,23 @@ export const MapDisplay = () => {
     const maxZValuePoint = findPointWithMaxZValue(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
     const minZValuePoint = findPointWithMinZValue(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
 
-    console.log({ maxZValuePoint, minZValuePoint });
+    // console.log({ maxZValuePoint, minZValuePoint });
 
-    addFeaturesToLayer(drawLayer, g.readFeatures(maxZValuePoint));
-    addFeaturesToLayer(drawLayer, g.readFeatures(minZValuePoint));
+    drawLayer?.getSource()?.addFeatures(g.readFeatures(maxZValuePoint));
+    drawLayer?.getSource()?.addFeatures(g.readFeatures(minZValuePoint));
 
     const maxZValueCoordinates = maxZValuePoint!.geometry.coordinates;
     const minZValueCoordinates = minZValuePoint!.geometry.coordinates;
 
+    console.log(mapRef.current?.getOverlays());
+
     const maxZValuePopup = createOverlayFromTemplate('marker-popup-template', 'max-z-popup', MARKER_POPUP_BASE_CONFIG);
     const minZValuePopup = createOverlayFromTemplate('marker-popup-template', 'min-z-popup', MARKER_POPUP_BASE_CONFIG);
 
+    console.log(mapRef.current?.getOverlays());
+
     mapRef.current?.addOverlay(maxZValuePopup);
     mapRef.current?.addOverlay(minZValuePopup);
-
-    console.log({ maxZValuePopup });
 
     setOverlayMessage(
       'popup-content',
@@ -192,6 +198,11 @@ export const MapDisplay = () => {
             ...SETTINGS_PANEL_BASE_CONFIG.splineIsolines,
             isChecked: isIsolinesSplined,
             onChange: handleSplineIsolinesChange,
+          }}
+          clearButton={{
+            ...SETTINGS_PANEL_BASE_CONFIG.clearButton,
+            isVisible: true,
+            onClick: handleClearButtonClick,
           }}
           confirmButton={{
             ...SETTINGS_PANEL_BASE_CONFIG.confirmButton,
