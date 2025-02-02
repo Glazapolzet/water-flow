@@ -6,6 +6,7 @@ export const addZValueToEachPoint = (
   options: { zProperty: string },
 ) => {
   const { zProperty } = options;
+  //TODO: change this to https://turfjs.org/docs/api/clone
   const pointsWithZ = JSON.parse(JSON.stringify(points));
 
   for (let i = 0; i < pointsWithZ.features.length; i++) {

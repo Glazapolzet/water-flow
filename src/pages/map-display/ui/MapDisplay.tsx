@@ -4,24 +4,23 @@ import { FeatureCollection, Point } from 'geojson';
 import { GeoJSON } from 'ol/format';
 import Map from 'ol/Map.js';
 
-import { clearLayer } from '@/features/map-tools';
+import { addFeaturesToLayer, clearLayer, createOverlayFromTemplate, setOverlayMessage } from '@/features/map-tools';
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
 import { drawInteractions, drawLayers, interactions, rasterLayers } from '@/utils/map-config';
-import bbox from '@turf/bbox';
-import bboxPolygon from '@turf/bbox-polygon';
 
-import { makeConrecIsolines, makeTurfIsolines } from '@/features/isolines';
-import { addFeaturesToLayer } from '@/features/map-tools';
-import { addZValueToEachPoint } from '@/utils/helpers';
-import { findPointWithMaxZValue } from '@/utils/helpers/findMaxZValue';
+import { addZValueToEachPoint, findPointWithMinZValue } from '@/utils/helpers';
+import { findPointWithMaxZValue } from '@/utils/helpers/findPointWithMaxZValue';
 import {
-  ACTIVE_LAYER_OPTIONS,
-  getMapOptions,
+  addIsolinesToLayer,
   getPointsElevationData,
-  ISOLINES_TYPE_OPTIONS,
-  SELECTION_AREA_OPTIONS,
+  ISOLINES_BREAKS_DELTA,
+  makeIsolines,
+  MAP_BASE_CONFIG,
+  MARKER_POPUP_BASE_CONFIG,
+  SETTINGS_PANEL_BASE_CONFIG,
   useDrawHandlers,
+  Z_PROPERTY_NAME,
 } from '../utils';
 import styles from './MapDisplay.module.scss';
 
@@ -60,7 +59,10 @@ export const MapDisplay = () => {
       });
   }, []);
 
-  const mapOptions = getMapOptions([drawLayer, OTMLayer]);
+  const mapOptions = {
+    ...MAP_BASE_CONFIG,
+    layers: [drawLayer, OTMLayer],
+  };
 
   const handleMapMount = (map: Map) => {
     mapRef.current = map;
@@ -103,75 +105,103 @@ export const MapDisplay = () => {
     }
 
     clearLayer(drawLayer);
+    mapRef.current?.getOverlays().forEach((overlay) => mapRef.current?.removeOverlay(overlay));
 
     const elevationData = await getPointsElevationData(points);
-    const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: 'zValue' });
+    const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });
 
-    const isolines =
-      isolinesType === 'turf'
-        ? makeTurfIsolines({
-            points: pointsWithZValue,
-            breaksDelta: 10,
-            isolinesOptions: { zProperty: 'zValue' },
-            splined: isIsolinesSplined,
-          })
-        : makeConrecIsolines({
-            points: pointsWithZValue,
-            breaksDelta: 10,
-            isolinesOptions: { zProperty: 'zValue' },
-            splined: isIsolinesSplined,
-          });
+    const isolinesSettings = {
+      points: pointsWithZValue,
+      breaksDelta: ISOLINES_BREAKS_DELTA,
+      isolinesOptions: { zProperty: Z_PROPERTY_NAME },
+      splined: isIsolinesSplined,
+    };
+
+    const isolines = makeIsolines(isolinesType, isolinesSettings);
 
     if (!isolines) {
       return;
     }
 
-    addFeaturesToLayer(drawLayer, g.readFeatures(bboxPolygon(bbox(isolines))));
-    addFeaturesToLayer(drawLayer, g.readFeatures(isolines));
+    addIsolinesToLayer(drawLayer, isolines, { addBbox: true });
 
-    console.log({ pointsWithZValue });
-    console.log({ isolines });
+    // console.log({ pointsWithZValue });
+    // console.log({ isolines });
 
-    const maxZValuePoint = findPointWithMaxZValue(pointsWithZValue, { zProperty: 'zValue' });
-    console.log(maxZValuePoint);
+    const maxZValuePoint = findPointWithMaxZValue(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
+    const minZValuePoint = findPointWithMinZValue(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
+
+    console.log({ maxZValuePoint, minZValuePoint });
 
     addFeaturesToLayer(drawLayer, g.readFeatures(maxZValuePoint));
+    addFeaturesToLayer(drawLayer, g.readFeatures(minZValuePoint));
+
+    const maxZValueCoordinates = maxZValuePoint!.geometry.coordinates;
+    const minZValueCoordinates = minZValuePoint!.geometry.coordinates;
+
+    const maxZValuePopup = createOverlayFromTemplate('marker-popup-template', 'max-z-popup', MARKER_POPUP_BASE_CONFIG);
+    const minZValuePopup = createOverlayFromTemplate('marker-popup-template', 'min-z-popup', MARKER_POPUP_BASE_CONFIG);
+
+    mapRef.current?.addOverlay(maxZValuePopup);
+    mapRef.current?.addOverlay(minZValuePopup);
+
+    console.log({ maxZValuePopup });
+
+    setOverlayMessage(
+      'popup-content',
+      maxZValuePopup,
+      `max: ${maxZValueCoordinates[0].toFixed(2)}, ${maxZValueCoordinates[1].toFixed(2)}`,
+    );
+
+    setOverlayMessage(
+      'popup-content',
+      minZValuePopup,
+      `min: ${minZValueCoordinates[0].toFixed(2)}, ${minZValueCoordinates[1].toFixed(2)}`,
+    );
+
+    maxZValuePopup.setPosition(maxZValueCoordinates);
+    minZValuePopup.setPosition(minZValueCoordinates);
   };
 
   return (
-    <section className={styles.mapDisplay}>
-      <SettingsPanel
-        activeLayer={{
-          heading: 'Active layer',
-          defaultValue: OTMLayerName,
-          options: ACTIVE_LAYER_OPTIONS,
-          onChange: handleActiveLayerChange,
-        }}
-        isolinesType={{
-          heading: 'Isolines type',
-          defaultValue: '',
-          options: ISOLINES_TYPE_OPTIONS,
-          onChange: handleIsolinesTypeChange,
-        }}
-        selectionArea={{
-          heading: 'Selection area type',
-          defaultValue: '',
-          options: SELECTION_AREA_OPTIONS,
-          onChange: handleSelectionAreaChange,
-        }}
-        splineIsolines={{
-          title: 'Spline isolines',
-          isChecked: isIsolinesSplined,
-          onChange: handleSplineIsolinesChange,
-        }}
-        confirmButton={{
-          heading: 'Calculate selected area',
-          isVisible: isDrawEnd && !!isolinesType,
-          onClick: handleConfirmButtonClick,
-        }}
-      />
+    <>
+      <template id="marker-popup-template">
+        <div id="popup" className={styles.popup}>
+          <p id="popup-content" className={styles.popupContent}></p>
+        </div>
+      </template>
 
-      <OLMap containerId={'map'} options={mapOptions} onMount={handleMapMount} />
-    </section>
+      <section className={styles.mapDisplay}>
+        <SettingsPanel
+          activeLayer={{
+            ...SETTINGS_PANEL_BASE_CONFIG.activeLayer,
+            defaultValue: OTMLayerName,
+            onChange: handleActiveLayerChange,
+          }}
+          isolinesType={{
+            ...SETTINGS_PANEL_BASE_CONFIG.isolinesType,
+            defaultValue: '',
+            onChange: handleIsolinesTypeChange,
+          }}
+          selectionArea={{
+            ...SETTINGS_PANEL_BASE_CONFIG.selectionArea,
+            defaultValue: '',
+            onChange: handleSelectionAreaChange,
+          }}
+          splineIsolines={{
+            ...SETTINGS_PANEL_BASE_CONFIG.splineIsolines,
+            isChecked: isIsolinesSplined,
+            onChange: handleSplineIsolinesChange,
+          }}
+          confirmButton={{
+            ...SETTINGS_PANEL_BASE_CONFIG.confirmButton,
+            isVisible: isDrawEnd && !!isolinesType,
+            onClick: handleConfirmButtonClick,
+          }}
+        />
+
+        <OLMap containerId={'map'} options={mapOptions} onMount={handleMapMount} />
+      </section>
+    </>
   );
 };

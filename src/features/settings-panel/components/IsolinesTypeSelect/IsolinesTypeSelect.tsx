@@ -3,11 +3,11 @@ import { Heading, Stack } from '@chakra-ui/react';
 import { FC } from 'react';
 import { SelectOptions } from '../../types';
 
-export const IsolinesTypeSelect: FC<SelectOptions> = ({ heading, options, defaultValue, onChange }) => {
+export const IsolinesTypeSelect: FC<SelectOptions> = ({ title, options, defaultValue, onChange }) => {
   return (
     <Stack spacing={2}>
       <Heading as={'h4'} size={'md'}>
-        {heading}
+        {title}
       </Heading>
       <CustomSelect
         borderColor={'gray.500'}

@@ -1,8 +1,8 @@
 import { drawInteractions, rasterLayers } from '@/utils/map-config';
 
-const isolines = ['turf', 'conrec'];
+const isolinesAvailableTypes = ['turf', 'conrec'];
 
-const isolinesItems = isolines.map((option) => {
+const isolinesItems = isolinesAvailableTypes.map((option) => {
   return {
     id: option,
     value: option,
@@ -10,7 +10,7 @@ const isolinesItems = isolines.map((option) => {
   };
 });
 
-export const ISOLINES_TYPE_OPTIONS = [
+const ISOLINES_TYPE_OPTIONS = [
   {
     id: 'Select isoline type',
     disabled: true,
@@ -28,7 +28,7 @@ const layerItems = Object.values(rasterLayers.getProperties()).map((rasterLayerP
   };
 });
 
-export const ACTIVE_LAYER_OPTIONS = [
+const ACTIVE_LAYER_OPTIONS = [
   {
     id: 'Select active layer',
     disabled: true,
@@ -46,7 +46,7 @@ const selectionItems = Object.values(drawInteractions.getProperties()).map((draw
   };
 });
 
-export const SELECTION_AREA_OPTIONS = [
+const SELECTION_AREA_OPTIONS = [
   {
     id: 'Select selection area type',
     disabled: true,
@@ -60,3 +60,24 @@ export const SELECTION_AREA_OPTIONS = [
   },
   ...selectionItems,
 ];
+
+export const SETTINGS_PANEL_BASE_CONFIG = {
+  activeLayer: {
+    title: 'Active layer',
+    options: ACTIVE_LAYER_OPTIONS,
+  },
+  isolinesType: {
+    title: 'Isolines type',
+    options: ISOLINES_TYPE_OPTIONS,
+  },
+  selectionArea: {
+    title: 'Selection area type',
+    options: SELECTION_AREA_OPTIONS,
+  },
+  splineIsolines: {
+    title: 'Spline isolines',
+  },
+  confirmButton: {
+    title: 'Calculate selected area',
+  },
+};

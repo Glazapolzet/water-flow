@@ -1,7 +1,7 @@
 import { ChangeEvent, ComponentPropsWithoutRef, MouseEvent } from 'react';
 
 export type SelectOptions = {
-  heading: string;
+  title: string;
   defaultValue?: string;
   options: ComponentPropsWithoutRef<'option'>[];
   onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
@@ -14,7 +14,7 @@ export type CheckboxOptions = {
 };
 
 export type ConfirmButtonOptions = {
-  heading: string;
+  title: string;
   isVisible: boolean;
   onClick: (event: MouseEvent<HTMLButtonElement>) => void;
 };

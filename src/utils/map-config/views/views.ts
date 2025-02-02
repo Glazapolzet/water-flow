@@ -1,7 +1,6 @@
 import { View } from 'ol';
-import { fromLonLat } from 'ol/proj';
 
 export const view = new View({
-  center: fromLonLat([0, 0]),
-  zoom: 2,
+  center: [4190701.0645526173, 7511438.408408914],
+  zoom: 10,
 });

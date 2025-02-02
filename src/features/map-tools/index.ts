@@ -1,1 +1,9 @@
-export { addFeaturesToLayer, clearLayer, DrawInteractions, Interactions, Layers } from './utils';
+export {
+  addFeaturesToLayer,
+  clearLayer,
+  createOverlayFromTemplate,
+  DrawInteractions,
+  Interactions,
+  Layers,
+  setOverlayMessage,
+} from './utils';

@@ -31,21 +31,21 @@ export const SettingsPanel: FC<SettingsPanel> = ({
 
       <Stack spacing={5} direction={'column'} className={styles.optionsContainer}>
         <ActiveLayerSelect
-          heading={activeLayer.heading}
+          title={activeLayer.title}
           options={activeLayer.options}
           onChange={activeLayer.onChange}
           defaultValue={activeLayer.defaultValue ?? ''}
         />
 
         <IsolinesTypeSelect
-          heading={isolinesType.heading}
+          title={isolinesType.title}
           options={isolinesType.options}
           onChange={isolinesType.onChange}
           defaultValue={isolinesType.defaultValue ?? ''}
         />
 
         <SelectionAreaSelect
-          heading={selectionArea.heading}
+          title={selectionArea.title}
           options={selectionArea.options}
           onChange={selectionArea.onChange}
           defaultValue={selectionArea.defaultValue ?? ''}
@@ -64,7 +64,7 @@ export const SettingsPanel: FC<SettingsPanel> = ({
           isVisible={confirmButton.isVisible}
           onClick={confirmButton.onClick}
         >
-          {confirmButton.heading}
+          {confirmButton.title}
         </CustomButton>
       </Stack>
     </Stack>
