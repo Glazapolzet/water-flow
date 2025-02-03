@@ -1,0 +1,39 @@
+.popup {
+  position: absolute;
+  background-color: #fff;
+  width: 200px;
+  border-radius: 10px;
+  padding: 10px 15px;
+  display: flex;
+  flex-direction: column;
+  bottom: 0;
+  left: 0;
+}
+
+.closeButton {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  align-self: flex-end;
+}
+
+.closeIcon {
+  width: 20px;
+  height: 20px;
+}
+
+.popupContent {
+  margin: 0;
+  padding: 0;
+  color: #000;
+  font-size: 14px;
+}
+
+.marker {
+  cursor: pointer;
+}
+
+.markerIcon {
+  width: 30px;
+  height: 30px;
+}

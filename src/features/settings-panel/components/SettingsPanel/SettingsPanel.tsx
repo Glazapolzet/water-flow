@@ -61,8 +61,8 @@ export const SettingsPanel: FC<SettingsPanel> = ({
 
         <CustomButton
           colorScheme={'teal'}
+          variant={'outline'}
           opacity={'1'}
-          bgColor={'teal.100'}
           isVisible={clearButton.isVisible}
           onClick={clearButton.onClick}
         >

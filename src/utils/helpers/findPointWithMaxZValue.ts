@@ -1,12 +1,12 @@
 import { featureEach } from '@turf/meta';
-import { Feature, FeatureCollection, GeoJsonProperties, Point } from 'geojson';
+import { Feature, FeatureCollection, Point } from 'geojson';
 
 export const findPointWithMaxZValue = (
   feature: FeatureCollection<Point>,
   options: { zProperty: string },
-): Feature<Point, GeoJsonProperties> | null => {
+): Feature<Point> | null => {
   const { zProperty } = options;
-  let maxZValuePoint: Feature<Point, GeoJsonProperties> | null = null;
+  let maxZValuePoint: Feature<Point> | null = null;
   let maxZValue: number | null = null;
 
   featureEach(feature, (currentFeature) => {

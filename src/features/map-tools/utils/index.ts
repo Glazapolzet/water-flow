@@ -1,4 +1,3 @@
-export { createOverlayFromTemplate } from './helpers/createOverlayFromTemplate';
 export { setOverlayMessage } from './helpers/setOverlayMessage';
 export { DrawInteractions } from './wrappers/DrawInteractions';
 export { Interactions } from './wrappers/Interactions';

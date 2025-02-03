@@ -1,1 +1,1 @@
-export { createOverlayFromTemplate, DrawInteractions, Interactions, Layers, setOverlayMessage } from './utils';
+export { DrawInteractions, Interactions, Layers, setOverlayMessage } from './utils';

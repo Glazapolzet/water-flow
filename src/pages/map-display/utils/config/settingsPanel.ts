@@ -81,6 +81,6 @@ export const SETTINGS_PANEL_BASE_CONFIG = {
     title: 'Calculate selected area',
   },
   clearButton: {
-    title: 'Clear all',
+    title: 'Clear',
   },
 };

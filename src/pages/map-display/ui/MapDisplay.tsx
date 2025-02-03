@@ -1,14 +1,13 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
-import { FeatureCollection, Point } from 'geojson';
-import { GeoJSON } from 'ol/format';
+import { Feature, FeatureCollection, Point } from 'geojson';
 import Map from 'ol/Map.js';
 
-import { createOverlayFromTemplate, setOverlayMessage } from '@/features/map-tools';
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
 import { drawInteractions, drawLayers, interactions, rasterLayers } from '@/utils/map-config';
 
+import { Marker } from '@/components';
 import { addZValueToEachPoint, findPointWithMinZValue } from '@/utils/helpers';
 import { findPointWithMaxZValue } from '@/utils/helpers/findPointWithMaxZValue';
 import {
@@ -17,7 +16,6 @@ import {
   ISOLINES_BREAKS_DELTA,
   makeIsolines,
   MAP_BASE_CONFIG,
-  MARKER_POPUP_BASE_CONFIG,
   SETTINGS_PANEL_BASE_CONFIG,
   useDrawHandlers,
   Z_PROPERTY_NAME,
@@ -26,12 +24,15 @@ import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
   const mapRef = useRef<Map | undefined>(undefined);
-  const g = new GeoJSON();
+  // const g = new GeoJSON();
 
   const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
   const [isolinesType, setIsolinesType] = useState<string | undefined>(undefined);
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
   const [points, setPoints] = useState<FeatureCollection<Point> | undefined>(undefined);
+
+  const [maxZValuePoint, setMaxZValuePoint] = useState<Feature<Point> | null>(null);
+  const [minZValuePoint, setMinZValuePoint] = useState<Feature<Point> | null>(null);
 
   const OTMLayerName: string = rasterLayers.getProperties().OpenTopoMap.name;
   const drawLayerName: string = drawLayers.getProperties().draw.name;
@@ -99,7 +100,7 @@ export const MapDisplay = () => {
   };
 
   const handleClearButtonClick = async () => {
-    mapRef.current?.getOverlays().forEach((overlay) => mapRef.current?.removeOverlay(overlay));
+    // mapRef.current?.getOverlays().forEach((overlay) => mapRef.current?.removeOverlay(overlay));
     drawLayer?.getSource()?.clear();
   };
 
@@ -108,7 +109,7 @@ export const MapDisplay = () => {
       return;
     }
 
-    mapRef.current?.getOverlays().forEach((overlay) => mapRef.current?.removeOverlay(overlay));
+    // mapRef.current?.getOverlays().forEach((overlay) => mapRef.current?.removeOverlay(overlay));
     drawLayer?.getSource()?.clear();
 
     const elevationData = await getPointsElevationData(points);
@@ -135,47 +136,14 @@ export const MapDisplay = () => {
     const maxZValuePoint = findPointWithMaxZValue(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
     const minZValuePoint = findPointWithMinZValue(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
 
-    // console.log({ maxZValuePoint, minZValuePoint });
-
-    drawLayer?.getSource()?.addFeatures(g.readFeatures(maxZValuePoint));
-    drawLayer?.getSource()?.addFeatures(g.readFeatures(minZValuePoint));
-
-    const maxZValueCoordinates = maxZValuePoint!.geometry.coordinates;
-    const minZValueCoordinates = minZValuePoint!.geometry.coordinates;
-
-    console.log(mapRef.current?.getOverlays());
-
-    const maxZValuePopup = createOverlayFromTemplate('marker-popup-template', 'max-z-popup', MARKER_POPUP_BASE_CONFIG);
-    const minZValuePopup = createOverlayFromTemplate('marker-popup-template', 'min-z-popup', MARKER_POPUP_BASE_CONFIG);
-
-    console.log(mapRef.current?.getOverlays());
-
-    mapRef.current?.addOverlay(maxZValuePopup);
-    mapRef.current?.addOverlay(minZValuePopup);
-
-    setOverlayMessage(
-      'popup-content',
-      maxZValuePopup,
-      `max: ${maxZValueCoordinates[0].toFixed(2)}, ${maxZValueCoordinates[1].toFixed(2)}`,
-    );
-
-    setOverlayMessage(
-      'popup-content',
-      minZValuePopup,
-      `min: ${minZValueCoordinates[0].toFixed(2)}, ${minZValueCoordinates[1].toFixed(2)}`,
-    );
-
-    maxZValuePopup.setPosition(maxZValueCoordinates);
-    minZValuePopup.setPosition(minZValueCoordinates);
+    setMaxZValuePoint(maxZValuePoint);
+    setMinZValuePoint(minZValuePoint);
   };
 
   return (
     <>
-      <template id="marker-popup-template">
-        <div id="popup" className={styles.popup}>
-          <p id="popup-content" className={styles.popupContent}></p>
-        </div>
-      </template>
+      <Marker mapRef={mapRef} position={maxZValuePoint?.geometry.coordinates} title={'Max Z Value'} />
+      <Marker mapRef={mapRef} position={minZValuePoint?.geometry.coordinates} title={'Min Z Value'} />
 
       <section className={styles.mapDisplay}>
         <SettingsPanel
