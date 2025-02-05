@@ -1,3 +1,6 @@
+.markerLayout {
+}
+
 .popup {
   position: absolute;
   background-color: #fff;
@@ -15,6 +18,11 @@
   border: none;
   cursor: pointer;
   align-self: flex-end;
+  transition: transform 0.2s ease-in-out;
+}
+
+.closeButton:hover {
+  transform: scale(1.2);
 }
 
 .closeIcon {

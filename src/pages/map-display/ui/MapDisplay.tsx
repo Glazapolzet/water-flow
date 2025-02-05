@@ -10,6 +10,8 @@ import { drawInteractions, drawLayers, interactions, rasterLayers } from '@/util
 import { Marker } from '@/components';
 import { addZValueToEachPoint, findPointWithMinZValue } from '@/utils/helpers';
 import { findPointWithMaxZValue } from '@/utils/helpers/findPointWithMaxZValue';
+import { toStringHDMS } from 'ol/coordinate';
+import { toLonLat } from 'ol/proj';
 import {
   addIsolinesToLayer,
   getPointsElevationData,
@@ -142,8 +144,18 @@ export const MapDisplay = () => {
 
   return (
     <>
-      <Marker mapRef={mapRef} position={maxZValuePoint?.geometry.coordinates} title={'Max Z Value'} />
-      <Marker mapRef={mapRef} position={minZValuePoint?.geometry.coordinates} title={'Min Z Value'} />
+      <Marker
+        mapRef={mapRef}
+        position={maxZValuePoint?.geometry.coordinates}
+        title={`Max height: ${maxZValuePoint?.properties?.[`${Z_PROPERTY_NAME}`]}m
+        Coordinates: ${toStringHDMS(toLonLat(maxZValuePoint?.geometry.coordinates || []))}`}
+      />
+      <Marker
+        mapRef={mapRef}
+        position={minZValuePoint?.geometry.coordinates}
+        title={`Min height: ${minZValuePoint?.properties?.[`${Z_PROPERTY_NAME}`]}m
+        Coordinates: ${toStringHDMS(toLonLat(minZValuePoint?.geometry.coordinates || []))}`}
+      />
 
       <section className={styles.mapDisplay}>
         <SettingsPanel

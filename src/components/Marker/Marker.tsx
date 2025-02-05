@@ -39,16 +39,24 @@ export const Marker: FC<Marker> = ({ mapRef, position, title }) => {
     };
   }, [mapRef, position]);
 
-  const handleMarkerClick = () => {
-    markerPopup.setPosition(position);
-  };
-
-  const handleCloseButtonClick = () => {
+  const closePopup = () => {
     markerPopup.setPosition(undefined);
   };
 
+  const openPopup = () => {
+    markerPopup.setPosition(position);
+  };
+
+  const handleMarkerClick = () => {
+    markerPopup.getPosition() ? closePopup() : openPopup();
+  };
+
+  const handleCloseButtonClick = () => {
+    closePopup();
+  };
+
   return (
-    <>
+    <div className={styles.markerLayout} style={{ display: position ? 'block' : 'none' }}>
       <div ref={popupRef} className={styles.popup}>
         <button className={styles.closeButton} onClick={handleCloseButtonClick}>
           <img src={closeIcon} className={styles.closeIcon} alt={'close'} />
@@ -59,6 +67,6 @@ export const Marker: FC<Marker> = ({ mapRef, position, title }) => {
       <div ref={markerRef} className={styles.marker} onClick={handleMarkerClick}>
         <img src={markerIcon} className={styles.markerIcon} alt={'marker'} />
       </div>
-    </>
+    </div>
   );
 };
