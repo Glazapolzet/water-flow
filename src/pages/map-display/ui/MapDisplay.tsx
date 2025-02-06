@@ -5,7 +5,7 @@ import Map from 'ol/Map.js';
 
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
-import { drawInteractions, drawLayers, interactions, rasterLayers } from '@/utils/map-config';
+import { drawInteractions, drawLayer, interactions, rasterLayers } from '@/utils/map-config';
 
 import { Marker } from '@/components';
 import { addZValueToEachPoint, findPointWithMinZValue } from '@/utils/helpers';
@@ -35,19 +35,11 @@ export const MapDisplay = () => {
   const [minZValuePoint, setMinZValuePoint] = useState<Feature<Point> | null>(null);
 
   const OTMLayerName: string = rasterLayers.getProperties().OpenTopoMap.name;
-  const drawLayerName: string = drawLayers.getProperties().draw.name;
-
-  const OTMLayer = rasterLayers.get(OTMLayerName);
-  const drawLayer = drawLayers.get(drawLayerName);
 
   const [activeLayer, setActiveLayer] = useState<string>(OTMLayerName);
   const [selectionArea, setSelectionArea] = useState<string>('');
   const [isolinesType, setIsolinesType] = useState<string>('');
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
-
-  if (!drawLayer || !OTMLayer) {
-    return;
-  }
 
   const { handleDrawStart, handleDrawEnd } = useDrawHandlers(drawLayer, setIsDrawEnd, setPoints);
 
@@ -170,8 +162,8 @@ export const MapDisplay = () => {
         <SettingsPanel
           activeLayer={{
             ...SETTINGS_PANEL_BASE_CONFIG.activeLayer,
-            defaultValue: OTMLayerName,
             onChange: handleActiveLayerChange,
+            value: activeLayer,
           }}
           isolinesType={{
             ...SETTINGS_PANEL_BASE_CONFIG.isolinesType,
