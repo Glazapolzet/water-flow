@@ -21,9 +21,9 @@ export const SettingsPanel: FC<SettingsPanel> = ({
   clearButton,
   confirmButton,
 }) => {
-  const { title: activeLayerTitle, defaultValue: activeLayerDefaultValue, ...activeLayerProps } = activeLayer;
-  const { title: isolinesTypeTitle, defaultValue: isolinesTypeDefaultValue, ...isolinesTypeProps } = isolinesType;
-  const { title: selectionAreaTitle, defaultValue: selectionAreaDefaultValue, ...selectionAreaProps } = selectionArea;
+  const { title: activeLayerTitle, ...activeLayerProps } = activeLayer;
+  const { title: isolinesTypeTitle, ...isolinesTypeProps } = isolinesType;
+  const { title: selectionAreaTitle, ...selectionAreaProps } = selectionArea;
   const { title: splineIsolinesTitle, ...splineIsolinesProps } = splineIsolines;
 
   const { title: clearButtonTitle, ...clearButtonProps } = clearButton;
@@ -44,7 +44,6 @@ export const SettingsPanel: FC<SettingsPanel> = ({
               borderWidth={'1px'}
               size={'md'}
               variant={'filled'}
-              defaultValue={activeLayerDefaultValue ?? ''}
               {...activeLayerProps}
             />
           }
@@ -58,7 +57,6 @@ export const SettingsPanel: FC<SettingsPanel> = ({
               borderWidth={'1px'}
               size={'md'}
               variant={'filled'}
-              defaultValue={isolinesTypeDefaultValue ?? ''}
               {...isolinesTypeProps}
             />
           }
@@ -72,7 +70,6 @@ export const SettingsPanel: FC<SettingsPanel> = ({
               borderWidth={'1px'}
               size={'md'}
               variant={'filled'}
-              defaultValue={selectionAreaDefaultValue ?? ''}
               {...selectionAreaProps}
             />
           }

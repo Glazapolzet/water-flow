@@ -29,8 +29,6 @@ export const MapDisplay = () => {
   // const g = new GeoJSON();
 
   const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
-  const [isolinesType, setIsolinesType] = useState<string | undefined>(undefined);
-  const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
   const [points, setPoints] = useState<FeatureCollection<Point> | undefined>(undefined);
 
   const [maxZValuePoint, setMaxZValuePoint] = useState<Feature<Point> | null>(null);
@@ -41,6 +39,11 @@ export const MapDisplay = () => {
 
   const OTMLayer = rasterLayers.get(OTMLayerName);
   const drawLayer = drawLayers.get(drawLayerName);
+
+  const [activeLayer, setActiveLayer] = useState<string>(OTMLayerName);
+  const [selectionArea, setSelectionArea] = useState<string>('');
+  const [isolinesType, setIsolinesType] = useState<string>('');
+  const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
 
   if (!drawLayer || !OTMLayer) {
     return;
@@ -61,9 +64,25 @@ export const MapDisplay = () => {
       });
   }, []);
 
+  useEffect(() => {
+    rasterLayers.getArray().forEach((layer) => {
+      layer.getProperties()?.name !== activeLayer
+        ? mapRef.current?.removeLayer(layer)
+        : mapRef.current?.addLayer(layer);
+    });
+  }, [activeLayer]);
+
+  useEffect(() => {
+    drawInteractions.getArray().forEach((draw) => {
+      draw.getProperties()?.name !== selectionArea
+        ? mapRef.current?.removeInteraction(draw)
+        : mapRef.current?.addInteraction(draw);
+    });
+  }, [selectionArea]);
+
   const mapOptions = {
     ...MAP_BASE_CONFIG,
-    layers: [drawLayer, OTMLayer],
+    layers: [drawLayer],
   };
 
   const handleMapMount = (map: Map) => {
@@ -78,19 +97,11 @@ export const MapDisplay = () => {
   };
 
   const handleActiveLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    rasterLayers.getArray().forEach((layer) => {
-      layer.getProperties()?.name !== event.target.value
-        ? mapRef.current?.removeLayer(layer)
-        : mapRef.current?.addLayer(layer);
-    });
+    setActiveLayer(event.target.value);
   };
 
   const handleSelectionAreaChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    drawInteractions.getArray().forEach((draw) => {
-      draw.getProperties()?.name !== event.target.value
-        ? mapRef.current?.removeInteraction(draw)
-        : mapRef.current?.addInteraction(draw);
-    });
+    setSelectionArea(event.target.value);
   };
 
   const handleIsolinesTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -102,7 +113,6 @@ export const MapDisplay = () => {
   };
 
   const handleClearButtonClick = async () => {
-    // mapRef.current?.getOverlays().forEach((overlay) => mapRef.current?.removeOverlay(overlay));
     drawLayer?.getSource()?.clear();
   };
 
@@ -131,7 +141,6 @@ export const MapDisplay = () => {
 
     addIsolinesToLayer(drawLayer, isolines, { addBbox: true });
 
-    drawInteractions.getArray().forEach((draw) => mapRef.current?.removeInteraction(draw));
     // console.log({ pointsWithZValue });
     // console.log({ isolines });
 
@@ -181,7 +190,6 @@ export const MapDisplay = () => {
           }}
           clearButton={{
             ...SETTINGS_PANEL_BASE_CONFIG.clearButton,
-            isVisible: true,
             onClick: handleClearButtonClick,
           }}
           confirmButton={{
