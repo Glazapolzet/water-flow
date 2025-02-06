@@ -44,7 +44,13 @@ export const MapDisplay = () => {
   const [isolinesType, setIsolinesType] = useState<string>('');
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
 
-  const { handleDrawStart, handleDrawEnd } = useDrawHandlers(drawLayer, setIsDrawEnd, setPoints);
+  const { handleDrawStart, handleDrawEnd } = useDrawHandlers(
+    drawLayer,
+    setIsDrawEnd,
+    setPoints,
+    setMaxZValuePoint,
+    setMinZValuePoint,
+  );
 
   useEffect(() => {
     drawInteractions.getArray().forEach((draw) => {
@@ -75,6 +81,13 @@ export const MapDisplay = () => {
     // });
   };
 
+  const clearLayer = () => {
+    drawLayer?.getSource()?.clear();
+
+    setMaxZValuePoint(null);
+    setMinZValuePoint(null);
+  };
+
   const handleActiveLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
     setActiveLayer(event.target.value);
   };
@@ -92,7 +105,7 @@ export const MapDisplay = () => {
   };
 
   const handleClearButtonClick = async () => {
-    drawLayer?.getSource()?.clear();
+    clearLayer();
   };
 
   const handleConfirmButtonClick = async () => {
@@ -100,7 +113,7 @@ export const MapDisplay = () => {
       return;
     }
 
-    drawLayer?.getSource()?.clear();
+    clearLayer();
 
     const elevationData = await getPointsElevationData(points);
     const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });

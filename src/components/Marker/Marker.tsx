@@ -1,7 +1,7 @@
 import closeIcon from '@/assets/icons/cross.svg';
 import markerIcon from '@/assets/icons/map-marker.svg';
 import { Map, Overlay } from 'ol';
-import { FC, useEffect, useRef } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import styles from './Marker.module.scss';
 
 interface Marker {
@@ -10,7 +10,7 @@ interface Marker {
   title: string;
 }
 
-export const Marker: FC<Marker> = ({ mapRef, position, title }) => {
+const Component = function ({ mapRef, position, title }: Marker) {
   const markerRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -70,3 +70,5 @@ export const Marker: FC<Marker> = ({ mapRef, position, title }) => {
     </div>
   );
 };
+
+export const Marker = memo(Component);

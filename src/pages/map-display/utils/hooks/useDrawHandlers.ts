@@ -1,5 +1,5 @@
 import { makePointsFromBBox } from '@/utils/helpers';
-import { FeatureCollection, Point } from 'geojson';
+import { Feature, FeatureCollection, Point } from 'geojson';
 import { GeoJSON } from 'ol/format';
 import { DrawEvent } from 'ol/interaction/Draw';
 import VectorLayer from 'ol/layer/Vector';
@@ -9,11 +9,16 @@ export const useDrawHandlers = (
   drawLayer: VectorLayer,
   setIsDrawEnd: (isDrawEnd: boolean) => void,
   setPoints: (points: FeatureCollection<Point>) => void,
+  setMaxZValuePoint: (maxZValuePoint: Feature<Point> | null) => void,
+  setMinZValuePoint: (minZValuePoint: Feature<Point> | null) => void,
 ) => {
   const g = new GeoJSON();
 
   const handleDrawStart = useCallback(() => {
     setIsDrawEnd(false);
+
+    setMaxZValuePoint(null);
+    setMinZValuePoint(null);
 
     drawLayer?.getSource()?.clear();
   }, [drawLayer, setIsDrawEnd]);

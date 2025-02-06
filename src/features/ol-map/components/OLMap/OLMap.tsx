@@ -1,9 +1,6 @@
-import { memo, useEffect } from 'react';
-
-import Map from 'ol/Map.js';
-
 import { Unpacked } from '@/types';
-
+import Map from 'ol/Map.js';
+import { memo, useEffect } from 'react';
 import styles from './OLMap.module.scss';
 
 interface OLMap {
