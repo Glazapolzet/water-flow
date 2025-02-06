@@ -1,11 +1,11 @@
 import { Select as ChakraSelect } from '@chakra-ui/react';
-import { ComponentProps, FC } from 'react';
+import { ComponentProps, ComponentPropsWithoutRef, FC } from 'react';
 
-type CustomSelect = ComponentProps<typeof ChakraSelect> & {
-  options: ComponentProps<'option'>[];
+type SelectWithOptions = ComponentProps<typeof ChakraSelect> & {
+  options: ComponentPropsWithoutRef<'option'>[];
 };
 
-export const CustomSelect: FC<CustomSelect> = ({ options, ...props }) => {
+export const SelectWithOptions: FC<SelectWithOptions> = ({ options, ...props }) => {
   return (
     <ChakraSelect {...props}>
       {options.map(({ children, id, ...props }, index) => (

@@ -1,1 +1,1 @@
-export type { ButtonOptions, CheckboxOptions, SelectOptions } from './types';
+export type { SettingsButton, SettingsCheckbox, SettingsSelect } from './types';

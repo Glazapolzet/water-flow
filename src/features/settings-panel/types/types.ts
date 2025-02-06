@@ -1,20 +1,9 @@
-import { ChangeEvent, ComponentPropsWithoutRef, MouseEvent } from 'react';
+import { HideableButton, SelectWithOptions } from '@/components';
+import { Checkbox } from '@chakra-ui/react';
+import { ComponentProps } from 'react';
 
-export type SelectOptions = {
-  title: string;
-  defaultValue?: string;
-  options: ComponentPropsWithoutRef<'option'>[];
-  onChange: (event: ChangeEvent<HTMLSelectElement>) => void;
-};
+export type SettingsSelect = ComponentProps<typeof SelectWithOptions> & { title: string };
 
-export type CheckboxOptions = {
-  title: string;
-  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
-  isChecked: boolean;
-};
+export type SettingsCheckbox = ComponentProps<typeof Checkbox> & { title: string };
 
-export type ButtonOptions = {
-  title: string;
-  isVisible: boolean;
-  onClick: (event: MouseEvent<HTMLButtonElement>) => void;
-};
+export type SettingsButton = ComponentProps<typeof HideableButton> & { title: string };

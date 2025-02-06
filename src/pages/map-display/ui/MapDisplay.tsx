@@ -111,7 +111,6 @@ export const MapDisplay = () => {
       return;
     }
 
-    // mapRef.current?.getOverlays().forEach((overlay) => mapRef.current?.removeOverlay(overlay));
     drawLayer?.getSource()?.clear();
 
     const elevationData = await getPointsElevationData(points);
@@ -132,6 +131,7 @@ export const MapDisplay = () => {
 
     addIsolinesToLayer(drawLayer, isolines, { addBbox: true });
 
+    drawInteractions.getArray().forEach((draw) => mapRef.current?.removeInteraction(draw));
     // console.log({ pointsWithZValue });
     // console.log({ isolines });
 
