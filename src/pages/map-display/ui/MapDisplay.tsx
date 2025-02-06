@@ -19,7 +19,9 @@ import {
   makeIsolines,
   MAP_BASE_CONFIG,
   SETTINGS_PANEL_BASE_CONFIG,
+  useActiveLayer,
   useDrawHandlers,
+  useSelectionArea,
   Z_PROPERTY_NAME,
 } from '../utils';
 import styles from './MapDisplay.module.scss';
@@ -36,8 +38,9 @@ export const MapDisplay = () => {
 
   const OTMLayerName: string = rasterLayers.getProperties().OpenTopoMap.name;
 
-  const [activeLayer, setActiveLayer] = useState<string>(OTMLayerName);
-  const [selectionArea, setSelectionArea] = useState<string>('');
+  const { activeLayer, setActiveLayer } = useActiveLayer(mapRef, OTMLayerName, rasterLayers);
+  const { selectionArea, setSelectionArea } = useSelectionArea(mapRef, '', drawInteractions);
+
   const [isolinesType, setIsolinesType] = useState<string>('');
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
 
@@ -55,22 +58,6 @@ export const MapDisplay = () => {
         draw.un('drawend', handleDrawEnd);
       });
   }, []);
-
-  useEffect(() => {
-    rasterLayers.getArray().forEach((layer) => {
-      layer.getProperties()?.name !== activeLayer
-        ? mapRef.current?.removeLayer(layer)
-        : mapRef.current?.addLayer(layer);
-    });
-  }, [activeLayer]);
-
-  useEffect(() => {
-    drawInteractions.getArray().forEach((draw) => {
-      draw.getProperties()?.name !== selectionArea
-        ? mapRef.current?.removeInteraction(draw)
-        : mapRef.current?.addInteraction(draw);
-    });
-  }, [selectionArea]);
 
   const mapOptions = {
     ...MAP_BASE_CONFIG,
@@ -167,13 +154,13 @@ export const MapDisplay = () => {
           }}
           isolinesType={{
             ...SETTINGS_PANEL_BASE_CONFIG.isolinesType,
-            defaultValue: '',
             onChange: handleIsolinesTypeChange,
+            value: isolinesType,
           }}
           selectionArea={{
             ...SETTINGS_PANEL_BASE_CONFIG.selectionArea,
-            defaultValue: '',
             onChange: handleSelectionAreaChange,
+            value: selectionArea,
           }}
           splineIsolines={{
             ...SETTINGS_PANEL_BASE_CONFIG.splineIsolines,
