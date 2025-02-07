@@ -44,13 +44,14 @@ export const MapDisplay = () => {
   const [isolinesType, setIsolinesType] = useState<string>('');
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
 
-  const { handleDrawStart, handleDrawEnd } = useDrawHandlers(
-    drawLayer,
-    setIsDrawEnd,
-    setPoints,
-    setMaxZValuePoint,
-    setMinZValuePoint,
-  );
+  const clearLayer = () => {
+    drawLayer?.getSource()?.clear();
+
+    setMaxZValuePoint(null);
+    setMinZValuePoint(null);
+  };
+
+  const { handleDrawStart, handleDrawEnd } = useDrawHandlers(drawLayer, setIsDrawEnd, setPoints, clearLayer);
 
   useEffect(() => {
     drawInteractions.getArray().forEach((draw) => {
@@ -79,13 +80,6 @@ export const MapDisplay = () => {
     //   const clickedCoordinate = event.coordinate;
     //   console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
     // });
-  };
-
-  const clearLayer = () => {
-    drawLayer?.getSource()?.clear();
-
-    setMaxZValuePoint(null);
-    setMinZValuePoint(null);
   };
 
   const handleActiveLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -149,14 +143,14 @@ export const MapDisplay = () => {
       <Marker
         mapRef={mapRef}
         position={maxZValuePoint?.geometry.coordinates}
-        title={`Max height: ${maxZValuePoint?.properties?.[`${Z_PROPERTY_NAME}`]}m
-        Coordinates: ${toStringHDMS(toLonLat(maxZValuePoint?.geometry.coordinates || []))}`}
+        title={`Верхняя граница: ${maxZValuePoint?.properties?.[`${Z_PROPERTY_NAME}`]}м
+        Координаты: ${toStringHDMS(toLonLat(maxZValuePoint?.geometry.coordinates || []))}`}
       />
       <Marker
         mapRef={mapRef}
         position={minZValuePoint?.geometry.coordinates}
-        title={`Min height: ${minZValuePoint?.properties?.[`${Z_PROPERTY_NAME}`]}m
-        Coordinates: ${toStringHDMS(toLonLat(minZValuePoint?.geometry.coordinates || []))}`}
+        title={`Нижняя граница: ${minZValuePoint?.properties?.[`${Z_PROPERTY_NAME}`]}м
+        Координаты: ${toStringHDMS(toLonLat(minZValuePoint?.geometry.coordinates || []))}`}
       />
 
       <section className={styles.mapDisplay}>
