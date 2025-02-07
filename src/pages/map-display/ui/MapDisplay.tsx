@@ -114,6 +114,7 @@ export const MapDisplay = () => {
     }
 
     clearLayer();
+    setSelectionArea('');
 
     const elevationData = await getPointsElevationData(points);
     const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });
