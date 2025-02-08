@@ -94,6 +94,10 @@ export const MapDisplay = () => {
     setIsolinesType(event.target.value);
   };
 
+  const handleMeasureDeltaChange = (valueAsString: string, valueAsNumber: number) => {
+    console.log(valueAsString, valueAsNumber);
+  };
+
   const handleSplineIsolinesChange = () => {
     setIsIsolinesSplined(!isIsolinesSplined);
   };
@@ -174,6 +178,10 @@ export const MapDisplay = () => {
             ...SETTINGS_PANEL_BASE_CONFIG.splineIsolines,
             isChecked: isIsolinesSplined,
             onChange: handleSplineIsolinesChange,
+          }}
+          measureDelta={{
+            title: 'Measure delta',
+            onChange: handleMeasureDeltaChange,
           }}
           clearButton={{
             ...SETTINGS_PANEL_BASE_CONFIG.clearButton,

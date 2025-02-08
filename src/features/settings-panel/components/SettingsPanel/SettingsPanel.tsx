@@ -1,7 +1,17 @@
 import { HideableButton, SelectWithOptions, TitledComponent } from '@/components';
-import { Checkbox, Heading, Stack, StackDivider } from '@chakra-ui/react';
+import {
+  Checkbox,
+  Heading,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  Stack,
+  StackDivider,
+} from '@chakra-ui/react';
 import { FC } from 'react';
-import { SettingsButton, SettingsCheckbox, SettingsSelect } from '../../types';
+import { SettingsButton, SettingsCheckbox, SettingsNumber, SettingsSelect } from '../../types';
 import styles from './SettingsPanel.module.scss';
 
 interface SettingsPanel {
@@ -11,6 +21,7 @@ interface SettingsPanel {
   splineIsolines: SettingsCheckbox;
   clearButton: SettingsButton;
   confirmButton: SettingsButton;
+  measureDelta: SettingsNumber;
 }
 
 export const SettingsPanel: FC<SettingsPanel> = ({
@@ -20,11 +31,13 @@ export const SettingsPanel: FC<SettingsPanel> = ({
   splineIsolines,
   clearButton,
   confirmButton,
+  measureDelta,
 }) => {
   const { title: activeLayerTitle, ...activeLayerProps } = activeLayer;
   const { title: isolinesTypeTitle, ...isolinesTypeProps } = isolinesType;
   const { title: selectionAreaTitle, ...selectionAreaProps } = selectionArea;
   const { title: splineIsolinesTitle, ...splineIsolinesProps } = splineIsolines;
+  const { title: measureDeltaTitle, ...measureDeltaProps } = measureDelta;
 
   const { title: clearButtonTitle, ...clearButtonProps } = clearButton;
   const { title: confirmButtonTitle, ...confirmButtonProps } = confirmButton;
@@ -78,6 +91,19 @@ export const SettingsPanel: FC<SettingsPanel> = ({
         <Checkbox colorScheme={'teal'} {...splineIsolinesProps}>
           {splineIsolinesTitle}
         </Checkbox>
+
+        <TitledComponent
+          title={measureDeltaTitle}
+          Component={
+            <NumberInput step={5} defaultValue={150} min={100} {...measureDeltaProps}>
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          }
+        />
 
         <HideableButton colorScheme={'teal'} variant={'outline'} opacity={'1'} {...clearButtonProps}>
           {clearButtonTitle}
