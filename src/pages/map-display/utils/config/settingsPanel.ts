@@ -77,6 +77,9 @@ export const SETTINGS_PANEL_BASE_CONFIG = {
   splineIsolines: {
     title: 'Spline isolines',
   },
+  measureDelta: {
+    title: 'Measure delta (m)',
+  },
   confirmButton: {
     title: 'Calculate selected area',
   },

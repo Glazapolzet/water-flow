@@ -1,6 +1,7 @@
 import { HideableButton, SelectWithOptions, TitledComponent } from '@/components';
 import {
-  Checkbox,
+  FormControl,
+  FormLabel,
   Heading,
   NumberDecrementStepper,
   NumberIncrementStepper,
@@ -9,16 +10,17 @@ import {
   NumberInputStepper,
   Stack,
   StackDivider,
+  Switch,
 } from '@chakra-ui/react';
 import { FC } from 'react';
-import { SettingsButton, SettingsCheckbox, SettingsNumber, SettingsSelect } from '../../types';
+import { SettingsButton, SettingsNumber, SettingsSelect, SettingsSwitch } from '../../types';
 import styles from './SettingsPanel.module.scss';
 
 interface SettingsPanel {
   activeLayer: SettingsSelect;
   isolinesType: SettingsSelect;
   selectionArea: SettingsSelect;
-  splineIsolines: SettingsCheckbox;
+  splineIsolines: SettingsSwitch;
   clearButton: SettingsButton;
   confirmButton: SettingsButton;
   measureDelta: SettingsNumber;
@@ -53,7 +55,7 @@ export const SettingsPanel: FC<SettingsPanel> = ({
           title={activeLayerTitle}
           Component={
             <SelectWithOptions
-              borderColor={'gray.500'}
+              borderColor={'gray.400'}
               borderWidth={'1px'}
               size={'md'}
               variant={'filled'}
@@ -66,7 +68,7 @@ export const SettingsPanel: FC<SettingsPanel> = ({
           title={isolinesTypeTitle}
           Component={
             <SelectWithOptions
-              borderColor={'gray.500'}
+              borderColor={'gray.400'}
               borderWidth={'1px'}
               size={'md'}
               variant={'filled'}
@@ -79,7 +81,7 @@ export const SettingsPanel: FC<SettingsPanel> = ({
           title={selectionAreaTitle}
           Component={
             <SelectWithOptions
-              borderColor={'gray.500'}
+              borderColor={'gray.400'}
               borderWidth={'1px'}
               size={'md'}
               variant={'filled'}
@@ -88,15 +90,25 @@ export const SettingsPanel: FC<SettingsPanel> = ({
           }
         />
 
-        <Checkbox colorScheme={'teal'} {...splineIsolinesProps}>
-          {splineIsolinesTitle}
-        </Checkbox>
+        <FormControl display="flex" alignItems="center">
+          <FormLabel htmlFor="email-alerts" mb="0">
+            {splineIsolinesTitle}
+          </FormLabel>
+          <Switch {...splineIsolinesProps} colorScheme={'teal'} size="md" id="email-alerts" />
+        </FormControl>
 
         <TitledComponent
           title={measureDeltaTitle}
           Component={
-            <NumberInput step={5} defaultValue={150} min={100} {...measureDeltaProps}>
-              <NumberInputField />
+            <NumberInput
+              step={5}
+              defaultValue={150}
+              min={100}
+              variant={'filled'}
+              focusBorderColor={'teal.200'}
+              {...measureDeltaProps}
+            >
+              <NumberInputField borderColor={'gray.400'} borderWidth={'1px'} />
               <NumberInputStepper>
                 <NumberIncrementStepper />
                 <NumberDecrementStepper />

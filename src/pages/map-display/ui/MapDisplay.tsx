@@ -2,13 +2,14 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { Feature, FeatureCollection, Point } from 'geojson';
 import Map from 'ol/Map.js';
+import GeoJSON from 'ol/format/GeoJSON';
 
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
 import { drawInteractions, drawLayer, interactions, rasterLayers } from '@/utils/map-config';
 
 import { Marker } from '@/components';
-import { addZValueToEachPoint, findPointWithMinZValue } from '@/utils/helpers';
+import { addZValueToEachPoint, findPointWithMinZValue, makePointsFromBBox } from '@/utils/helpers';
 import { findPointWithMaxZValue } from '@/utils/helpers/findPointWithMaxZValue';
 import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';
@@ -28,9 +29,8 @@ import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
   const mapRef = useRef<Map | undefined>(undefined);
-  // const g = new GeoJSON();
+  const g = new GeoJSON();
 
-  const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
   const [points, setPoints] = useState<FeatureCollection<Point> | undefined>(undefined);
 
   const [maxZValuePoint, setMaxZValuePoint] = useState<Feature<Point> | null>(null);
@@ -51,7 +51,20 @@ export const MapDisplay = () => {
     setMinZValuePoint(null);
   };
 
-  const { handleDrawStart, handleDrawEnd } = useDrawHandlers(drawLayer, setIsDrawEnd, setPoints, clearLayer);
+  const { handleDrawStart, handleDrawEnd, isDrawEnd, geometry } = useDrawHandlers();
+
+  useEffect(() => {
+    if (isDrawEnd && geometry) {
+      const points = makePointsFromBBox(geometry.getExtent(), 20, { units: 'meters' });
+      setPoints(points);
+
+      drawLayer?.getSource()?.addFeatures(g.readFeatures(points));
+
+      return;
+    }
+
+    clearLayer();
+  }, [isDrawEnd, geometry]);
 
   useEffect(() => {
     drawInteractions.getArray().forEach((draw) => {
@@ -180,7 +193,7 @@ export const MapDisplay = () => {
             onChange: handleSplineIsolinesChange,
           }}
           measureDelta={{
-            title: 'Measure delta',
+            ...SETTINGS_PANEL_BASE_CONFIG.measureDelta,
             onChange: handleMeasureDeltaChange,
           }}
           clearButton={{
