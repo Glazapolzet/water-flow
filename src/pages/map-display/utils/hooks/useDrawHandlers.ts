@@ -1,41 +1,20 @@
-import { makePointsFromBBox } from '@/utils/helpers';
-import { FeatureCollection, Point } from 'geojson';
-import { GeoJSON } from 'ol/format';
+import { Geometry } from 'ol/geom';
 import { DrawEvent } from 'ol/interaction/Draw';
-import VectorLayer from 'ol/layer/Vector';
-import { useCallback } from 'react';
+import { useState } from 'react';
 
-export const useDrawHandlers = (
-  drawLayer: VectorLayer,
-  setIsDrawEnd: (isDrawEnd: boolean) => void,
-  setPoints: (points: FeatureCollection<Point>) => void,
-  clearLayer: () => void,
-) => {
-  const g = new GeoJSON();
+export const useDrawHandlers = () => {
+  const [isDrawEnd, setIsDrawEnd] = useState<boolean>(false);
+  const [geometry, setGeometry] = useState<Geometry | undefined>(undefined);
 
-  const handleDrawStart = useCallback(() => {
+  const handleDrawStart = () => {
     setIsDrawEnd(false);
+    setGeometry(undefined);
+  };
 
-    clearLayer();
-  }, [drawLayer, setIsDrawEnd]);
+  const handleDrawEnd = (drawEvent: DrawEvent) => {
+    setIsDrawEnd(true);
+    setGeometry(drawEvent?.feature.getGeometry());
+  };
 
-  const handleDrawEnd = useCallback(
-    (drawEvent: DrawEvent) => {
-      setIsDrawEnd(true);
-
-      const geometry = drawEvent?.feature.getGeometry();
-
-      if (!geometry) {
-        return;
-      }
-
-      const points = makePointsFromBBox(geometry.getExtent(), 20, { units: 'meters' });
-      setPoints(points);
-
-      drawLayer?.getSource()?.addFeatures(g.readFeatures(points));
-    },
-    [drawLayer, setPoints, setIsDrawEnd],
-  );
-
-  return { handleDrawStart, handleDrawEnd };
+  return { handleDrawStart, handleDrawEnd, isDrawEnd, geometry };
 };
