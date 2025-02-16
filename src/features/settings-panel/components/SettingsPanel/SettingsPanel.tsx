@@ -23,7 +23,7 @@ interface SettingsPanel {
   splineIsolines: SettingsSwitch;
   clearButton: SettingsButton;
   confirmButton: SettingsButton;
-  measureDelta: SettingsNumber;
+  pointsDelta: SettingsNumber;
 }
 
 export const SettingsPanel: FC<SettingsPanel> = ({
@@ -33,13 +33,13 @@ export const SettingsPanel: FC<SettingsPanel> = ({
   splineIsolines,
   clearButton,
   confirmButton,
-  measureDelta,
+  pointsDelta,
 }) => {
   const { title: activeLayerTitle, ...activeLayerProps } = activeLayer;
   const { title: isolinesTypeTitle, ...isolinesTypeProps } = isolinesType;
   const { title: selectionAreaTitle, ...selectionAreaProps } = selectionArea;
   const { title: splineIsolinesTitle, ...splineIsolinesProps } = splineIsolines;
-  const { title: measureDeltaTitle, ...measureDeltaProps } = measureDelta;
+  const { title: pointsDeltaTitle, ...pointsDeltaProps } = pointsDelta;
 
   const { title: clearButtonTitle, ...clearButtonProps } = clearButton;
   const { title: confirmButtonTitle, ...confirmButtonProps } = confirmButton;
@@ -98,16 +98,9 @@ export const SettingsPanel: FC<SettingsPanel> = ({
         </FormControl>
 
         <TitledComponent
-          title={measureDeltaTitle}
+          title={pointsDeltaTitle}
           Component={
-            <NumberInput
-              step={5}
-              defaultValue={150}
-              min={100}
-              variant={'filled'}
-              focusBorderColor={'teal.200'}
-              {...measureDeltaProps}
-            >
+            <NumberInput step={5} variant={'filled'} focusBorderColor={'teal.200'} {...pointsDeltaProps}>
               <NumberInputField borderColor={'gray.400'} borderWidth={'1px'} />
               <NumberInputStepper>
                 <NumberIncrementStepper />

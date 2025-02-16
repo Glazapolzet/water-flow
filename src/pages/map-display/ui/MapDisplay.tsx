@@ -15,6 +15,7 @@ import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';
 import {
   addIsolinesToLayer,
+  DEFAULT_POINTS_DELTA,
   getPointsElevationData,
   ISOLINES_BREAKS_DELTA,
   makeIsolines,
@@ -43,6 +44,7 @@ export const MapDisplay = () => {
 
   const [isolinesType, setIsolinesType] = useState<string>('');
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
+  const [pointsDelta, setPointsDelta] = useState<number>(DEFAULT_POINTS_DELTA);
 
   const clearLayer = () => {
     drawLayer?.getSource()?.clear();
@@ -55,7 +57,7 @@ export const MapDisplay = () => {
 
   useEffect(() => {
     if (isDrawEnd && geometry) {
-      const points = makePointsFromBBox(geometry.getExtent(), 20, { units: 'meters' });
+      const points = makePointsFromBBox(geometry.getExtent(), pointsDelta, { units: 'meters' });
       setPoints(points);
 
       drawLayer?.getSource()?.addFeatures(g.readFeatures(points));
@@ -64,6 +66,7 @@ export const MapDisplay = () => {
     }
 
     clearLayer();
+    setPoints(undefined);
   }, [isDrawEnd, geometry]);
 
   useEffect(() => {
@@ -89,10 +92,10 @@ export const MapDisplay = () => {
 
     interactions.getArray().forEach((interaction) => map.addInteraction(interaction));
 
-    // map.on('click', (event) => {
-    //   const clickedCoordinate = event.coordinate;
-    //   console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
-    // });
+    map.on('click', (event) => {
+      const clickedCoordinate = event.coordinate;
+      console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
+    });
   };
 
   const handleActiveLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
@@ -107,8 +110,8 @@ export const MapDisplay = () => {
     setIsolinesType(event.target.value);
   };
 
-  const handleMeasureDeltaChange = (valueAsString: string, valueAsNumber: number) => {
-    console.log(valueAsString, valueAsNumber);
+  const handleMeasureDeltaChange = (_valueAsString: string, valueAsNumber: number) => {
+    setPointsDelta(valueAsNumber);
   };
 
   const handleSplineIsolinesChange = () => {
@@ -125,7 +128,6 @@ export const MapDisplay = () => {
     }
 
     clearLayer();
-    setSelectionArea('');
 
     const elevationData = await getPointsElevationData(points);
     const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });
@@ -192,9 +194,11 @@ export const MapDisplay = () => {
             isChecked: isIsolinesSplined,
             onChange: handleSplineIsolinesChange,
           }}
-          measureDelta={{
+          pointsDelta={{
             ...SETTINGS_PANEL_BASE_CONFIG.measureDelta,
             onChange: handleMeasureDeltaChange,
+            defaultValue: DEFAULT_POINTS_DELTA,
+            min: DEFAULT_POINTS_DELTA,
           }}
           clearButton={{
             ...SETTINGS_PANEL_BASE_CONFIG.clearButton,
@@ -202,7 +206,7 @@ export const MapDisplay = () => {
           }}
           confirmButton={{
             ...SETTINGS_PANEL_BASE_CONFIG.confirmButton,
-            isVisible: isDrawEnd && !!isolinesType,
+            isVisible: !!points && !!isolinesType,
             onClick: handleConfirmButtonClick,
           }}
         />
