@@ -9,8 +9,14 @@ import { SettingsPanel } from '@/features/settings-panel';
 import { drawInteractions, drawLayer, interactions, rasterLayers } from '@/utils/map-config';
 
 import { Marker } from '@/components';
-import { addZValueToEachPoint, findPointWithMinZValue, makePointsFromBBox } from '@/utils/helpers';
-import { findPointWithMaxZValue } from '@/utils/helpers/findPointWithMaxZValue';
+import {
+  addZValueToEachPoint,
+  cleanEmptyFeatures,
+  findFeatureWithMinZValue,
+  makePointsFromBBox,
+} from '@/utils/helpers';
+import { findFeatureWithMaxZValue } from '@/utils/helpers/findFeatureWithMaxZValue';
+import { featureCollection } from '@turf/helpers';
 import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';
 import {
@@ -145,13 +151,14 @@ export const MapDisplay = () => {
       return;
     }
 
-    addIsolinesToLayer(drawLayer, isolines, { addBbox: true });
+    const cleanIsolines = featureCollection(cleanEmptyFeatures(isolines.features));
 
-    // console.log({ pointsWithZValue });
-    // console.log({ isolines });
+    addIsolinesToLayer(drawLayer, cleanIsolines, { addBbox: true });
 
-    const maxZValuePoint = findPointWithMaxZValue(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
-    const minZValuePoint = findPointWithMinZValue(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
+    console.log({ cleanIsolines });
+
+    const maxZValuePoint = findFeatureWithMaxZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
+    const minZValuePoint = findFeatureWithMinZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
 
     setMaxZValuePoint(maxZValuePoint);
     setMinZValuePoint(minZValuePoint);
