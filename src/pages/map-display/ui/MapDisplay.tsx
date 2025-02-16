@@ -92,10 +92,10 @@ export const MapDisplay = () => {
 
     interactions.getArray().forEach((interaction) => map.addInteraction(interaction));
 
-    map.on('click', (event) => {
-      const clickedCoordinate = event.coordinate;
-      console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
-    });
+    // map.on('click', (event) => {
+    //   const clickedCoordinate = event.coordinate;
+    //   console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
+    // });
   };
 
   const handleActiveLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
