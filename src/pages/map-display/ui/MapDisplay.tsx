@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
-import { Feature, FeatureCollection, Point } from 'geojson';
+import { Feature, FeatureCollection, MultiLineString, Point } from 'geojson';
 import Map from 'ol/Map.js';
 import GeoJSON from 'ol/format/GeoJSON';
 
@@ -13,6 +13,7 @@ import {
   addZValueToEachPoint,
   cleanEmptyFeatures,
   findFeatureWithMinZValue,
+  findPerpendiculars,
   makePointsFromBBox,
 } from '@/utils/helpers';
 import { findFeatureWithMaxZValue } from '@/utils/helpers/findFeatureWithMaxZValue';
@@ -151,14 +152,25 @@ export const MapDisplay = () => {
       return;
     }
 
-    const cleanIsolines = featureCollection(cleanEmptyFeatures(isolines.features));
+    const cleanIsolines = featureCollection<MultiLineString>(cleanEmptyFeatures(isolines.features));
 
     addIsolinesToLayer(drawLayer, cleanIsolines, { addBbox: true });
 
-    console.log({ cleanIsolines });
-
     const maxZValuePoint = findFeatureWithMaxZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
     const minZValuePoint = findFeatureWithMinZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
+
+    if (!maxZValuePoint || !minZValuePoint) {
+      return;
+    }
+
+    const perpendiculars = findPerpendiculars(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+
+    // console.log({ cleanIsolines });
+
+    // featureEach(perpendiculars, (feature) => {
+    //   console.log(feature);
+    // });
+    drawLayer?.getSource()?.addFeatures(g.readFeatures(perpendiculars));
 
     setMaxZValuePoint(maxZValuePoint);
     setMinZValuePoint(minZValuePoint);
