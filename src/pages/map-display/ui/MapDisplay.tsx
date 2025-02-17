@@ -13,7 +13,7 @@ import {
   addZValueToEachPoint,
   cleanEmptyFeatures,
   findFeatureWithMinZValue,
-  findPerpendiculars,
+  findFlowLines,
   makePointsFromBBox,
 } from '@/utils/helpers';
 import { findFeatureWithMaxZValue } from '@/utils/helpers/findFeatureWithMaxZValue';
@@ -163,14 +163,19 @@ export const MapDisplay = () => {
       return;
     }
 
-    const perpendiculars = findPerpendiculars(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+    const stockLines = findFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+
+    stockLines.forEach((stockLine) => {
+      drawLayer?.getSource()?.addFeatures(g.readFeatures(stockLine));
+    });
+
+    console.log(stockLines);
 
     // console.log({ cleanIsolines });
 
     // featureEach(perpendiculars, (feature) => {
     //   console.log(feature);
     // });
-    drawLayer?.getSource()?.addFeatures(g.readFeatures(perpendiculars));
 
     setMaxZValuePoint(maxZValuePoint);
     setMinZValuePoint(minZValuePoint);
