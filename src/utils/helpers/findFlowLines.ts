@@ -12,12 +12,24 @@ export const findFlowLines = (
   const { zProperty } = options;
   const closestIsoline = findFeatureWithMaxZValue<MultiLineString>(isolines, { zProperty });
 
-  if (!closestIsoline) return [];
+  console.log({ closestIsoline });
 
-  const perpendiculars = findAllPerpendicularsToLine(
-    closestIsoline.geometry.coordinates[0] as [number, number][],
-    maxZValuePoint.geometry.coordinates as [number, number],
-  );
+  if (!closestIsoline) {
+    return [];
+  }
+
+  const perpendiculars: [number, number][][] = [];
+
+  closestIsoline.geometry.coordinates.forEach((line) => {
+    const p = findAllPerpendicularsToLine(
+      line as [number, number][],
+      maxZValuePoint.geometry.coordinates as [number, number],
+    );
+
+    perpendiculars.push(...p);
+  });
+
+  console.log({ perpendiculars });
 
   const isolinesWithoutClosest = isolines.features.filter((feature) => feature !== closestIsoline);
 

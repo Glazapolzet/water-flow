@@ -1,5 +1,5 @@
 type PointCoordiates = [number, number];
-type LineStringCoordiates = PointCoordiates[];
+type LineStringCoordiates = [number, number][];
 
 /**
  * Вычисляет ближайшую точку на отрезке [A, B] к точке P
