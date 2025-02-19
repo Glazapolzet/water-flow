@@ -1,10 +1,11 @@
-type PointCoordiates = [number, number];
-type LineStringCoordiates = [number, number][];
+type PointCoordinates = [number, number];
+type LineStringCoordinates = PointCoordinates[];
+type MultiLineStringCoordinates = LineStringCoordinates[];
 
 /**
- * Вычисляет ближайшую точку на отрезке [A, B] к точке P
+ * Вычисляет ближайшую точку на отрезке [A, B] к точке P, если она проецируется внутрь отрезка
  */
-function closestPointOnSegment(A: PointCoordiates, B: PointCoordiates, P: PointCoordiates): PointCoordiates | null {
+function closestPointOnSegment(A: PointCoordinates, B: PointCoordinates, P: PointCoordinates): PointCoordinates | null {
   const [Ax, Ay] = A;
   const [Bx, By] = B;
   const [Px, Py] = P;
@@ -20,32 +21,31 @@ function closestPointOnSegment(A: PointCoordiates, B: PointCoordiates, P: PointC
   const t = ap_ab / ab2; // Проекция точки на линию AB
 
   if (t >= 0 && t <= 1) {
-    // Точка лежит внутри отрезка
-    return [Ax + ABx * t, Ay + ABy * t];
-  } else {
-    return null; // Точка за пределами отрезка
+    return [Ax + ABx * t, Ay + ABy * t]; // Ближайшая точка внутри отрезка
   }
+  return null; // Точка проецируется за пределами отрезка
 }
 
 /**
- * Находит все перпендикуляры от точки ко всей линии (если они существуют)
+ * Находит все перпендикуляры от точки ко всей изолинии (MultiLineString)
  */
-export const findAllPerpendicularsToLine = (
-  line: LineStringCoordiates,
-  point: PointCoordiates,
-): LineStringCoordiates[] => {
-  const perpendiculars: LineStringCoordiates[] = [];
+export function findAllPerpendicularsToLine(
+  multiLine: MultiLineStringCoordinates,
+  point: PointCoordinates,
+): LineStringCoordinates[] {
+  const perpendiculars: LineStringCoordinates[] = [];
 
-  for (let i = 0; i < line.length - 1; i++) {
-    const A = line[i];
-    const B = line[i + 1];
+  for (const line of multiLine) {
+    for (let i = 0; i < line.length - 1; i++) {
+      const A = line[i];
+      const B = line[i + 1];
 
-    const perpendicularPoint = closestPointOnSegment(A, B, point);
-
-    if (perpendicularPoint) {
-      perpendiculars.push([point, perpendicularPoint]);
+      const perpendicularPoint = closestPointOnSegment(A, B, point);
+      if (perpendicularPoint) {
+        perpendiculars.push([point, perpendicularPoint]);
+      }
     }
   }
 
   return perpendiculars;
-};
+}

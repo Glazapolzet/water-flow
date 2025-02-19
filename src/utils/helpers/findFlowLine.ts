@@ -20,14 +20,19 @@ export const findFlowLine = (
 
     if (!closestIsoline) break;
 
-    const pCoords: [number, number][] = findPerpendicularToLine(
-      closestIsoline.geometry.coordinates[0] as [number, number][],
+    const perpendicular: [number, number][] = findPerpendicularToLine(
+      closestIsoline.geometry.coordinates as [number, number][][],
       currentMaxZValuePoint.geometry.coordinates as [number, number],
     );
 
-    stockLine.features.push(lineString(pCoords));
+    /** Напиши здесь код, который проверяет, что найденный перпендикуляр не пересекает изолинию closestIsoline. Если да, то найди все возможные перпендикуляры с помощью findAllPerpendicularsToLine и выбери ближайший по расстоянию перпендикуляр, который не пересекает closestIsoline
+     * const findAllPerpendicularsToLine: (line: [number, number][], point: [number, number]) => [number, number][][]
+Находит все перпендикуляры от точки ко всей линии (если они существуют)
+     *  **/
 
-    currentMaxZValuePoint = point(pCoords[1]);
+    stockLine.features.push(lineString(perpendicular));
+
+    currentMaxZValuePoint = point(perpendicular[1]);
 
     clonedIsolines.features = clonedIsolines.features.filter((feature) => feature !== closestIsoline);
   }
