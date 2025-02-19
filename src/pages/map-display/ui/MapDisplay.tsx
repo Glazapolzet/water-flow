@@ -21,7 +21,6 @@ import { featureCollection } from '@turf/helpers';
 import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';
 import {
-  addIsolinesToLayer,
   DEFAULT_POINTS_DELTA,
   getPointsElevationData,
   ISOLINES_BREAKS_DELTA,
@@ -154,7 +153,7 @@ export const MapDisplay = () => {
 
     const cleanIsolines = featureCollection<MultiLineString>(cleanEmptyFeatures(isolines.features));
 
-    addIsolinesToLayer(drawLayer, cleanIsolines, { addBbox: true });
+    // addIsolinesToLayer(drawLayer, cleanIsolines, { addBbox: true });
 
     const maxZValuePoint = findFeatureWithMaxZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
     const minZValuePoint = findFeatureWithMinZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
@@ -171,12 +170,6 @@ export const MapDisplay = () => {
 
     console.log(stockLines);
 
-    // console.log({ cleanIsolines });
-
-    // featureEach(perpendiculars, (feature) => {
-    //   console.log(feature);
-    // });
-
     setMaxZValuePoint(maxZValuePoint);
     setMinZValuePoint(minZValuePoint);
   };
@@ -187,13 +180,17 @@ export const MapDisplay = () => {
         mapRef={mapRef}
         position={maxZValuePoint?.geometry.coordinates}
         title={`Верхняя граница: ${maxZValuePoint?.properties?.[`${Z_PROPERTY_NAME}`]}м
-        Координаты: ${toStringHDMS(toLonLat(maxZValuePoint?.geometry.coordinates || []))}`}
+        Координаты: ${toStringHDMS(toLonLat(maxZValuePoint?.geometry.coordinates || []))}, ${
+          maxZValuePoint?.geometry.coordinates
+        }`}
       />
       <Marker
         mapRef={mapRef}
         position={minZValuePoint?.geometry.coordinates}
         title={`Нижняя граница: ${minZValuePoint?.properties?.[`${Z_PROPERTY_NAME}`]}м
-        Координаты: ${toStringHDMS(toLonLat(minZValuePoint?.geometry.coordinates || []))}`}
+        Координаты: ${toStringHDMS(toLonLat(minZValuePoint?.geometry.coordinates || []))}, ${
+          minZValuePoint?.geometry.coordinates
+        }`}
       />
 
       <section className={styles.mapDisplay}>

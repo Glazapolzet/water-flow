@@ -6,7 +6,7 @@ export const findFeatureWithMaxZValue = <G extends Geometry>(
   options: { zProperty: string },
 ): Feature<G, GeoJsonProperties> | null => {
   const { zProperty } = options;
-  let maxZValueFeature: Feature<G> | null = null;
+  let maxZValueFeature: Feature<G, GeoJsonProperties> | null = null;
   let maxZValue: number | null = null;
 
   featureEach(features, (currentFeature) => {
