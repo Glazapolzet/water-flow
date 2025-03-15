@@ -16,9 +16,14 @@ function closestPointOnSegment(A: PointCoordinates, B: PointCoordinates, P: Poin
   const APy = Py - Ay;
 
   const ab2 = ABx * ABx + ABy * ABy; // Длина AB в квадрате
-  const ap_ab = APx * ABx + APy * ABy; // Скалярное произведение
 
+  if (ab2 === 0) {
+    return A; // Если A и B совпадают, возвращаем A
+  }
+
+  const ap_ab = APx * ABx + APy * ABy; // Скалярное произведение
   const t = Math.max(0, Math.min(1, ap_ab / ab2)); // Проекция точки на отрезок
+
   return [Ax + ABx * t, Ay + ABy * t]; // Координаты ближайшей точки
 }
 
@@ -43,35 +48,34 @@ function closestPointOnLine(line: LineStringCoordinates, point: PointCoordinates
 }
 
 /**
- * Находит ближайшую точку на изолинии (MultiLineString) к заданной точке
+ * Находит все перпендикуляры от точки к изолинии (MultiLineString)
+ * Если ни одного перпендикуляра не нашлось, возвращает линию до ближайшей точки
  */
-function closestPointOnMultiLineString(
+export function findAllPathsToLine(
   multiLine: MultiLineStringCoordinates,
   point: PointCoordinates,
-): PointCoordinates {
-  let closest: PointCoordinates = multiLine[0][0];
-  let minDist = Infinity;
+): LineStringCoordinates[] {
+  const perpendiculars: LineStringCoordinates[] = [];
 
   for (const line of multiLine) {
-    const lineClosest = closestPointOnLine(line, point);
-    const dist = Math.hypot(point[0] - lineClosest[0], point[1] - lineClosest[1]);
+    for (let i = 0; i < line.length - 1; i++) {
+      const A = line[i];
+      const B = line[i + 1];
 
-    if (dist < minDist) {
-      minDist = dist;
-      closest = lineClosest;
+      const perpendicularPoint = closestPointOnSegment(A, B, point);
+
+      // Проверяем, что точка корректная
+      if (!isNaN(perpendicularPoint[0]) && !isNaN(perpendicularPoint[1])) {
+        perpendiculars.push([point, perpendicularPoint]);
+      }
     }
   }
 
-  return closest;
-}
+  // Если не найдено ни одного перпендикуляра, добавляем линию к ближайшей точке
+  if (perpendiculars.length === 0) {
+    const nearestPoint = closestPointOnLine(multiLine.flat(), point);
+    perpendiculars.push([point, nearestPoint]);
+  }
 
-/**
- * Находит перпендикуляр от точки к изолинии (MultiLineString)
- */
-export function findPerpendicularToLine(
-  multiLine: MultiLineStringCoordinates,
-  point: PointCoordinates,
-): LineStringCoordinates {
-  const nearest = closestPointOnMultiLineString(multiLine, point);
-  return [point, nearest]; // Отрезок между точкой и ближайшей точкой
+  return perpendiculars;
 }

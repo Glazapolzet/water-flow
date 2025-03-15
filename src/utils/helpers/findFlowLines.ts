@@ -21,14 +21,16 @@ export const findFlowLines = (
     maxZValuePoint.geometry.coordinates as [number, number],
   );
 
-  // console.log({ perpendiculars });
+  console.log({ perpendiculars });
 
   const isolinesWithoutClosest = isolines.features.filter((feature) => feature !== closestIsoline);
 
   return perpendiculars.map(([start, end]) => {
     const localMaxZValuePoint = point(end);
     const stockLineStart = lineString([start, end]);
-    const stockLine = findFlowLine(featureCollection(isolinesWithoutClosest), localMaxZValuePoint, { zProperty });
+    const stockLine = findFlowLine(featureCollection(isolinesWithoutClosest), localMaxZValuePoint, [closestIsoline], {
+      zProperty,
+    });
 
     stockLine.features.unshift(stockLineStart);
 
