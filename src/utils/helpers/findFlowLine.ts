@@ -18,21 +18,21 @@ export const findFlowLine = (
   let currentMaxZValuePoint = maxZValuePoint;
 
   while (clonedIsolines.features.length > 0) {
+    // Находим ближайшую изолинию с максимальным Z-значением
     const closestIsoline = findFeatureWithMaxZValue<MultiLineString>(clonedIsolines, { zProperty });
     let perpendicular: [number, number][] = [];
+    if (!closestIsoline) break; // Если изолиния не найдена, выходим из цикла
 
-    if (!closestIsoline) break;
-
+    // Находим все перпендикуляры к ближайшей изолинии
     const allPerpendiculars = findAllPathsToLine(
       closestIsoline.geometry.coordinates as [number, number][][],
       currentMaxZValuePoint.geometry.coordinates as [number, number],
     );
 
-    // Фильтруем только те, которые не пересекают ни одну из обработанных изолиний и заканчиваются на изолинии
+    // Фильтруем перпендикуляры, чтобы исключить пересечения с обработанными изолиниями
     const validPerpendiculars = allPerpendiculars.filter((perpendicular) => {
       const isIntersectingProcessedIsolines = processedIsolines.some((isoline) => {
         const intersections = lineIntersect(isoline, lineString(perpendicular), { ignoreSelfIntersections: true });
-
         const hasOnlyPerpendicularStartIntersection =
           intersections.features.some(
             (point) =>
@@ -41,7 +41,6 @@ export const findFlowLine = (
           ) && intersections.features.length === 1;
 
         const hasNoIntersections = intersections.features.length === 0;
-
         return !hasOnlyPerpendicularStartIntersection && !hasNoIntersections;
       });
 
@@ -57,7 +56,6 @@ export const findFlowLine = (
         ) && closestIsolineIntersections.features.length === 1;
 
       const hasNoIntersections = closestIsolineIntersections.features.length === 0;
-
       const isIntersectingClosestIsoline = !(hasOnlyPerpendicularEndIntersection || hasNoIntersections);
 
       return !isIntersectingProcessedIsolines && !isIntersectingClosestIsoline;
@@ -65,7 +63,6 @@ export const findFlowLine = (
 
     // Выбираем ближайший по расстоянию корректный перпендикуляр
     if (validPerpendiculars.length > 0) {
-      console.log(validPerpendiculars);
       perpendicular = validPerpendiculars.reduce((nearest, current) => {
         const distNearest = Math.hypot(nearest[0][0] - nearest[1][0], nearest[0][1] - nearest[1][1]);
         const distCurrent = Math.hypot(current[0][0] - current[1][0], current[0][1] - current[1][1]);
@@ -73,15 +70,13 @@ export const findFlowLine = (
       });
     }
 
-    if (perpendicular.length === 0) break;
+    if (perpendicular.length === 0) break; // Если нет корректных перпендикуляров, выходим из цикла
 
     stockLine.features.push(lineString(perpendicular));
-
-    currentMaxZValuePoint = point(perpendicular[1]);
-
-    processedIsolines.push(closestIsoline);
-    clonedIsolines.features = clonedIsolines.features.filter((feature) => feature !== closestIsoline);
+    currentMaxZValuePoint = point(perpendicular[1]); // Обновляем текущую точку максимального Z-значения
+    processedIsolines.push(closestIsoline); // Добавляем обработанную изолинию в список
+    clonedIsolines.features = clonedIsolines.features.filter((feature) => feature !== closestIsoline); // Удаляем обработанную изолинию
   }
 
-  return stockLine;
+  return stockLine; // Возвращаем найденную линию потока
 };
