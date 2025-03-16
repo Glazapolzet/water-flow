@@ -13,10 +13,11 @@ import {
   addZValueToEachPoint,
   cleanEmptyFeatures,
   findFeatureWithMinZValue,
-  findFlowLines,
   makePointsFromBBox,
 } from '@/utils/helpers';
+import { addFeaturesToLayer } from '@/utils/helpers/addFeaturesToLayer';
 import { findFeatureWithMaxZValue } from '@/utils/helpers/findFeatureWithMaxZValue';
+import { generateFlowLines } from '@/utils/helpers/generateFlowLines';
 import { featureCollection } from '@turf/helpers';
 import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';
@@ -163,11 +164,25 @@ export const MapDisplay = () => {
       return;
     }
 
-    const stockLines = findFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+    // const stockLines = findFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
 
-    stockLines.forEach((stockLine) => {
-      drawLayer?.getSource()?.addFeatures(g.readFeatures(stockLine));
-    });
+    // console.log(stockLines);
+
+    // stockLines.forEach((stockLine) => {
+    //   drawLayer?.getSource()?.addFeatures(g.readFeatures(stockLine));
+    // });
+
+    // const stockLine = generateFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+    // const stockLineMock1 = generateFlowLinesTest(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+    const stockLineMock2 = generateFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+
+    // console.log({ cleanIsolines }, maxZValuePoint);
+    // console.log(g.readFeatures(stockLine));
+
+    // addFeaturesToLayer(drawLayer, stockLineMock1, { color: 'blue', width: 2 });
+    addFeaturesToLayer(drawLayer, stockLineMock2, { color: 'red', width: 2 });
+    // drawLayer?.getSource()?.addFeatures(g.readFeatures(stockLine));
+    // drawLayer?.getSource()?.addFeatures(g.readFeatures(stockLineMock));
 
     setMaxZValuePoint(maxZValuePoint);
     setMinZValuePoint(minZValuePoint);

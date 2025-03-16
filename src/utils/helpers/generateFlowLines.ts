@@ -1,7 +1,10 @@
-import { Feature, FeatureCollection, GeoJsonProperties, MultiLineString, Point } from 'geojson';
+import { lineString, multiLineString, point } from '@turf/helpers';
+import lineIntersect from '@turf/line-intersect';
+import { Feature, FeatureCollection, GeoJsonProperties, LineString, MultiLineString, Point } from 'geojson';
+import { sortIsolinesByZ } from './sortIsolinesByZ';
 
 export function generateFlowLines(
-  contourLines: FeatureCollection<MultiLineString, GeoJsonProperties>,
+  isolines: FeatureCollection<MultiLineString, GeoJsonProperties>,
   startPoint: Feature<Point, GeoJsonProperties>,
   options: { zProperty: string },
 ): FeatureCollection<MultiLineString, GeoJsonProperties> {
@@ -10,87 +13,91 @@ export function generateFlowLines(
     type: 'FeatureCollection',
     features: [],
   };
+  let currentPoint = startPoint;
 
-  if (!startPoint.properties || typeof startPoint.properties[`${zProperty}`] !== 'number') {
+  if (!currentPoint.properties || typeof currentPoint.properties[`${zProperty}`] !== 'number') {
     return flowLines;
   }
 
-  let currentPoint = startPoint;
-  let currentZ = currentPoint.properties![zProperty];
+  // let currentZ = currentPoint.properties[zProperty];
+  const processedIsolines: Feature<MultiLineString, GeoJsonProperties>[] = [];
 
-  while (true) {
-    let nearestSegment = null;
+  const isolinesInDescendingOrder = sortIsolinesByZ(isolines, { zProperty });
+
+  for (const isoline of isolinesInDescendingOrder.features) {
     let minDistance = Infinity;
     let nextZ = Infinity;
-    let nearestPoint = null;
     let targetPoint = null;
 
-    for (const contour of contourLines.features) {
-      if (!contour.properties || typeof contour.properties[`${zProperty}`] !== 'number') {
-        continue;
-      }
+    //TODO: make checkZProperty function
+    if (!isoline.properties || typeof isoline.properties[`${zProperty}`] !== 'number') {
+      continue;
+    }
 
-      const contourZ = contour.properties[zProperty];
-      if (contourZ >= currentZ) continue;
+    const isolineZ = isoline.properties[zProperty];
 
-      for (const line of contour.geometry.coordinates) {
-        for (let i = 0; i < line.length - 1; i++) {
-          const segment = [line[i], line[i + 1]];
-          const { distance, projection } = getPerpendicularProjection(currentPoint.geometry.coordinates, segment);
+    for (const line of isoline.geometry.coordinates) {
+      for (let i = 0; i < line.length - 1; i++) {
+        const segment = [line[i], line[i + 1]];
+        const { distance, projection } = getPerpendicularProjection(currentPoint.geometry.coordinates, segment);
 
-          if (distance < minDistance) {
+        if (distance < minDistance) {
+          // Проверяем, пересекает ли перпендикуляр уже обработанные изолинии
+          const perpendicularLine = lineString([currentPoint.geometry.coordinates, projection]);
+          const intersects = checkIfLineIntersectsProcessedIsolines(processedIsolines, perpendicularLine);
+
+          if (!intersects) {
             minDistance = distance;
-            nearestSegment = { segment, projection, contour };
-            nextZ = contourZ;
+            nextZ = isolineZ;
             targetPoint = projection;
           }
         }
+      }
 
-        for (const point of line) {
-          const distance = Math.hypot(
-            point[0] - currentPoint.geometry.coordinates[0],
-            point[1] - currentPoint.geometry.coordinates[1],
-          );
-          if (distance < minDistance) {
-            minDistance = distance;
-            nearestPoint = point;
-            nextZ = contourZ;
-            targetPoint = point;
-          }
+      for (const point of line) {
+        const distance = Math.hypot(
+          point[0] - currentPoint.geometry.coordinates[0],
+          point[1] - currentPoint.geometry.coordinates[1],
+        );
+        if (distance < minDistance) {
+          minDistance = distance;
+          nextZ = isolineZ;
+          targetPoint = point;
         }
       }
     }
 
     if (!targetPoint) break;
 
-    // Если перпендикуляр пересекает другую изолинию, выбираем ближайшую точку
-    if (
-      nearestSegment &&
-      doesIntersectAnyContour(currentPoint.geometry.coordinates, targetPoint, contourLines, nearestSegment.contour)
-    ) {
-      targetPoint = nearestPoint;
-    }
+    flowLines.features.push(multiLineString([[currentPoint.geometry.coordinates, targetPoint]]));
 
-    if (!targetPoint) break;
+    currentPoint = point(targetPoint, { [zProperty]: nextZ });
+    // currentZ = nextZ;
 
-    flowLines.features.push({
-      type: 'Feature',
-      geometry: {
-        type: 'MultiLineString',
-        coordinates: [[currentPoint.geometry.coordinates, targetPoint]],
-      },
-      properties: {},
-    });
-
-    currentPoint = {
-      type: 'Feature',
-      geometry: { type: 'Point', coordinates: targetPoint },
-      properties: { [zProperty]: nextZ },
-    };
-    currentZ = nextZ;
+    processedIsolines.push(isoline);
   }
 
   return flowLines;
+}
+
+function checkIfLineIntersectsProcessedIsolines(
+  processedIsolines: Feature<MultiLineString>[],
+  line: Feature<LineString, GeoJsonProperties>,
+) {
+  return processedIsolines.some((isoline) => {
+    const intersections = lineIntersect(isoline, line, { ignoreSelfIntersections: true });
+
+    const hasOnlyLineStartIntersection =
+      intersections.features.some((intersectionPoint) => {
+        const [intersectionPointX, intersectionPointY] = intersectionPoint.geometry.coordinates;
+        const [lineStartX, lineStartY] = line.geometry.coordinates[0];
+
+        return intersectionPointX === lineStartX && intersectionPointY === lineStartY;
+      }) && intersections.features.length === 1;
+
+    const hasNoIntersections = intersections.features.length === 0;
+    return !hasOnlyLineStartIntersection && !hasNoIntersections;
+  });
 }
 
 function getPerpendicularProjection(point: number[], segment: number[][]) {
@@ -109,40 +116,4 @@ function getPerpendicularProjection(point: number[], segment: number[][]) {
   const projection = [ax + t * dx, ay + t * dy];
 
   return { distance: Math.hypot(px - projection[0], py - projection[1]), projection };
-}
-
-function doesIntersectAnyContour(
-  start: number[],
-  end: number[],
-  contourLines: FeatureCollection<MultiLineString, GeoJsonProperties>,
-  ignoredContour: Feature<MultiLineString, GeoJsonProperties> | null,
-): boolean {
-  for (const contour of contourLines.features) {
-    if (contour === ignoredContour) continue;
-
-    for (const line of contour.geometry.coordinates) {
-      for (let i = 0; i < line.length - 1; i++) {
-        const segment = [line[i], line[i + 1]];
-        if (segmentsIntersect(start, end, segment[0], segment[1])) {
-          return true;
-        }
-      }
-    }
-  }
-  return false;
-}
-
-function segmentsIntersect(A: number[], B: number[], C: number[], D: number[]): boolean {
-  function crossProduct(P: number[], Q: number[], R: number[]) {
-    return (Q[0] - P[0]) * (R[1] - P[1]) - (Q[1] - P[1]) * (R[0] - P[0]);
-  }
-
-  const d1 = crossProduct(A, B, C);
-  const d2 = crossProduct(A, B, D);
-  const d3 = crossProduct(C, D, A);
-  const d4 = crossProduct(C, D, B);
-
-  if (d1 * d2 < 0 && d3 * d4 < 0) return true;
-
-  return false;
 }
