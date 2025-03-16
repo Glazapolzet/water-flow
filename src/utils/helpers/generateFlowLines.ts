@@ -26,7 +26,6 @@ export function generateFlowLines(
 
   for (const isoline of isolinesInDescendingOrder.features) {
     let minDistance = Infinity;
-    let nextZ = Infinity;
     let targetPoint = null;
 
     //TODO: make checkZProperty function
@@ -34,7 +33,7 @@ export function generateFlowLines(
       continue;
     }
 
-    const isolineZ = isoline.properties[zProperty];
+    const nextZ = isoline.properties[zProperty];
 
     for (const line of isoline.geometry.coordinates) {
       for (let i = 0; i < line.length - 1; i++) {
@@ -48,7 +47,6 @@ export function generateFlowLines(
 
           if (!intersects) {
             minDistance = distance;
-            nextZ = isolineZ;
             targetPoint = projection;
           }
         }
@@ -59,10 +57,17 @@ export function generateFlowLines(
           point[0] - currentPoint.geometry.coordinates[0],
           point[1] - currentPoint.geometry.coordinates[1],
         );
+
         if (distance < minDistance) {
-          minDistance = distance;
-          nextZ = isolineZ;
-          targetPoint = point;
+          const line = lineString([currentPoint.geometry.coordinates, point]);
+          const intersects = checkIfLineIntersectsProcessedIsolines(processedIsolines, line);
+
+          console.log(intersects);
+
+          if (!intersects) {
+            minDistance = distance;
+            targetPoint = point;
+          }
         }
       }
     }
@@ -72,7 +77,6 @@ export function generateFlowLines(
     flowLines.features.push(multiLineString([[currentPoint.geometry.coordinates, targetPoint]]));
 
     currentPoint = point(targetPoint, { [zProperty]: nextZ });
-    // currentZ = nextZ;
 
     processedIsolines.push(isoline);
   }
