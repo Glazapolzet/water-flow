@@ -175,8 +175,6 @@ export const MapDisplay = () => {
     //   drawLayer?.getSource()?.addFeatures(g.readFeatures(stockLine));
     // });
 
-    console.log(cleanIsolines);
-
     const stockLine = generateFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
     // const stockLineMock1 = generateFlowLinesTest(testIsolines, testMaxZValuePoint, { zProperty: Z_PROPERTY_NAME });
     // const stockLineMock2 = generateFlowLines(testIsolines, testMaxZValuePoint, { zProperty: Z_PROPERTY_NAME });

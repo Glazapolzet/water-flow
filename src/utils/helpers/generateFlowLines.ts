@@ -17,6 +17,8 @@ export function generateFlowLines(
   const processedIsolines: Set<Feature<MultiLineString, GeoJsonProperties>> = new Set();
   const isolinesInDescendingOrder = sortIsolinesByZ(isolines, { zProperty });
 
+  console.log(isolinesInDescendingOrder.features);
+
   function traceFlow(
     currentPoint: Feature<Point, GeoJsonProperties>,
     processedIsolines: Set<Feature<MultiLineString>>,

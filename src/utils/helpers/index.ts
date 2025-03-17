@@ -2,7 +2,6 @@ export { addZValueToEachPoint } from './addZValueToEachPoint';
 export { cleanEmptyFeatures } from './cleanEmptyFeatures';
 export { findFeatureWithMaxZValue } from './findFeatureWithMaxZValue';
 export { findFeatureWithMinZValue } from './findFeatureWithMinZValue';
-export { findFlowLines } from './findFlowLines';
 export { makePointsFromBBox } from './makePointsFromBBox';
 export { makeValhallaMappings } from './makeValhallaMappings';
 export { slopeParametersSelection } from './slopeParametersSelection';
