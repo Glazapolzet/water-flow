@@ -21,6 +21,7 @@ export const findFlowLine = (
     // Находим ближайшую изолинию с максимальным Z-значением
     const closestIsoline = findFeatureWithMaxZValue<MultiLineString>(clonedIsolines, { zProperty });
     let perpendicular: [number, number][] = [];
+
     if (!closestIsoline) break; // Если изолиния не найдена, выходим из цикла
 
     // Находим все перпендикуляры к ближайшей изолинии

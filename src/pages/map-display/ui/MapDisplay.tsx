@@ -155,6 +155,9 @@ export const MapDisplay = () => {
 
     const cleanIsolines = featureCollection<MultiLineString>(cleanEmptyFeatures(isolines.features));
 
+    // console.log({ cleanIsolines });
+    // console.log({ isolines });
+
     addIsolinesToLayer(drawLayer, cleanIsolines, { addBbox: true });
 
     const maxZValuePoint = findFeatureWithMaxZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
@@ -172,17 +175,15 @@ export const MapDisplay = () => {
     //   drawLayer?.getSource()?.addFeatures(g.readFeatures(stockLine));
     // });
 
-    // const stockLine = generateFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
-    // const stockLineMock1 = generateFlowLinesTest(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
-    const stockLineMock2 = generateFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+    console.log(cleanIsolines);
 
-    // console.log({ cleanIsolines }, maxZValuePoint);
-    // console.log(g.readFeatures(stockLine));
+    const stockLine = generateFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+    // const stockLineMock1 = generateFlowLinesTest(testIsolines, testMaxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+    // const stockLineMock2 = generateFlowLines(testIsolines, testMaxZValuePoint, { zProperty: Z_PROPERTY_NAME });
 
+    addFeaturesToLayer(drawLayer, stockLine, { color: 'red', width: 2 });
     // addFeaturesToLayer(drawLayer, stockLineMock1, { color: 'blue', width: 2 });
-    addFeaturesToLayer(drawLayer, stockLineMock2, { color: 'red', width: 2 });
-    // drawLayer?.getSource()?.addFeatures(g.readFeatures(stockLine));
-    // drawLayer?.getSource()?.addFeatures(g.readFeatures(stockLineMock));
+    // addFeaturesToLayer(drawLayer, stockLineMock2, { color: 'green', width: 2 });
 
     setMaxZValuePoint(maxZValuePoint);
     setMinZValuePoint(minZValuePoint);

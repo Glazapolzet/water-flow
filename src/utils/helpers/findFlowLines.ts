@@ -1,8 +1,8 @@
-import { featureCollection, lineString, point } from '@turf/helpers';
+import { featureCollection, multiLineString, point } from '@turf/helpers';
 import { Feature, FeatureCollection, MultiLineString, Point } from 'geojson';
 import { findAllPerpendicularsToLine } from './findAllPerpendicularsToLine';
 import { findFeatureWithMaxZValue } from './findFeatureWithMaxZValue';
-import { findFlowLine } from './findFlowLine';
+import { generateFlowLines } from './generateFlowLines';
 
 export const findFlowLines = (
   isolines: FeatureCollection<MultiLineString>,
@@ -26,18 +26,27 @@ export const findFlowLines = (
   // Удаляем ближайшую изолинию из списка
   const isolinesWithoutClosest = isolines.features.filter((feature) => feature !== closestIsoline);
 
+  console.log(perpendiculars);
   // Создаем линии потока на основе найденных перпендикуляров
   return perpendiculars.map(([start, end]) => {
     const localMaxZValuePoint = point(end);
-    const stockLineStart = lineString([start, end]);
 
     // Находим линию потока, используя оставшиеся изолинии
-    const stockLine = findFlowLine(featureCollection(isolinesWithoutClosest), localMaxZValuePoint, [closestIsoline], {
-      zProperty,
-    });
+    const stockLine = generateFlowLines(
+      featureCollection(isolinesWithoutClosest),
+      localMaxZValuePoint,
+      [closestIsoline],
+      {
+        zProperty,
+      },
+    );
 
-    // Добавляем начальную линию потока к найденной линии
-    stockLine.features.unshift(stockLineStart);
-    return stockLine;
+    // Создаем новый MultiLineString, чтобы добавить stockLineStart
+    const combinedStockLine = featureCollection<MultiLineString>([
+      ...stockLine.features,
+      multiLineString([[start, end]]),
+    ]);
+
+    return combinedStockLine;
   });
 };
