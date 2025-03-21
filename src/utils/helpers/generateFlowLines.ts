@@ -17,77 +17,68 @@ export function generateFlowLines(
   const processedIsolines: Set<Feature<MultiLineString, GeoJsonProperties>> = new Set();
   const isolinesInDescendingOrder = sortIsolinesByZ(isolines, { zProperty });
 
-  console.log(isolinesInDescendingOrder.features);
-
   function traceFlow(
     currentPoint: Feature<Point, GeoJsonProperties>,
+    currentIsolineIndex: number,
+    isolines: FeatureCollection<MultiLineString, GeoJsonProperties>,
     processedIsolines: Set<Feature<MultiLineString>>,
   ) {
     const localFlowLines: FeatureCollection<LineString, GeoJsonProperties> = featureCollection([]);
+    if (!isolines.features[currentIsolineIndex]) {
+      return localFlowLines;
+    }
+    const isoline = isolines.features[currentIsolineIndex];
 
-    for (const isoline of isolinesInDescendingOrder.features) {
-      if (processedIsolines.has(isoline)) continue;
+    let minDistance = Infinity;
+    let targetPoints: number[][] = [];
 
-      let minDistance = Infinity;
-      let targetPoints: number[][] = [];
+    if (!isoline.properties || typeof isoline.properties[zProperty] !== 'number') {
+      return localFlowLines;
+    }
+    const nextZ = isoline.properties[zProperty];
 
-      if (!isoline.properties || typeof isoline.properties[zProperty] !== 'number') {
-        continue;
-      }
-      const nextZ = isoline.properties[zProperty];
+    for (const line of isoline.geometry.coordinates) {
+      for (const pt of line) {
+        const distance = Math.hypot(
+          pt[0] - currentPoint.geometry.coordinates[0],
+          pt[1] - currentPoint.geometry.coordinates[1],
+        );
 
-      for (const line of isoline.geometry.coordinates) {
-        // for (let i = 0; i < line.length - 1; i++) {
-        //   const segment = [line[i], line[i + 1]];
-        //   const { distance, projection } = getPerpendicularProjection(currentPoint.geometry.coordinates, segment);
-
-        //   if (distance < minDistance) {
-        //     minDistance = distance;
-        //     targetPoints = [projection];
-        //   } else if (distance === minDistance) {
-        //     console.log(distance);
-        //     targetPoints.push(projection);
-        //   }
-        // }
-
-        for (const pt of line) {
-          const distance = Math.hypot(
-            pt[0] - currentPoint.geometry.coordinates[0],
-            pt[1] - currentPoint.geometry.coordinates[1],
-          );
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            targetPoints = [pt];
-          } else if (distance === minDistance) {
-            targetPoints.push(pt);
-          }
+        if (distance < minDistance) {
+          minDistance = distance;
+          targetPoints = [pt];
+        } else if (distance === minDistance) {
+          targetPoints.push(pt);
         }
       }
+    }
 
-      targetPoints = targetPoints.filter((target) => {
-        const newLine = lineString([currentPoint.geometry.coordinates, target]);
-        return !checkIfLineIntersectsProcessedIsolines([...processedIsolines], newLine);
-      });
+    targetPoints = targetPoints.filter((target) => {
+      const newLine = lineString([currentPoint.geometry.coordinates, target]);
+      return !checkIfLineIntersectsProcessedIsolines([...processedIsolines], newLine);
+    });
 
-      if (targetPoints.length === 0) return localFlowLines;
+    if (targetPoints.length === 0) return localFlowLines;
 
-      processedIsolines.add(isoline);
+    processedIsolines.add(isoline);
 
-      for (const target of targetPoints) {
-        const newLine = lineString([currentPoint.geometry.coordinates, target]);
-        localFlowLines.features.push(newLine);
+    for (const target of targetPoints) {
+      const newLine = lineString([currentPoint.geometry.coordinates, target]);
+      localFlowLines.features.push(newLine);
 
-        const newFlowLines = traceFlow(point(target, { [zProperty]: nextZ }), processedIsolines);
-        localFlowLines.features.push(...newFlowLines.features);
-      }
+      const newFlowLines = traceFlow(
+        point(target, { [zProperty]: nextZ }),
+        currentIsolineIndex + 1,
+        isolines,
+        processedIsolines,
+      );
+      localFlowLines.features.push(...newFlowLines.features);
     }
 
     return localFlowLines;
   }
 
-  const t = traceFlow(startPoint, processedIsolines);
-  console.log(t);
+  const t = traceFlow(startPoint, 0, isolinesInDescendingOrder, processedIsolines);
 
   return t;
 }

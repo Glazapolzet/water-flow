@@ -15,6 +15,7 @@ import {
   findFeatureWithMinZValue,
   makePointsFromBBox,
 } from '@/utils/helpers';
+import { MatrixHelper } from '@/utils/helpers/MatrixHelper';
 import { addFeaturesToLayer } from '@/utils/helpers/addFeaturesToLayer';
 import { findFeatureWithMaxZValue } from '@/utils/helpers/findFeatureWithMaxZValue';
 import { generateFlowLines } from '@/utils/helpers/generateFlowLines';
@@ -139,6 +140,12 @@ export const MapDisplay = () => {
 
     const elevationData = await getPointsElevationData(points);
     const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });
+
+    const m = new MatrixHelper(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
+
+    console.log({ pointsWithZValue });
+    console.table(m.getXYmatrix());
+    console.table(m.getZmatrix());
 
     const isolinesSettings = {
       points: pointsWithZValue,

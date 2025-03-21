@@ -1,7 +1,7 @@
+import { MatrixHelper } from '@/utils/helpers/MatrixHelper';
 import { featureCollection, multiLineString } from '@turf/helpers';
 import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
 import { Conrec } from 'ml-conrec';
-import { MatrixHelper } from '../utils';
 
 export class ConrecHelper extends Conrec {
   private matrixHelper: MatrixHelper;
@@ -44,7 +44,7 @@ export class ConrecHelper extends Conrec {
     for (let i = 0; i < contour.contours.length; i++) {
       const linesWithXYObj = contour.contours[i].lines;
       const lines = linesWithXYObj.map(({ x, y }) => {
-        return this._restoreCoordinates(x, y);
+        return this.matrixHelper.restoreCoordinates(x, y);
       });
 
       const feature = multiLineString([lines], { [`${zProperty}`]: contour.contours[i].level, ...commonProperties });
@@ -53,12 +53,5 @@ export class ConrecHelper extends Conrec {
     }
 
     return featureCollection(features);
-  }
-
-  private _restoreCoordinates(x: number, y: number) {
-    const [dx, dy] = this.matrixHelper.getDeltas();
-    const [firstX, firstY] = this.matrixHelper.getXYmatrix()?.[0]?.[0];
-
-    return [firstX + x * dx, firstY + y * dy];
   }
 }

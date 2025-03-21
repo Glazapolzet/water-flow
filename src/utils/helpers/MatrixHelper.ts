@@ -28,6 +28,13 @@ export class MatrixHelper {
     return [this.dx, this.dy];
   }
 
+  restoreCoordinates(x: number, y: number) {
+    const [dx, dy] = this.getDeltas();
+    const [firstX, firstY] = this.getXYmatrix()?.[0]?.[0];
+
+    return [firstX + x * dx, firstY + y * dy];
+  }
+
   private findDeltas() {
     const [firstX, firstY] = this.XYmatrix?.[0]?.[0];
     const nextX = this.XYmatrix?.[0]?.[1]?.[0];
