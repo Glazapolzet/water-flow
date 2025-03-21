@@ -6,7 +6,14 @@ import GeoJSON from 'ol/format/GeoJSON';
 
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
-import { drawInteractions, drawLayer, interactions, rasterLayers } from '@/utils/map-config';
+import {
+  drawInteractions,
+  drawLayer,
+  flowLinesStyle,
+  interactions,
+  isolinesStyle,
+  rasterLayers,
+} from '@/utils/map-config';
 
 import { Marker } from '@/components';
 import {
@@ -165,7 +172,7 @@ export const MapDisplay = () => {
     // console.log({ cleanIsolines });
     // console.log({ isolines });
 
-    addIsolinesToLayer(drawLayer, cleanIsolines, { addBbox: true });
+    addIsolinesToLayer(drawLayer, cleanIsolines, { addBbox: true, style: isolinesStyle });
 
     const maxZValuePoint = findFeatureWithMaxZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
     const minZValuePoint = findFeatureWithMinZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
@@ -186,7 +193,7 @@ export const MapDisplay = () => {
     // const stockLineMock1 = generateFlowLinesTest(testIsolines, testMaxZValuePoint, { zProperty: Z_PROPERTY_NAME });
     // const stockLineMock2 = generateFlowLines(testIsolines, testMaxZValuePoint, { zProperty: Z_PROPERTY_NAME });
 
-    addFeaturesToLayer(drawLayer, stockLine, { color: 'red', width: 2 });
+    addFeaturesToLayer(drawLayer, stockLine, { style: flowLinesStyle });
     // addFeaturesToLayer(drawLayer, stockLineMock1, { color: 'blue', width: 2 });
     // addFeaturesToLayer(drawLayer, stockLineMock2, { color: 'green', width: 2 });
 

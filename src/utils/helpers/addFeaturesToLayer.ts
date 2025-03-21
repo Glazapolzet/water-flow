@@ -1,24 +1,17 @@
-import { FeatureCollection } from 'geojson';
+import { Feature, FeatureCollection } from 'geojson';
 import GeoJSON from 'ol/format/GeoJSON';
 import VectorLayer from 'ol/layer/Vector';
-import { Stroke, Style } from 'ol/style';
+import { Style } from 'ol/style';
 
 // Функция для добавления изолиний на слой
 export const addFeaturesToLayer = (
   layer: VectorLayer,
-  featureCollection: FeatureCollection,
-  options?: { color?: string; width?: number },
+  features: FeatureCollection | Feature,
+  options?: { style?: Style },
 ) => {
+  const { style } = options ?? {};
   const g = new GeoJSON();
-  const { color = 'red', width = 2 } = options || {};
-  const olFeatures = g.readFeatures(featureCollection);
-
-  const style = new Style({
-    stroke: new Stroke({
-      color,
-      width,
-    }),
-  });
+  const olFeatures = g.readFeatures(features);
 
   olFeatures.forEach((feature) => {
     feature.setStyle(style);

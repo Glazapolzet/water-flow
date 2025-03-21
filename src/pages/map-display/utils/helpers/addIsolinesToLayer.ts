@@ -1,13 +1,17 @@
+import { addFeaturesToLayer } from '@/utils/helpers/addFeaturesToLayer';
 import bbox from '@turf/bbox';
 import bboxPolygon from '@turf/bbox-polygon';
 import { FeatureCollection } from 'geojson';
-import { GeoJSON } from 'ol/format';
 import VectorLayer from 'ol/layer/Vector';
+import { Style } from 'ol/style';
 
-export const addIsolinesToLayer = (layer: VectorLayer, isolines: FeatureCollection, options: { addBbox?: boolean }) => {
-  const g = new GeoJSON();
-  const { addBbox = true } = options;
+export const addIsolinesToLayer = (
+  layer: VectorLayer,
+  isolines: FeatureCollection,
+  options?: { addBbox?: boolean; style?: Style },
+) => {
+  const { addBbox = true, style } = options ?? {};
 
-  addBbox && layer?.getSource()?.addFeatures(g.readFeatures(bboxPolygon(bbox(isolines))));
-  layer?.getSource()?.addFeatures(g.readFeatures(isolines));
+  addBbox && addFeaturesToLayer(layer, bboxPolygon(bbox(isolines)));
+  addFeaturesToLayer(layer, isolines, { style });
 };
