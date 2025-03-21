@@ -1,4 +1,4 @@
-import { MatrixHelper } from '@/utils/helpers/MatrixHelper';
+import { MatrixHelper } from '@/utils/helpers';
 import { featureCollection, multiLineString } from '@turf/helpers';
 import { FeatureCollection, GeoJsonProperties, Point } from 'geojson';
 import { Conrec } from 'ml-conrec';

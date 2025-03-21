@@ -16,16 +16,16 @@ import {
 } from '@/utils/map-config';
 
 import { Marker } from '@/components';
+import { generateFlowLines } from '@/features/flow-lines';
 import {
+  addFeaturesToLayer,
   addZValueToEachPoint,
   cleanEmptyFeatures,
+  findFeatureWithMaxZValue,
   findFeatureWithMinZValue,
   makePointsFromBBox,
+  MatrixHelper,
 } from '@/utils/helpers';
-import { MatrixHelper } from '@/utils/helpers/MatrixHelper';
-import { addFeaturesToLayer } from '@/utils/helpers/addFeaturesToLayer';
-import { findFeatureWithMaxZValue } from '@/utils/helpers/findFeatureWithMaxZValue';
-import { generateFlowLines } from '@/utils/helpers/generateFlowLines';
 import { featureCollection } from '@turf/helpers';
 import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';

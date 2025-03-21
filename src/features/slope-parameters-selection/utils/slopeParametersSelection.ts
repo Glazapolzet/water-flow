@@ -1,6 +1,6 @@
 import { levenbergMarquardt } from 'ml-levenberg-marquardt';
 
-export const createLogisticFunction = (H_min: number, H_max: number) => {
+const createLogisticFunction = (H_min: number, H_max: number) => {
   return ([a, b]: number[], L: number): number => (H_max - H_min) / (1 + Math.exp(-a + b * L)) + H_min;
 };
 
