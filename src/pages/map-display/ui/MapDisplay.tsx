@@ -2,7 +2,6 @@ import { ChangeEvent, useEffect, useRef, useState } from 'react';
 
 import { Feature, FeatureCollection, MultiLineString, Point } from 'geojson';
 import Map from 'ol/Map.js';
-import GeoJSON from 'ol/format/GeoJSON';
 
 import { OLMap } from '@/features/ol-map';
 import { SettingsPanel } from '@/features/settings-panel';
@@ -16,7 +15,7 @@ import {
 } from '@/utils/map-config';
 
 import { Marker } from '@/components';
-import { generateFlowLines } from '@/features/flow-lines';
+import { calculateFlowAccumulation, transformFlowAccumulationToFlowLines } from '@/features/flow-lines';
 import {
   addFeaturesToLayer,
   addZValueToEachPoint,
@@ -46,7 +45,6 @@ import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
   const mapRef = useRef<Map | undefined>(undefined);
-  const g = new GeoJSON();
 
   const [points, setPoints] = useState<FeatureCollection<Point> | undefined>(undefined);
 
@@ -74,16 +72,17 @@ export const MapDisplay = () => {
   useEffect(() => {
     if (isDrawEnd && geometry) {
       const points = makePointsFromBBox(geometry.getExtent(), pointsDelta, { units: 'meters' });
+      console.log(geometry.getExtent());
       setPoints(points);
 
-      drawLayer?.getSource()?.addFeatures(g.readFeatures(points));
+      addFeaturesToLayer(drawLayer, points);
 
       return;
     }
 
     clearLayer();
     setPoints(undefined);
-  }, [isDrawEnd, geometry]);
+  }, [isDrawEnd, geometry, pointsDelta]);
 
   useEffect(() => {
     drawInteractions.getArray().forEach((draw) => {
@@ -110,7 +109,7 @@ export const MapDisplay = () => {
 
     // map.on('click', (event) => {
     //   const clickedCoordinate = event.coordinate;
-    //   console.log('Clicked Coordinate:', toLonLat(clickedCoordinate), clickedCoordinate);
+    //   console.log('Clicked Coordinate:', clickedCoordinate);
     // });
   };
 
@@ -148,11 +147,11 @@ export const MapDisplay = () => {
     const elevationData = await getPointsElevationData(points);
     const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });
 
-    const m = new MatrixHelper(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
+    const mhlpr = new MatrixHelper(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
 
-    console.log({ pointsWithZValue });
-    console.table(m.getXYmatrix());
-    console.table(m.getZmatrix());
+    // console.log({ pointsWithZValue });
+    console.table(mhlpr.getXYmatrix());
+    console.table(mhlpr.getZmatrix());
 
     const isolinesSettings = {
       points: pointsWithZValue,
@@ -169,9 +168,6 @@ export const MapDisplay = () => {
 
     const cleanIsolines = featureCollection<MultiLineString>(cleanEmptyFeatures(isolines.features));
 
-    // console.log({ cleanIsolines });
-    // console.log({ isolines });
-
     addIsolinesToLayer(drawLayer, cleanIsolines, { addBbox: true, style: isolinesStyle });
 
     const maxZValuePoint = findFeatureWithMaxZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
@@ -181,21 +177,22 @@ export const MapDisplay = () => {
       return;
     }
 
-    // const stockLines = findFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+    // const stockLineOld = generateFlowLinesOld(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
+    const fd8FlowAccumulation = calculateFlowAccumulation(mhlpr.getZmatrix(), {
+      threshold: Infinity,
+    });
 
-    // console.log(stockLines);
+    console.table(fd8FlowAccumulation);
 
-    // stockLines.forEach((stockLine) => {
-    //   drawLayer?.getSource()?.addFeatures(g.readFeatures(stockLine));
-    // });
+    const fd8FlowLines = transformFlowAccumulationToFlowLines(
+      mhlpr.getZmatrix(),
+      mhlpr.getXYmatrix(),
+      fd8FlowAccumulation,
+      { minLength: 10 },
+    );
 
-    const stockLine = generateFlowLines(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
-    // const stockLineMock1 = generateFlowLinesTest(testIsolines, testMaxZValuePoint, { zProperty: Z_PROPERTY_NAME });
-    // const stockLineMock2 = generateFlowLines(testIsolines, testMaxZValuePoint, { zProperty: Z_PROPERTY_NAME });
-
-    addFeaturesToLayer(drawLayer, stockLine, { style: flowLinesStyle });
-    // addFeaturesToLayer(drawLayer, stockLineMock1, { color: 'blue', width: 2 });
-    // addFeaturesToLayer(drawLayer, stockLineMock2, { color: 'green', width: 2 });
+    // addFeaturesToLayer(drawLayer, stockLineOld, { style: flowLinesStyle });
+    addFeaturesToLayer(drawLayer, fd8FlowLines, { style: flowLinesStyle });
 
     setMaxZValuePoint(maxZValuePoint);
     setMinZValuePoint(minZValuePoint);

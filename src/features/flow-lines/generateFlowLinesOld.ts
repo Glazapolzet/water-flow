@@ -3,7 +3,7 @@ import lineIntersect from '@turf/line-intersect';
 import { Feature, FeatureCollection, GeoJsonProperties, LineString, MultiLineString, Point } from 'geojson';
 import { sortIsolinesByZ } from '../../utils/helpers/sortIsolinesByZ';
 
-export function generateFlowLines(
+export function generateFlowLinesOld(
   isolines: FeatureCollection<MultiLineString, GeoJsonProperties>,
   startPoint: Feature<Point, GeoJsonProperties>,
   options: { zProperty: string },
