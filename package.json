@@ -4,6 +4,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "test": "vitest",
     "preview": "vite preview",
     "format": "prettier --ignore-path .gitignore -u --write .",
     "lint": "eslint .",
@@ -63,7 +64,7 @@
     "web-vitals": "^2.1.4"
   },
   "devDependencies": {
-    "@types/node": "^17.0.45",
+    "@types/node": "^22.15.17",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/react-router": "^5.1.20",
@@ -85,6 +86,7 @@
     "typescript": "^4.9.5",
     "vite": "^4.5.3",
     "vite-plugin-eslint": "^1.8.1",
-    "vite-plugin-pwa": "^0.14.7"
+    "vite-plugin-pwa": "^0.14.7",
+    "vitest": "^3.1.3"
   }
 }
