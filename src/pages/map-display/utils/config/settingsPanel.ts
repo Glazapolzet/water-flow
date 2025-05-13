@@ -1,25 +1,5 @@
 import { drawInteractions, rasterLayers } from '@/utils/map-config';
 
-const isolinesAvailableTypes = ['turf', 'conrec'];
-
-const isolinesItems = isolinesAvailableTypes.map((option) => {
-  return {
-    id: option,
-    value: option,
-    children: option,
-  };
-});
-
-const ISOLINES_TYPE_OPTIONS = [
-  {
-    id: 'Select isoline type',
-    disabled: true,
-    value: '',
-    children: 'Select isoline type',
-  },
-  ...isolinesItems,
-];
-
 const layerItems = Object.values(rasterLayers.getProperties()).map((rasterLayerProps) => {
   return {
     id: rasterLayerProps.name,
@@ -65,10 +45,6 @@ export const SETTINGS_PANEL_BASE_CONFIG = {
   activeLayer: {
     title: 'Active layer',
     options: ACTIVE_LAYER_OPTIONS,
-  },
-  isolinesType: {
-    title: 'Isolines type',
-    options: ISOLINES_TYPE_OPTIONS,
   },
   selectionArea: {
     title: 'Selection area type',

@@ -18,7 +18,6 @@ import styles from './SettingsPanel.module.scss';
 
 interface SettingsPanel {
   activeLayer: SettingsSelect;
-  isolinesType: SettingsSelect;
   selectionArea: SettingsSelect;
   splineIsolines: SettingsSwitch;
   clearButton: SettingsButton;
@@ -28,7 +27,6 @@ interface SettingsPanel {
 
 export const SettingsPanel: FC<SettingsPanel> = ({
   activeLayer,
-  isolinesType,
   selectionArea,
   splineIsolines,
   clearButton,
@@ -36,7 +34,6 @@ export const SettingsPanel: FC<SettingsPanel> = ({
   pointsDelta,
 }) => {
   const { title: activeLayerTitle, ...activeLayerProps } = activeLayer;
-  const { title: isolinesTypeTitle, ...isolinesTypeProps } = isolinesType;
   const { title: selectionAreaTitle, ...selectionAreaProps } = selectionArea;
   const { title: splineIsolinesTitle, ...splineIsolinesProps } = splineIsolines;
   const { title: pointsDeltaTitle, ...pointsDeltaProps } = pointsDelta;
@@ -60,19 +57,6 @@ export const SettingsPanel: FC<SettingsPanel> = ({
               size={'md'}
               variant={'filled'}
               {...activeLayerProps}
-            />
-          }
-        />
-
-        <TitledComponent
-          title={isolinesTypeTitle}
-          Component={
-            <SelectWithOptions
-              borderColor={'gray.400'}
-              borderWidth={'1px'}
-              size={'md'}
-              variant={'filled'}
-              {...isolinesTypeProps}
             />
           }
         />

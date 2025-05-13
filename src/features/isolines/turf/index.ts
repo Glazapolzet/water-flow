@@ -1,1 +1,1 @@
-export { makeTurfIsolines } from './makeTurfIsolines';
+export { makeIsolines } from './makeIsolines';

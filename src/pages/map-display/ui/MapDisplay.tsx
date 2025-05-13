@@ -16,6 +16,7 @@ import {
 
 import { Marker } from '@/components';
 import { calculateFlowAccumulation, transformFlowAccumulationToFlowLines } from '@/features/flow-lines';
+import { makeIsolines } from '@/features/isolines';
 import {
   addFeaturesToLayer,
   addZValueToEachPoint,
@@ -33,7 +34,6 @@ import {
   DEFAULT_POINTS_DELTA,
   getPointsElevationData,
   ISOLINES_BREAKS_DELTA,
-  makeIsolines,
   MAP_BASE_CONFIG,
   SETTINGS_PANEL_BASE_CONFIG,
   useActiveLayer,
@@ -56,7 +56,6 @@ export const MapDisplay = () => {
   const { activeLayer, setActiveLayer } = useActiveLayer(mapRef, OTMLayerName, rasterLayers);
   const { selectionArea, setSelectionArea } = useSelectionArea(mapRef, '', drawInteractions);
 
-  const [isolinesType, setIsolinesType] = useState<string>('');
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
   const [pointsDelta, setPointsDelta] = useState<number>(DEFAULT_POINTS_DELTA);
 
@@ -121,10 +120,6 @@ export const MapDisplay = () => {
     setSelectionArea(event.target.value);
   };
 
-  const handleIsolinesTypeChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setIsolinesType(event.target.value);
-  };
-
   const handleMeasureDeltaChange = (_valueAsString: string, valueAsNumber: number) => {
     setPointsDelta(valueAsNumber);
   };
@@ -138,7 +133,7 @@ export const MapDisplay = () => {
   };
 
   const handleConfirmButtonClick = async () => {
-    if (!isolinesType || !points) {
+    if (!points) {
       return;
     }
 
@@ -149,18 +144,15 @@ export const MapDisplay = () => {
 
     const mhlpr = new MatrixHelper(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
 
-    // console.log({ pointsWithZValue });
     console.table(mhlpr.getXYmatrix());
     console.table(mhlpr.getZmatrix());
 
-    const isolinesSettings = {
+    const isolines = makeIsolines({
       points: pointsWithZValue,
       breaksDelta: ISOLINES_BREAKS_DELTA,
       isolinesOptions: { zProperty: Z_PROPERTY_NAME },
       splined: isIsolinesSplined,
-    };
-
-    const isolines = makeIsolines(isolinesType, isolinesSettings);
+    });
 
     if (!isolines) {
       return;
@@ -180,6 +172,7 @@ export const MapDisplay = () => {
     // const stockLineOld = generateFlowLinesOld(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
     const fd8FlowAccumulation = calculateFlowAccumulation(mhlpr.getZmatrix(), {
       threshold: Infinity,
+      exponent: 1.1,
     });
 
     console.table(fd8FlowAccumulation);
@@ -224,11 +217,6 @@ export const MapDisplay = () => {
             onChange: handleActiveLayerChange,
             value: activeLayer,
           }}
-          isolinesType={{
-            ...SETTINGS_PANEL_BASE_CONFIG.isolinesType,
-            onChange: handleIsolinesTypeChange,
-            value: isolinesType,
-          }}
           selectionArea={{
             ...SETTINGS_PANEL_BASE_CONFIG.selectionArea,
             onChange: handleSelectionAreaChange,
@@ -251,7 +239,7 @@ export const MapDisplay = () => {
           }}
           confirmButton={{
             ...SETTINGS_PANEL_BASE_CONFIG.confirmButton,
-            isVisible: !!points && !!isolinesType,
+            isVisible: !!points,
             onClick: handleConfirmButtonClick,
           }}
         />

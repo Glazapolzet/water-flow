@@ -24,7 +24,7 @@ export class MatrixHelper {
     return this.Zmatrix;
   }
 
-  getDeltas() {
+  getDeltas(): [dx: number, dy: number] {
     return [this.dx, this.dy];
   }
 

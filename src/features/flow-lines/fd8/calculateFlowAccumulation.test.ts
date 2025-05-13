@@ -8,7 +8,7 @@ test('simple flow accumulation', () => {
     [3, 1, 0],
   ];
 
-  const result = calculateFlowAccumulation(elevationGrid);
+  const result = calculateFlowAccumulation(elevationGrid, { threshold: Infinity, exponent: 1.1 });
 
   expect(result).toEqual([
     [1, 2, 3],

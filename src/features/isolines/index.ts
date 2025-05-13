@@ -1,2 +1,1 @@
-export { makeConrecIsolines } from './conrec';
-export { makeTurfIsolines } from './turf';
+export { makeIsolines } from './turf';
