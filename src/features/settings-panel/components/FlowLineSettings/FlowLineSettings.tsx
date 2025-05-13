@@ -1,77 +1,32 @@
-import { SelectWithOptions, TitledComponent } from '@/components';
+import { TitledComponent } from '@/components';
 import {
-  FormControl,
-  FormLabel,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper,
-  Switch,
+  Stack,
 } from '@chakra-ui/react';
 import { FC } from 'react';
-import { SettingsNumber, SettingsSelect, SettingsSwitch } from '../../types';
+import { SettingsNumber } from '../../types';
 
 export type FlowLineSettings = {
-  activeLayer: SettingsSelect;
-  selectionArea: SettingsSelect;
-  splineIsolines: SettingsSwitch;
-  isolinesDelta: SettingsNumber;
-  pointsDelta: SettingsNumber;
+  threshold: SettingsNumber;
+  exponent: SettingsNumber;
+  minLength: SettingsNumber;
 };
 
-export const FlowLineSettings: FC<FlowLineSettings> = ({
-  activeLayer,
-  selectionArea,
-  splineIsolines,
-  isolinesDelta,
-  pointsDelta,
-}) => {
-  const { title: activeLayerTitle, ...activeLayerProps } = activeLayer;
-  const { title: selectionAreaTitle, ...selectionAreaProps } = selectionArea;
-  const { title: splineIsolinesTitle, ...splineIsolinesProps } = splineIsolines;
-  const { title: isolinesDeltaTitle, ...isolinesDeltaProps } = isolinesDelta;
-  const { title: pointsDeltaTitle, ...pointsDeltaProps } = pointsDelta;
+export const FlowLineSettings: FC<FlowLineSettings> = ({ threshold, exponent, minLength }) => {
+  const { title: thresholdTitle, ...thresholdProps } = threshold;
+  const { title: exponentTitle, ...exponentProps } = exponent;
+  const { title: minLengthTitle, ...minLengthProps } = minLength;
 
   return (
-    <>
+    <Stack spacing={4} direction={'column'}>
       <TitledComponent
-        title={activeLayerTitle}
+        title={thresholdTitle}
         Component={
-          <SelectWithOptions
-            borderColor={'gray.400'}
-            borderWidth={'1px'}
-            size={'md'}
-            variant={'filled'}
-            {...activeLayerProps}
-          />
-        }
-      />
-
-      <TitledComponent
-        title={selectionAreaTitle}
-        Component={
-          <SelectWithOptions
-            borderColor={'gray.400'}
-            borderWidth={'1px'}
-            size={'md'}
-            variant={'filled'}
-            {...selectionAreaProps}
-          />
-        }
-      />
-
-      <FormControl display="flex" alignItems="center">
-        <FormLabel htmlFor="email-alerts" mb="0">
-          {splineIsolinesTitle}
-        </FormLabel>
-        <Switch {...splineIsolinesProps} colorScheme={'teal'} size="md" id="email-alerts" />
-      </FormControl>
-
-      <TitledComponent
-        title={isolinesDeltaTitle}
-        Component={
-          <NumberInput step={5} variant={'filled'} focusBorderColor={'teal.200'} {...isolinesDeltaProps}>
+          <NumberInput variant={'filled'} focusBorderColor={'teal.200'} {...thresholdProps}>
             <NumberInputField borderColor={'gray.400'} borderWidth={'1px'} />
             <NumberInputStepper>
               <NumberIncrementStepper />
@@ -82,9 +37,9 @@ export const FlowLineSettings: FC<FlowLineSettings> = ({
       />
 
       <TitledComponent
-        title={pointsDeltaTitle}
+        title={exponentTitle}
         Component={
-          <NumberInput step={5} variant={'filled'} focusBorderColor={'teal.200'} {...pointsDeltaProps}>
+          <NumberInput variant={'filled'} focusBorderColor={'teal.200'} {...exponentProps}>
             <NumberInputField borderColor={'gray.400'} borderWidth={'1px'} />
             <NumberInputStepper>
               <NumberIncrementStepper />
@@ -93,6 +48,19 @@ export const FlowLineSettings: FC<FlowLineSettings> = ({
           </NumberInput>
         }
       />
-    </>
+
+      <TitledComponent
+        title={minLengthTitle}
+        Component={
+          <NumberInput variant={'filled'} focusBorderColor={'teal.200'} {...minLengthProps}>
+            <NumberInputField borderColor={'gray.400'} borderWidth={'1px'} />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
+        }
+      />
+    </Stack>
   );
 };

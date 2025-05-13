@@ -31,16 +31,21 @@ import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';
 import {
   addIsolinesToLayer,
+  BASE_SETTINGS_PANEL_CONFIG,
+  DEFAULT_EXPONENT,
   DEFAULT_ISOLINES_DELTA,
+  DEFAULT_MIN_LENGTH,
   DEFAULT_POINTS_DELTA,
+  DEFAULT_THRESHOLD,
   getPointsElevationData,
+  MAIN_SETTINGS_PANEL_CONFIG,
   MAP_BASE_CONFIG,
-  SETTINGS_PANEL_BASE_CONFIG,
   useActiveLayer,
   useDrawHandlers,
   useSelectionArea,
   Z_PROPERTY_NAME,
 } from '../utils';
+import { FLOW_LINE_SETTINGS_PANEL_CONFIG } from '../utils/config/settingsPanel';
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
@@ -57,28 +62,37 @@ export const MapDisplay = () => {
   const { selectionArea, setSelectionArea } = useSelectionArea(mapRef, '', drawInteractions);
 
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
-  const [isolinesDelta, setIsolinesDelta] = useState<number>(DEFAULT_POINTS_DELTA);
+  const [isolinesDelta, setIsolinesDelta] = useState<number>(DEFAULT_ISOLINES_DELTA);
   const [pointsDelta, setPointsDelta] = useState<number>(DEFAULT_POINTS_DELTA);
+
+  const [threshold, setThreshold] = useState<number>(DEFAULT_THRESHOLD);
+  const [exponent, setExponent] = useState<number>(DEFAULT_EXPONENT);
+  const [minLength, setMinLength] = useState<number>(DEFAULT_MIN_LENGTH);
 
   const { handleDrawStart, handleDrawEnd, isDrawStart, isDrawEnd, geometry } = useDrawHandlers();
 
   const clearLayer = () => {
     drawLayer?.getSource()?.clear();
+  };
+
+  const clearAreaContext = () => {
+    clearLayer();
 
     setMaxZValuePoint(null);
     setMinZValuePoint(null);
+
+    setPoints(undefined);
   };
 
   useEffect(() => {
     if (isDrawStart) {
-      clearLayer();
-      setPoints(undefined);
+      clearAreaContext();
     }
   }, [isDrawStart]);
 
   useEffect(() => {
     if (isDrawEnd && geometry) {
-      clearLayer();
+      clearAreaContext();
 
       const points = makePointsFromBBox(geometry.getExtent(), pointsDelta, { units: 'meters' });
 
@@ -138,8 +152,20 @@ export const MapDisplay = () => {
     setIsIsolinesSplined(!isIsolinesSplined);
   };
 
+  const handleThresholdChange = (_valueAsString: string, valueAsNumber: number) => {
+    setThreshold(valueAsNumber);
+  };
+
+  const handleExponentChange = (_valueAsString: string, valueAsNumber: number) => {
+    setExponent(valueAsNumber);
+  };
+
+  const handleMinLengthChange = (_valueAsString: string, valueAsNumber: number) => {
+    setMinLength(valueAsNumber);
+  };
+
   const handleClearButtonClick = async () => {
-    clearLayer();
+    clearAreaContext();
   };
 
   const handleConfirmButtonClick = async () => {
@@ -180,8 +206,8 @@ export const MapDisplay = () => {
     }
 
     const fd8FlowAccumulation = calculateFlowAccumulation(mhlpr.getZmatrix(), {
-      threshold: Infinity,
-      exponent: 10,
+      threshold: threshold,
+      exponent: exponent,
     });
 
     console.table(fd8FlowAccumulation);
@@ -190,7 +216,7 @@ export const MapDisplay = () => {
       mhlpr.getZmatrix(),
       mhlpr.getXYmatrix(),
       fd8FlowAccumulation,
-      { minLength: 10 },
+      { minLength: minLength },
     );
 
     addFeaturesToLayer(drawLayer, fd8FlowLines, { style: flowLinesStyle });
@@ -220,42 +246,67 @@ export const MapDisplay = () => {
 
       <section className={styles.mapDisplay}>
         <SettingsPanel
-          title={SETTINGS_PANEL_BASE_CONFIG.title}
+          title={BASE_SETTINGS_PANEL_CONFIG.title}
           mainSettings={{
             activeLayer: {
-              ...SETTINGS_PANEL_BASE_CONFIG.activeLayer,
+              ...MAIN_SETTINGS_PANEL_CONFIG.activeLayer,
               onChange: handleActiveLayerChange,
               value: activeLayer,
             },
             selectionArea: {
-              ...SETTINGS_PANEL_BASE_CONFIG.selectionArea,
+              ...MAIN_SETTINGS_PANEL_CONFIG.selectionArea,
               onChange: handleSelectionAreaChange,
               value: selectionArea,
             },
             splineIsolines: {
-              ...SETTINGS_PANEL_BASE_CONFIG.splineIsolines,
+              ...MAIN_SETTINGS_PANEL_CONFIG.splineIsolines,
               isChecked: isIsolinesSplined,
               onChange: handleSplineIsolinesChange,
             },
             isolinesDelta: {
-              ...SETTINGS_PANEL_BASE_CONFIG.isolinesDelta,
+              ...MAIN_SETTINGS_PANEL_CONFIG.isolinesDelta,
               onChange: handleIsolinesDeltaChange,
               defaultValue: DEFAULT_ISOLINES_DELTA,
               min: DEFAULT_ISOLINES_DELTA,
+              step: 5,
             },
             pointsDelta: {
-              ...SETTINGS_PANEL_BASE_CONFIG.pointsDelta,
+              ...MAIN_SETTINGS_PANEL_CONFIG.pointsDelta,
               onChange: handlePointsDeltaChange,
               defaultValue: DEFAULT_POINTS_DELTA,
               min: DEFAULT_POINTS_DELTA,
+              step: 5,
+            },
+          }}
+          flowLineSettings={{
+            threshold: {
+              ...FLOW_LINE_SETTINGS_PANEL_CONFIG.threshold,
+              onChange: handleThresholdChange,
+              defaultValue: DEFAULT_THRESHOLD,
+              min: DEFAULT_THRESHOLD,
+              step: 10,
+            },
+            exponent: {
+              ...FLOW_LINE_SETTINGS_PANEL_CONFIG.exponent,
+              onChange: handleExponentChange,
+              defaultValue: DEFAULT_EXPONENT,
+              min: 1,
+              step: 0.1,
+            },
+            minLength: {
+              ...FLOW_LINE_SETTINGS_PANEL_CONFIG.minLength,
+              onChange: handleMinLengthChange,
+              defaultValue: DEFAULT_MIN_LENGTH,
+              min: 1,
+              step: 1,
             },
           }}
           clearButton={{
-            ...SETTINGS_PANEL_BASE_CONFIG.clearButton,
+            ...BASE_SETTINGS_PANEL_CONFIG.clearButton,
             onClick: handleClearButtonClick,
           }}
           confirmButton={{
-            ...SETTINGS_PANEL_BASE_CONFIG.confirmButton,
+            ...BASE_SETTINGS_PANEL_CONFIG.confirmButton,
             isVisible: !!points,
             onClick: handleConfirmButtonClick,
           }}

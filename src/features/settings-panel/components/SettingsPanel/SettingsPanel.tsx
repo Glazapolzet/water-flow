@@ -2,17 +2,25 @@ import { HideableButton } from '@/components';
 import { Heading, Stack, StackDivider, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { FC } from 'react';
 import { SettingsButton } from '../../types';
+import { FlowLineSettings } from '../FlowLineSettings/FlowLineSettings';
 import { MainSettings } from '../MainSettings/MainSettings';
 import styles from './SettingsPanel.module.scss';
 
 interface SettingsPanel {
   title: string;
   mainSettings: MainSettings;
+  flowLineSettings: FlowLineSettings;
   clearButton: SettingsButton;
   confirmButton: SettingsButton;
 }
 
-export const SettingsPanel: FC<SettingsPanel> = ({ title, mainSettings, clearButton, confirmButton }) => {
+export const SettingsPanel: FC<SettingsPanel> = ({
+  title,
+  mainSettings,
+  flowLineSettings,
+  clearButton,
+  confirmButton,
+}) => {
   const { title: clearButtonTitle, ...clearButtonProps } = clearButton;
   const { title: confirmButtonTitle, ...confirmButtonProps } = confirmButton;
 
@@ -25,7 +33,7 @@ export const SettingsPanel: FC<SettingsPanel> = ({ title, mainSettings, clearBut
       <Stack spacing={10} direction={'column'} className={styles.optionsContainer}>
         <Tabs variant={'solid-rounded'} colorScheme="teal">
           <TabList>
-            <Tab>Основное</Tab>
+            <Tab>Основные</Tab>
             <Tab>Параметры склона</Tab>
           </TabList>
           <TabPanels marginTop={30}>
@@ -33,7 +41,7 @@ export const SettingsPanel: FC<SettingsPanel> = ({ title, mainSettings, clearBut
               <MainSettings {...mainSettings} />
             </TabPanel>
             <TabPanel padding={0}>
-              <p>two!</p>
+              <FlowLineSettings {...flowLineSettings} />
             </TabPanel>
           </TabPanels>
         </Tabs>

@@ -13,7 +13,7 @@ const ACTIVE_LAYER_OPTIONS = [
     id: 'Select active layer',
     disabled: true,
     value: '',
-    children: 'Select active layer',
+    children: 'Выберите активный слой',
   },
   ...layerItems,
 ];
@@ -31,7 +31,7 @@ const SELECTION_AREA_OPTIONS = [
     id: 'Select selection area type',
     disabled: true,
     value: '',
-    children: 'Select selection area type',
+    children: 'Выберите тип области выделения',
   },
   {
     id: 'none',
@@ -41,29 +41,44 @@ const SELECTION_AREA_OPTIONS = [
   ...selectionItems,
 ];
 
-export const SETTINGS_PANEL_BASE_CONFIG = {
-  title: 'Settings',
+export const FLOW_LINE_SETTINGS_PANEL_CONFIG = {
+  threshold: {
+    title: 'Порог аккумуляции потока',
+  },
+  exponent: {
+    title: 'Экспонента',
+  },
+  minLength: {
+    title: 'Минимальная длина линий тока',
+  },
+};
+
+export const MAIN_SETTINGS_PANEL_CONFIG = {
   activeLayer: {
-    title: 'Active layer',
+    title: 'Активный слой',
     options: ACTIVE_LAYER_OPTIONS,
   },
   selectionArea: {
-    title: 'Selection area type',
+    title: 'Область выделения',
     options: SELECTION_AREA_OPTIONS,
   },
   splineIsolines: {
-    title: 'Spline isolines',
+    title: 'Сглаживать изолинии',
   },
   isolinesDelta: {
-    title: 'Isolines delta (m)',
+    title: 'Частота изолиний (м.)',
   },
   pointsDelta: {
-    title: 'Points delta (m)',
+    title: 'Частота точек (м.)',
   },
+};
+
+export const BASE_SETTINGS_PANEL_CONFIG = {
+  title: 'Настройки',
   confirmButton: {
-    title: 'Calculate selected area',
+    title: 'Рассчитать область',
   },
   clearButton: {
-    title: 'Clear',
+    title: 'Очистить область',
   },
 };

@@ -72,7 +72,7 @@ export const MainSettings: FC<MainSettings> = ({
       <TitledComponent
         title={isolinesDeltaTitle}
         Component={
-          <NumberInput step={5} variant={'filled'} focusBorderColor={'teal.200'} {...isolinesDeltaProps}>
+          <NumberInput variant={'filled'} focusBorderColor={'teal.200'} {...isolinesDeltaProps}>
             <NumberInputField borderColor={'gray.400'} borderWidth={'1px'} />
             <NumberInputStepper>
               <NumberIncrementStepper />
@@ -85,7 +85,7 @@ export const MainSettings: FC<MainSettings> = ({
       <TitledComponent
         title={pointsDeltaTitle}
         Component={
-          <NumberInput step={5} variant={'filled'} focusBorderColor={'teal.200'} {...pointsDeltaProps}>
+          <NumberInput variant={'filled'} focusBorderColor={'teal.200'} {...pointsDeltaProps}>
             <NumberInputField borderColor={'gray.400'} borderWidth={'1px'} />
             <NumberInputStepper>
               <NumberIncrementStepper />
