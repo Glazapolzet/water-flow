@@ -179,7 +179,6 @@ export const MapDisplay = () => {
       return;
     }
 
-    // const stockLineOld = generateFlowLinesOld(cleanIsolines, maxZValuePoint, { zProperty: Z_PROPERTY_NAME });
     const fd8FlowAccumulation = calculateFlowAccumulation(mhlpr.getZmatrix(), {
       threshold: Infinity,
       exponent: 1.1,
@@ -194,7 +193,6 @@ export const MapDisplay = () => {
       { minLength: 10 },
     );
 
-    // addFeaturesToLayer(drawLayer, stockLineOld, { style: flowLinesStyle });
     addFeaturesToLayer(drawLayer, fd8FlowLines, { style: flowLinesStyle });
 
     setMaxZValuePoint(maxZValuePoint);
