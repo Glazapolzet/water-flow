@@ -17,12 +17,11 @@ export function transformFlowAccumulationToFlowLines(
   options: {
     threshold?: number; // Порог для "русла" (default: 5% от max)
     minLength?: number; // Минимальная длина линии (ячейки)
-    exponent?: number;
   } = {},
 ): FeatureCollection<LineString> {
   const maxFlow = Math.max(...flowGrid.flat());
 
-  const { threshold = maxFlow * 0.05, minLength = 3, exponent = 1.1 } = options;
+  const { threshold = maxFlow * 0.05, minLength = 3 } = options;
 
   const rows = flowGrid.length;
   const cols = flowGrid[0].length;
@@ -40,7 +39,7 @@ export function transformFlowAccumulationToFlowLines(
   // Строим линии от каждой точки
   const features = startPoints
     .map(([y, x]) => {
-      const line = traceFlowLine(y, x, elevationGrid, coordinatesGrid, exponent);
+      const line = traceFlowLine(y, x, elevationGrid, coordinatesGrid);
       return lineToFeature(line);
     })
     .filter((f) => f.geometry.coordinates.length >= minLength);
@@ -59,7 +58,6 @@ function traceFlowLine(
   startX: number,
   elevationGrid: ElevationGrid,
   coordinatesGrid: CoordinatesGrid,
-  exponent: number,
 ): Position[] {
   const line: Position[] = [];
   let [y, x] = [startY, startX];
@@ -76,7 +74,7 @@ function traceFlowLine(
     visited.add(cellKey);
 
     // Получаем направление потока
-    const direction = getFlowDirection(y, x, elevationGrid, coordinatesGrid, exponent);
+    const direction = getFlowDirection(y, x, elevationGrid, coordinatesGrid);
     if (!direction) break; // Локальный минимум
 
     // Переходим к следующей ячейке
@@ -98,7 +96,6 @@ function getFlowDirection(
   x: number,
   elevationGrid: ElevationGrid,
   coordinatesGrid: CoordinatesGrid,
-  _exponent: number,
 ): FlowDirection {
   let maxSlope = 0;
   let bestDir: FlowDirection = null;

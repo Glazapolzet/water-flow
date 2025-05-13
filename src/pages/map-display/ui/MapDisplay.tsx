@@ -181,7 +181,7 @@ export const MapDisplay = () => {
 
     const fd8FlowAccumulation = calculateFlowAccumulation(mhlpr.getZmatrix(), {
       threshold: Infinity,
-      exponent: 1.1,
+      exponent: 10,
     });
 
     console.table(fd8FlowAccumulation);
@@ -221,32 +221,34 @@ export const MapDisplay = () => {
       <section className={styles.mapDisplay}>
         <SettingsPanel
           title={SETTINGS_PANEL_BASE_CONFIG.title}
-          activeLayer={{
-            ...SETTINGS_PANEL_BASE_CONFIG.activeLayer,
-            onChange: handleActiveLayerChange,
-            value: activeLayer,
-          }}
-          selectionArea={{
-            ...SETTINGS_PANEL_BASE_CONFIG.selectionArea,
-            onChange: handleSelectionAreaChange,
-            value: selectionArea,
-          }}
-          splineIsolines={{
-            ...SETTINGS_PANEL_BASE_CONFIG.splineIsolines,
-            isChecked: isIsolinesSplined,
-            onChange: handleSplineIsolinesChange,
-          }}
-          isolinesDelta={{
-            ...SETTINGS_PANEL_BASE_CONFIG.isolinesDelta,
-            onChange: handleIsolinesDeltaChange,
-            defaultValue: DEFAULT_ISOLINES_DELTA,
-            min: DEFAULT_ISOLINES_DELTA,
-          }}
-          pointsDelta={{
-            ...SETTINGS_PANEL_BASE_CONFIG.pointsDelta,
-            onChange: handlePointsDeltaChange,
-            defaultValue: DEFAULT_POINTS_DELTA,
-            min: DEFAULT_POINTS_DELTA,
+          mainSettings={{
+            activeLayer: {
+              ...SETTINGS_PANEL_BASE_CONFIG.activeLayer,
+              onChange: handleActiveLayerChange,
+              value: activeLayer,
+            },
+            selectionArea: {
+              ...SETTINGS_PANEL_BASE_CONFIG.selectionArea,
+              onChange: handleSelectionAreaChange,
+              value: selectionArea,
+            },
+            splineIsolines: {
+              ...SETTINGS_PANEL_BASE_CONFIG.splineIsolines,
+              isChecked: isIsolinesSplined,
+              onChange: handleSplineIsolinesChange,
+            },
+            isolinesDelta: {
+              ...SETTINGS_PANEL_BASE_CONFIG.isolinesDelta,
+              onChange: handleIsolinesDeltaChange,
+              defaultValue: DEFAULT_ISOLINES_DELTA,
+              min: DEFAULT_ISOLINES_DELTA,
+            },
+            pointsDelta: {
+              ...SETTINGS_PANEL_BASE_CONFIG.pointsDelta,
+              onChange: handlePointsDeltaChange,
+              defaultValue: DEFAULT_POINTS_DELTA,
+              min: DEFAULT_POINTS_DELTA,
+            },
           }}
           clearButton={{
             ...SETTINGS_PANEL_BASE_CONFIG.clearButton,
