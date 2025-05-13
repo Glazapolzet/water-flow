@@ -17,6 +17,7 @@ import { SettingsButton, SettingsNumber, SettingsSelect, SettingsSwitch } from '
 import styles from './SettingsPanel.module.scss';
 
 interface SettingsPanel {
+  title: string;
   activeLayer: SettingsSelect;
   selectionArea: SettingsSelect;
   splineIsolines: SettingsSwitch;
@@ -27,6 +28,7 @@ interface SettingsPanel {
 }
 
 export const SettingsPanel: FC<SettingsPanel> = ({
+  title,
   activeLayer,
   selectionArea,
   splineIsolines,
@@ -45,9 +47,9 @@ export const SettingsPanel: FC<SettingsPanel> = ({
   const { title: confirmButtonTitle, ...confirmButtonProps } = confirmButton;
 
   return (
-    <Stack align={'start'} direction={'column'} divider={<StackDivider borderColor={'gray.500'} />}>
+    <Stack align={'start'} direction={'column'} divider={<StackDivider borderColor={'white'} />}>
       <Heading as={'h2'} size={'lg'}>
-        Settings
+        {title}
       </Heading>
 
       <Stack spacing={5} direction={'column'} className={styles.optionsContainer}>

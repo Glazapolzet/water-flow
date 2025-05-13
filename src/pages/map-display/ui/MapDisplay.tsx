@@ -220,6 +220,7 @@ export const MapDisplay = () => {
 
       <section className={styles.mapDisplay}>
         <SettingsPanel
+          title={SETTINGS_PANEL_BASE_CONFIG.title}
           activeLayer={{
             ...SETTINGS_PANEL_BASE_CONFIG.activeLayer,
             onChange: handleActiveLayerChange,

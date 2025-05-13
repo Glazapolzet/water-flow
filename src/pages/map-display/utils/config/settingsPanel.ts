@@ -42,6 +42,7 @@ const SELECTION_AREA_OPTIONS = [
 ];
 
 export const SETTINGS_PANEL_BASE_CONFIG = {
+  title: 'Settings',
   activeLayer: {
     title: 'Active layer',
     options: ACTIVE_LAYER_OPTIONS,
