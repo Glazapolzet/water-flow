@@ -31,9 +31,9 @@ import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';
 import {
   addIsolinesToLayer,
+  DEFAULT_ISOLINES_DELTA,
   DEFAULT_POINTS_DELTA,
   getPointsElevationData,
-  ISOLINES_BREAKS_DELTA,
   MAP_BASE_CONFIG,
   SETTINGS_PANEL_BASE_CONFIG,
   useActiveLayer,
@@ -57,7 +57,10 @@ export const MapDisplay = () => {
   const { selectionArea, setSelectionArea } = useSelectionArea(mapRef, '', drawInteractions);
 
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
+  const [isolinesDelta, setIsolinesDelta] = useState<number>(DEFAULT_POINTS_DELTA);
   const [pointsDelta, setPointsDelta] = useState<number>(DEFAULT_POINTS_DELTA);
+
+  const { handleDrawStart, handleDrawEnd, isDrawStart, isDrawEnd, geometry } = useDrawHandlers();
 
   const clearLayer = () => {
     drawLayer?.getSource()?.clear();
@@ -66,21 +69,24 @@ export const MapDisplay = () => {
     setMinZValuePoint(null);
   };
 
-  const { handleDrawStart, handleDrawEnd, isDrawEnd, geometry } = useDrawHandlers();
+  useEffect(() => {
+    if (isDrawStart) {
+      clearLayer();
+      setPoints(undefined);
+    }
+  }, [isDrawStart]);
 
   useEffect(() => {
     if (isDrawEnd && geometry) {
-      const points = makePointsFromBBox(geometry.getExtent(), pointsDelta, { units: 'meters' });
-      console.log(geometry.getExtent());
-      setPoints(points);
+      clearLayer();
 
+      const points = makePointsFromBBox(geometry.getExtent(), pointsDelta, { units: 'meters' });
+
+      setPoints(points);
       addFeaturesToLayer(drawLayer, points);
 
       return;
     }
-
-    clearLayer();
-    setPoints(undefined);
   }, [isDrawEnd, geometry, pointsDelta]);
 
   useEffect(() => {
@@ -120,7 +126,11 @@ export const MapDisplay = () => {
     setSelectionArea(event.target.value);
   };
 
-  const handleMeasureDeltaChange = (_valueAsString: string, valueAsNumber: number) => {
+  const handleIsolinesDeltaChange = (_valueAsString: string, valueAsNumber: number) => {
+    setIsolinesDelta(valueAsNumber);
+  };
+
+  const handlePointsDeltaChange = (_valueAsString: string, valueAsNumber: number) => {
     setPointsDelta(valueAsNumber);
   };
 
@@ -149,7 +159,7 @@ export const MapDisplay = () => {
 
     const isolines = makeIsolines({
       points: pointsWithZValue,
-      breaksDelta: ISOLINES_BREAKS_DELTA,
+      breaksDelta: isolinesDelta,
       isolinesOptions: { zProperty: Z_PROPERTY_NAME },
       splined: isIsolinesSplined,
     });
@@ -227,9 +237,15 @@ export const MapDisplay = () => {
             isChecked: isIsolinesSplined,
             onChange: handleSplineIsolinesChange,
           }}
+          isolinesDelta={{
+            ...SETTINGS_PANEL_BASE_CONFIG.isolinesDelta,
+            onChange: handleIsolinesDeltaChange,
+            defaultValue: DEFAULT_ISOLINES_DELTA,
+            min: DEFAULT_ISOLINES_DELTA,
+          }}
           pointsDelta={{
-            ...SETTINGS_PANEL_BASE_CONFIG.measureDelta,
-            onChange: handleMeasureDeltaChange,
+            ...SETTINGS_PANEL_BASE_CONFIG.pointsDelta,
+            onChange: handlePointsDeltaChange,
             defaultValue: DEFAULT_POINTS_DELTA,
             min: DEFAULT_POINTS_DELTA,
           }}

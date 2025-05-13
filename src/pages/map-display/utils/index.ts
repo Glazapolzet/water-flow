@@ -1,4 +1,4 @@
-export { DEFAULT_POINTS_DELTA, ISOLINES_BREAKS_DELTA, Z_PROPERTY_NAME } from './config/constants';
+export { DEFAULT_ISOLINES_DELTA, DEFAULT_POINTS_DELTA, Z_PROPERTY_NAME } from './config/constants';
 export { MAP_BASE_CONFIG } from './config/map';
 export { SETTINGS_PANEL_BASE_CONFIG } from './config/settingsPanel';
 export { addIsolinesToLayer } from './helpers/addIsolinesToLayer';

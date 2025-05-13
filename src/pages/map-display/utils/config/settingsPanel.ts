@@ -53,7 +53,10 @@ export const SETTINGS_PANEL_BASE_CONFIG = {
   splineIsolines: {
     title: 'Spline isolines',
   },
-  measureDelta: {
+  isolinesDelta: {
+    title: 'Isolines delta (m)',
+  },
+  pointsDelta: {
     title: 'Points delta (m)',
   },
   confirmButton: {
