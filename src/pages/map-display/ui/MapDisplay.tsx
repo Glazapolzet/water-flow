@@ -76,8 +76,6 @@ export const MapDisplay = () => {
   };
 
   const clearAreaContext = () => {
-    clearLayer();
-
     setMaxZValuePoint(null);
     setMinZValuePoint(null);
 
@@ -86,12 +84,14 @@ export const MapDisplay = () => {
 
   useEffect(() => {
     if (isDrawStart) {
+      clearLayer();
       clearAreaContext();
     }
   }, [isDrawStart]);
 
   useEffect(() => {
     if (isDrawEnd && geometry) {
+      clearLayer();
       clearAreaContext();
 
       const points = makePointsFromBBox(geometry.getExtent(), pointsDelta, { units: 'meters' });
@@ -165,6 +165,7 @@ export const MapDisplay = () => {
   };
 
   const handleClearButtonClick = async () => {
+    clearLayer();
     clearAreaContext();
   };
 
@@ -180,8 +181,8 @@ export const MapDisplay = () => {
 
     const mhlpr = new MatrixHelper(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
 
-    console.table(mhlpr.getXYmatrix());
-    console.table(mhlpr.getZmatrix());
+    // console.table(mhlpr.getXYmatrix());
+    // console.table(mhlpr.getZmatrix());
 
     const isolines = makeIsolines({
       points: pointsWithZValue,
