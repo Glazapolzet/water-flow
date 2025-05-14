@@ -181,9 +181,6 @@ export const MapDisplay = () => {
 
     const mhlpr = new MatrixHelper(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
 
-    // console.table(mhlpr.getXYmatrix());
-    // console.table(mhlpr.getZmatrix());
-
     const isolines = makeIsolines({
       points: pointsWithZValue,
       breaksDelta: isolinesDelta,
@@ -206,21 +203,24 @@ export const MapDisplay = () => {
       return;
     }
 
-    const fd8FlowAccumulation = calculateFlowAccumulation(mhlpr.getZmatrix(), {
+    const flowAccumulation = calculateFlowAccumulation(mhlpr.getZmatrix(), {
       threshold: threshold,
       exponent: exponent,
     });
 
-    console.table(fd8FlowAccumulation);
+    // console.table(mhlpr.getXYmatrix());
+    // console.table(mhlpr.getZmatrix());
+    // console.table(flowAccumulation);
 
-    const fd8FlowLines = transformFlowAccumulationToFlowLines(
-      mhlpr.getZmatrix(),
-      mhlpr.getXYmatrix(),
-      fd8FlowAccumulation,
-      { minLength: minLength },
-    );
+    const flowLines = transformFlowAccumulationToFlowLines(mhlpr.getZmatrix(), mhlpr.getXYmatrix(), flowAccumulation, {
+      minLength: minLength,
+    });
 
-    addFeaturesToLayer(drawLayer, fd8FlowLines, { style: flowLinesStyle });
+    console.log(flowLines);
+
+    // console.log(distance([0, 0], [1, 1]));
+
+    addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
 
     setMaxZValuePoint(maxZValuePoint);
     setMinZValuePoint(minZValuePoint);

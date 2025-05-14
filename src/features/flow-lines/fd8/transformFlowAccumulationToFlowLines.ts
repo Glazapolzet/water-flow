@@ -1,7 +1,6 @@
 import { Feature, FeatureCollection, LineString, Position } from 'geojson';
 import { directions } from './directions';
 
-// Типы для ясности
 type FlowGrid = number[][];
 type ElevationGrid = number[][];
 type CoordinatesGrid = Position[][]; // [x, y] на каждой позиции
@@ -66,7 +65,9 @@ function traceFlowLine(
   while (true) {
     // Получаем реальные координаты из координатной сетки
     const [wx, wy] = coordinatesGrid[y][x];
-    line.push([wx, wy]);
+    // Добавляем значение высоты
+    const wz = elevationGrid[y][x];
+    line.push([wx, wy, wz]);
 
     // Проверяем, не зациклились ли мы
     const cellKey = `${y},${x}`;
@@ -108,6 +109,7 @@ function getFlowDirection(
       // Рассчитываем реальное расстояние между точками
       const [x1, y1] = coordinatesGrid[y][x];
       const [x2, y2] = coordinatesGrid[ny][nx];
+
       const distance = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
 
       if (distance > 0) {

@@ -1,0 +1,43 @@
+import { FeatureCollection, GeoJsonProperties, LineString } from 'geojson';
+
+export const makeFlowLineDistanceElevationData = (
+  featureCollection: FeatureCollection<LineString, GeoJsonProperties>,
+) => {
+  // Проверяем, что есть хотя бы одна линия
+  if (!featureCollection.features || featureCollection.features.length === 0) {
+    return { distances: [0], elevations: [0] };
+  }
+
+  // Берем первую линию из коллекции (предполагаем, что она одна)
+  const lineString = featureCollection.features[0];
+  const coordinates = lineString.geometry.coordinates;
+
+  // Инициализируем массивы
+  const distances = [0]; // Первая точка - расстояние 0
+  const elevations = [coordinates[0][2]]; // Высота первой точки
+
+  // Если только одна точка, возвращаем массивы с одним элементом
+  if (coordinates.length === 1) {
+    return { distances, elevations };
+  }
+
+  // Проходим по всем точкам, начиная со второй
+  for (let i = 1; i < coordinates.length; i++) {
+    const prevCoord = coordinates[i - 1];
+    const currCoord = coordinates[i];
+
+    // 1. Рассчитываем расстояние между текущей и предыдущей точкой
+    const dx = currCoord[0] - prevCoord[0];
+    const dy = currCoord[1] - prevCoord[1];
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // 2. Добавляем к предыдущему расстоянию
+    const totalDistance = distances[i - 1] + distance;
+
+    // 3. Записываем расстояние и высоту
+    distances.push(totalDistance);
+    elevations.push(currCoord[2]);
+  }
+
+  return { distances, elevations };
+};

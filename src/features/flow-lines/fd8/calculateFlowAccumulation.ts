@@ -9,7 +9,6 @@ export function calculateFlowAccumulation(
   } = {},
 ): number[][] {
   const { threshold = Infinity, exponent = 1.1 } = options;
-  console.log(exponent);
 
   const rows = elevationGrid.length;
   const columns = elevationGrid[0].length;

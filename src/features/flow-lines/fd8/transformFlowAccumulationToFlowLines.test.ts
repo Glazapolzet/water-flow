@@ -38,13 +38,11 @@ test('transform flow accumulation to flow lines', () => {
   expect(result.type).toBe('FeatureCollection');
   expect(result.features.length).toBeGreaterThan(0);
 
-  result.features.forEach((f) => console.log(f.geometry.coordinates));
-
   // Проверяем, что линия содержит все ожидаемые точки (в любом порядке)
   const expectedPoints = [
-    [0, 0],
-    [1, 1],
-    [2, 2],
+    [0, 0, 5],
+    [1, 1, 2],
+    [2, 2, 0],
   ];
   const linePoints = result.features[0].geometry.coordinates;
 
@@ -75,9 +73,9 @@ test('edge flow', () => {
   const result = transformFlowAccumulationToFlowLines(elevationGrid, coordinatesGrid, edgeFlowGrid);
 
   const expectedPoints = [
-    [2, 0],
-    [2, 1],
-    [2, 2],
+    [2, 0, 2],
+    [2, 1, 1],
+    [2, 2, 0],
   ];
 
   const linePoints = result.features[0].geometry.coordinates;
