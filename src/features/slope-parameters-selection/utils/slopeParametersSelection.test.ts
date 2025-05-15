@@ -5,8 +5,8 @@ test('should find correct parameters for known logistic curve', () => {
   // Создаем данные по известной логистической кривой
   const knownA = 2;
   const knownB = 0.5;
-  const H_min = 10;
-  const H_max = 20;
+  const H_min = 100;
+  const H_max = 200;
 
   const logisticFunc = (L: number) => (H_max - H_min) / (1 + Math.exp(-knownA + knownB * L)) + H_min;
 
@@ -15,9 +15,9 @@ test('should find correct parameters for known logistic curve', () => {
 
   console.log(L_values, H_values);
 
-  const [a, b] = slopeParametersSelection(L_values, H_values);
+  const { a, b, hMax, hMin, error } = slopeParametersSelection(L_values, H_values, H_max, H_min);
 
-  console.log(L_values, H_values);
+  console.log({ a, b, hMax, hMin, error });
 
   // Проверяем с некоторой погрешностью
   expect(a).toBeCloseTo(knownA, 1);
