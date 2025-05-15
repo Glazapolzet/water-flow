@@ -35,13 +35,13 @@ export const SettingsPanel: FC<TSettingsPanel> = ({
 
       <Stack spacing={10} direction={'column'} className={styles.optionsContainer}>
         <Tabs variant={'solid-rounded'} colorScheme="teal">
-          <TabList gap={1} flexWrap={'wrap'} width={'100%'}>
+          <TabList flexWrap={'wrap'} width={'100%'}>
             <Tab>Основные</Tab>
             <Tab>Анализ склона</Tab>
             <Tab>Параметры для расчета W</Tab>
             <Tab>Параметры для расчета L</Tab>
           </TabList>
-          <TabPanels marginTop={30}>
+          <TabPanels marginTop={3}>
             <TabPanel padding={0}>
               <MainSettings {...mainSettings} />
             </TabPanel>

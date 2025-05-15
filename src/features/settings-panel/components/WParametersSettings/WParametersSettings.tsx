@@ -43,6 +43,7 @@ export const WParametersSettings: FC<TWParametersSettings> = ({ alpha, Kt, Km, K
 
       <TitledComponent
         title={KtTitle}
+        titleProps={{ size: 'xs' }}
         Component={
           <SelectWithOptions borderColor={'gray.400'} borderWidth={'1px'} size={'md'} variant={'filled'} {...KtProps} />
         }
@@ -50,6 +51,7 @@ export const WParametersSettings: FC<TWParametersSettings> = ({ alpha, Kt, Km, K
 
       <TitledComponent
         title={KmTitle}
+        titleProps={{ size: 'xs' }}
         Component={
           <SelectWithOptions borderColor={'gray.400'} borderWidth={'1px'} size={'md'} variant={'filled'} {...KmProps} />
         }
@@ -57,6 +59,7 @@ export const WParametersSettings: FC<TWParametersSettings> = ({ alpha, Kt, Km, K
 
       <TitledComponent
         title={KeTitle}
+        titleProps={{ size: 'xs' }}
         Component={
           <SelectWithOptions borderColor={'gray.400'} borderWidth={'1px'} size={'md'} variant={'filled'} {...KeProps} />
         }
@@ -64,6 +67,7 @@ export const WParametersSettings: FC<TWParametersSettings> = ({ alpha, Kt, Km, K
 
       <TitledComponent
         title={WLimitTitle}
+        titleProps={{ size: 'sm' }}
         Component={
           <NumberInput variant={'filled'} focusBorderColor={'teal.200'} {...WLimitProps}>
             <NumberInputField borderColor={'gray.400'} borderWidth={'1px'} />
