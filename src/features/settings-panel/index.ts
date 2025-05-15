@@ -1,1 +1,1 @@
-export { SettingsPanel } from './components';
+export * from './components';

@@ -33,21 +33,15 @@ import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';
 import {
   addIsolinesToLayer,
-  BASE_SETTINGS_PANEL_CONFIG,
-  DEFAULT_EXPONENT,
-  DEFAULT_ISOLINES_DELTA,
-  DEFAULT_MIN_LENGTH,
-  DEFAULT_POINTS_DELTA,
-  DEFAULT_THRESHOLD,
+  DEFAULT_SETTINGS,
   getPointsElevationData,
-  MAIN_SETTINGS_PANEL_CONFIG,
   MAP_BASE_CONFIG,
+  SETTINGS_PANEL_CONFIG,
   useActiveLayer,
   useDrawHandlers,
   useSelectionArea,
   Z_PROPERTY_NAME,
 } from '../utils';
-import { FLOW_LINE_SETTINGS_PANEL_CONFIG } from '../utils/config/settingsPanel';
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
@@ -64,12 +58,19 @@ export const MapDisplay = () => {
   const { selectionArea, setSelectionArea } = useSelectionArea(mapRef, '', drawInteractions);
 
   const [isIsolinesSplined, setIsIsolinesSplined] = useState<boolean>(false);
-  const [isolinesDelta, setIsolinesDelta] = useState<number>(DEFAULT_ISOLINES_DELTA);
-  const [pointsDelta, setPointsDelta] = useState<number>(DEFAULT_POINTS_DELTA);
+  const [isolinesDelta, setIsolinesDelta] = useState<number>(DEFAULT_SETTINGS.isolinesDelta);
+  const [pointsDelta, setPointsDelta] = useState<number>(DEFAULT_SETTINGS.pointsDelta);
 
-  const [threshold, setThreshold] = useState<number>(DEFAULT_THRESHOLD);
-  const [exponent, setExponent] = useState<number>(DEFAULT_EXPONENT);
-  const [minLength, setMinLength] = useState<number>(DEFAULT_MIN_LENGTH);
+  const [threshold, setThreshold] = useState<number>(DEFAULT_SETTINGS.threshold);
+  const [exponent, setExponent] = useState<number>(DEFAULT_SETTINGS.exponent);
+  const [minLength, setMinLength] = useState<number>(DEFAULT_SETTINGS.minLength);
+
+  const [alpha, setAlpha] = useState<number>(DEFAULT_SETTINGS.alpha);
+  const [Kt, setKt] = useState<number>(DEFAULT_SETTINGS.Kt);
+  const [Km, setKm] = useState<number>(DEFAULT_SETTINGS.Km);
+  const [Ke, setKe] = useState<number>(DEFAULT_SETTINGS.Ke);
+  const [h, setH] = useState<number>(DEFAULT_SETTINGS.h);
+  const [WLimit, setWLimit] = useState<number>(DEFAULT_SETTINGS.WLimit);
 
   const { handleDrawStart, handleDrawEnd, isDrawStart, isDrawEnd, geometry } = useDrawHandlers();
 
@@ -134,38 +135,6 @@ export const MapDisplay = () => {
     // });
   };
 
-  const handleActiveLayerChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setActiveLayer(event.target.value);
-  };
-
-  const handleSelectionAreaChange = (event: ChangeEvent<HTMLSelectElement>) => {
-    setSelectionArea(event.target.value);
-  };
-
-  const handleIsolinesDeltaChange = (_valueAsString: string, valueAsNumber: number) => {
-    setIsolinesDelta(valueAsNumber);
-  };
-
-  const handlePointsDeltaChange = (_valueAsString: string, valueAsNumber: number) => {
-    setPointsDelta(valueAsNumber);
-  };
-
-  const handleSplineIsolinesChange = () => {
-    setIsIsolinesSplined(!isIsolinesSplined);
-  };
-
-  const handleThresholdChange = (_valueAsString: string, valueAsNumber: number) => {
-    setThreshold(valueAsNumber);
-  };
-
-  const handleExponentChange = (_valueAsString: string, valueAsNumber: number) => {
-    setExponent(valueAsNumber);
-  };
-
-  const handleMinLengthChange = (_valueAsString: string, valueAsNumber: number) => {
-    setMinLength(valueAsNumber);
-  };
-
   const handleClearButtonClick = async () => {
     clearLayer();
     clearAreaContext();
@@ -224,6 +193,8 @@ export const MapDisplay = () => {
     console.log({ distances, elevations });
     console.log({ logisticFunctionParameters });
 
+    console.log({ alpha, Kt, Km, Ke, h, WLimit });
+
     addFeaturesToLayer(drawLayer, flowLines.features[0], { style: flowLinesStyle });
 
     setMaxZValuePoint(maxZValuePoint);
@@ -251,67 +222,81 @@ export const MapDisplay = () => {
 
       <section className={styles.mapDisplay}>
         <SettingsPanel
-          title={BASE_SETTINGS_PANEL_CONFIG.title}
+          title={SETTINGS_PANEL_CONFIG.title}
           mainSettings={{
             activeLayer: {
-              ...MAIN_SETTINGS_PANEL_CONFIG.activeLayer,
-              onChange: handleActiveLayerChange,
+              ...SETTINGS_PANEL_CONFIG.mainSettings.activeLayer,
+              onChange: (event: ChangeEvent<HTMLSelectElement>) => setActiveLayer(event.target.value),
               value: activeLayer,
             },
             selectionArea: {
-              ...MAIN_SETTINGS_PANEL_CONFIG.selectionArea,
-              onChange: handleSelectionAreaChange,
+              ...SETTINGS_PANEL_CONFIG.mainSettings.selectionArea,
+              onChange: (event: ChangeEvent<HTMLSelectElement>) => setSelectionArea(event.target.value),
               value: selectionArea,
             },
             splineIsolines: {
-              ...MAIN_SETTINGS_PANEL_CONFIG.splineIsolines,
+              ...SETTINGS_PANEL_CONFIG.mainSettings.splineIsolines,
               isChecked: isIsolinesSplined,
-              onChange: handleSplineIsolinesChange,
+              onChange: () => setIsIsolinesSplined(!isIsolinesSplined),
             },
             isolinesDelta: {
-              ...MAIN_SETTINGS_PANEL_CONFIG.isolinesDelta,
-              onChange: handleIsolinesDeltaChange,
-              defaultValue: DEFAULT_ISOLINES_DELTA,
-              min: DEFAULT_ISOLINES_DELTA,
-              step: 5,
+              ...SETTINGS_PANEL_CONFIG.mainSettings.isolinesDelta,
+              onChange: (_valueAsString: string, valueAsNumber: number) => setIsolinesDelta(valueAsNumber),
             },
             pointsDelta: {
-              ...MAIN_SETTINGS_PANEL_CONFIG.pointsDelta,
-              onChange: handlePointsDeltaChange,
-              defaultValue: DEFAULT_POINTS_DELTA,
-              min: DEFAULT_POINTS_DELTA,
-              step: 5,
+              ...SETTINGS_PANEL_CONFIG.mainSettings.pointsDelta,
+              onChange: (_valueAsString: string, valueAsNumber: number) => setPointsDelta(valueAsNumber),
             },
           }}
           flowLineSettings={{
             threshold: {
-              ...FLOW_LINE_SETTINGS_PANEL_CONFIG.threshold,
-              onChange: handleThresholdChange,
-              defaultValue: DEFAULT_THRESHOLD,
-              min: DEFAULT_THRESHOLD,
-              step: 10,
+              ...SETTINGS_PANEL_CONFIG.flowLineSettings.threshold,
+              onChange: (_valueAsString: string, valueAsNumber: number) => setThreshold(valueAsNumber),
             },
             exponent: {
-              ...FLOW_LINE_SETTINGS_PANEL_CONFIG.exponent,
-              onChange: handleExponentChange,
-              defaultValue: DEFAULT_EXPONENT,
-              min: 1,
-              step: 0.1,
+              ...SETTINGS_PANEL_CONFIG.flowLineSettings.exponent,
+              onChange: (_valueAsString: string, valueAsNumber: number) => setExponent(valueAsNumber),
             },
             minLength: {
-              ...FLOW_LINE_SETTINGS_PANEL_CONFIG.minLength,
-              onChange: handleMinLengthChange,
-              defaultValue: DEFAULT_MIN_LENGTH,
-              min: 1,
-              step: 1,
+              ...SETTINGS_PANEL_CONFIG.flowLineSettings.minLength,
+              onChange: (_valueAsString: string, valueAsNumber: number) => setMinLength(valueAsNumber),
+            },
+          }}
+          wParametersSettings={{
+            alpha: {
+              ...SETTINGS_PANEL_CONFIG.wParametersSettings.alpha,
+              onChange: (_valueAsString: string, valueAsNumber: number) => setAlpha(valueAsNumber),
+            },
+            Kt: {
+              ...SETTINGS_PANEL_CONFIG.wParametersSettings.Kt,
+              onChange: (event: ChangeEvent<HTMLSelectElement>) => setKt(Number(event.target.value)),
+              value: Kt,
+            },
+            Km: {
+              ...SETTINGS_PANEL_CONFIG.wParametersSettings.Km,
+              onChange: (event: ChangeEvent<HTMLSelectElement>) => setKm(Number(event.target.value)),
+              value: Km,
+            },
+            Ke: {
+              ...SETTINGS_PANEL_CONFIG.wParametersSettings.Ke,
+              onChange: (event: ChangeEvent<HTMLSelectElement>) => setKe(Number(event.target.value)),
+              value: Ke,
+            },
+            h: {
+              ...SETTINGS_PANEL_CONFIG.wParametersSettings.h,
+              onChange: (_valueAsString: string, valueAsNumber: number) => setH(valueAsNumber),
+            },
+            WLimit: {
+              ...SETTINGS_PANEL_CONFIG.wParametersSettings.WLimit,
+              onChange: (_valueAsString: string, valueAsNumber: number) => setWLimit(valueAsNumber),
             },
           }}
           clearButton={{
-            ...BASE_SETTINGS_PANEL_CONFIG.clearButton,
+            ...SETTINGS_PANEL_CONFIG.clearButton,
             onClick: handleClearButtonClick,
           }}
           confirmButton={{
-            ...BASE_SETTINGS_PANEL_CONFIG.confirmButton,
+            ...SETTINGS_PANEL_CONFIG.confirmButton,
             isVisible: !!points,
             onClick: handleConfirmButtonClick,
           }}

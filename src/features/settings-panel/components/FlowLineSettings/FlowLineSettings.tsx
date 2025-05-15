@@ -10,13 +10,13 @@ import {
 import { FC } from 'react';
 import { SettingsNumber } from '../../types';
 
-export type FlowLineSettings = {
+export type TFlowLineSettings = {
   threshold: SettingsNumber;
   exponent: SettingsNumber;
   minLength: SettingsNumber;
 };
 
-export const FlowLineSettings: FC<FlowLineSettings> = ({ threshold, exponent, minLength }) => {
+export const FlowLineSettings: FC<TFlowLineSettings> = ({ threshold, exponent, minLength }) => {
   const { title: thresholdTitle, ...thresholdProps } = threshold;
   const { title: exponentTitle, ...exponentProps } = exponent;
   const { title: minLengthTitle, ...minLengthProps } = minLength;

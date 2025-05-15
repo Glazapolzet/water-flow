@@ -13,7 +13,7 @@ import {
 import { FC } from 'react';
 import { SettingsNumber, SettingsSelect, SettingsSwitch } from '../../types';
 
-export type MainSettings = {
+export type TMainSettings = {
   activeLayer: SettingsSelect;
   selectionArea: SettingsSelect;
   splineIsolines: SettingsSwitch;
@@ -21,7 +21,7 @@ export type MainSettings = {
   pointsDelta: SettingsNumber;
 };
 
-export const MainSettings: FC<MainSettings> = ({
+export const MainSettings: FC<TMainSettings> = ({
   activeLayer,
   selectionArea,
   splineIsolines,

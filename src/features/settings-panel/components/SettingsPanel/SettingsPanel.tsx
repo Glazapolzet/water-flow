@@ -2,22 +2,25 @@ import { HideableButton } from '@/components';
 import { Heading, Stack, StackDivider, Tab, TabList, TabPanel, TabPanels, Tabs } from '@chakra-ui/react';
 import { FC } from 'react';
 import { SettingsButton } from '../../types';
-import { FlowLineSettings } from '../FlowLineSettings/FlowLineSettings';
-import { MainSettings } from '../MainSettings/MainSettings';
+import { FlowLineSettings, TFlowLineSettings } from '../FlowLineSettings/FlowLineSettings';
+import { MainSettings, TMainSettings } from '../MainSettings/MainSettings';
+import { TWParametersSettings, WParametersSettings } from '../WParametersSettings/WParametersSettings';
 import styles from './SettingsPanel.module.scss';
 
-interface SettingsPanel {
+export type TSettingsPanel = {
   title: string;
-  mainSettings: MainSettings;
-  flowLineSettings: FlowLineSettings;
+  mainSettings: TMainSettings;
+  flowLineSettings: TFlowLineSettings;
+  wParametersSettings: TWParametersSettings;
   clearButton: SettingsButton;
   confirmButton: SettingsButton;
-}
+};
 
-export const SettingsPanel: FC<SettingsPanel> = ({
+export const SettingsPanel: FC<TSettingsPanel> = ({
   title,
   mainSettings,
   flowLineSettings,
+  wParametersSettings,
   clearButton,
   confirmButton,
 }) => {
@@ -32,13 +35,21 @@ export const SettingsPanel: FC<SettingsPanel> = ({
 
       <Stack spacing={10} direction={'column'} className={styles.optionsContainer}>
         <Tabs variant={'solid-rounded'} colorScheme="teal">
-          <TabList>
+          <TabList gap={1} flexWrap={'wrap'} width={'100%'}>
             <Tab>Основные</Tab>
-            <Tab>Параметры склона</Tab>
+            <Tab>Анализ склона</Tab>
+            <Tab>Параметры для расчета W</Tab>
+            <Tab>Параметры для расчета L</Tab>
           </TabList>
           <TabPanels marginTop={30}>
             <TabPanel padding={0}>
               <MainSettings {...mainSettings} />
+            </TabPanel>
+            <TabPanel padding={0}>
+              <FlowLineSettings {...flowLineSettings} />
+            </TabPanel>
+            <TabPanel padding={0}>
+              <WParametersSettings {...wParametersSettings} />
             </TabPanel>
             <TabPanel padding={0}>
               <FlowLineSettings {...flowLineSettings} />
