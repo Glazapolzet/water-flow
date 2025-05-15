@@ -5,7 +5,7 @@ export const makeFlowLineDistanceElevationData = (
 ) => {
   // Проверяем, что есть хотя бы одна линия
   if (!featureCollection.features || featureCollection.features.length === 0) {
-    return { distances: [0], elevations: [0] };
+    return { distances: [], elevations: [] };
   }
 
   // Берем первую линию из коллекции (предполагаем, что она одна)

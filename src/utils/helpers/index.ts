@@ -3,6 +3,7 @@ export { addZValueToEachPoint } from './addZValueToEachPoint';
 export { cleanEmptyFeatures } from './cleanEmptyFeatures';
 export { findFeatureWithMaxZValue } from './findFeatureWithMaxZValue';
 export { findFeatureWithMinZValue } from './findFeatureWithMinZValue';
+export { makeFlowLineDistanceElevationData } from './makeFlowLineDistanceElevationData';
 export { makePointsFromBBox } from './makePointsFromBBox';
 export { makeValhallaMappings } from './makeValhallaMappings';
 export { MatrixHelper } from './MatrixHelper';

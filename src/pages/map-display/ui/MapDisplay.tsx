@@ -17,12 +17,14 @@ import {
 import { Marker } from '@/components';
 import { calculateFlowAccumulation, transformFlowAccumulationToFlowLines } from '@/features/flow-lines';
 import { makeIsolines } from '@/features/isolines';
+import { slopeParametersSelection } from '@/features/slope-parameters-selection';
 import {
   addFeaturesToLayer,
   addZValueToEachPoint,
   cleanEmptyFeatures,
   findFeatureWithMaxZValue,
   findFeatureWithMinZValue,
+  makeFlowLineDistanceElevationData,
   makePointsFromBBox,
   MatrixHelper,
 } from '@/utils/helpers';
@@ -216,9 +218,11 @@ export const MapDisplay = () => {
       minLength: minLength,
     });
 
-    console.log(flowLines);
+    const { distances, elevations } = makeFlowLineDistanceElevationData(flowLines);
+    const logisticFunctionParameters = slopeParametersSelection(distances, elevations);
 
-    // console.log(distance([0, 0], [1, 1]));
+    console.log({ distances, elevations });
+    console.log({ logisticFunctionParameters });
 
     addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
 

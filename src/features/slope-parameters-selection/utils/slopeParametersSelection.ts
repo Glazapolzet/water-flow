@@ -1,8 +1,10 @@
 import { levenbergMarquardt } from 'ml-levenberg-marquardt';
 
-const createLogisticFunction = (H_min: number, H_max: number) => {
-  return ([a, b]: number[], L: number): number => (H_max - H_min) / (1 + Math.exp(-a + b * L)) + H_min;
-};
+function createLogisticFunction(H_min: number, H_max: number) {
+  return function logisticFunc([a, b]: number[]) {
+    return (L: number) => (H_max - H_min) / (1 + Math.exp(-a + b * L)) + H_min;
+  };
+}
 
 export const slopeParametersSelection = (L_values: number[], H_values: number[]) => {
   const H_max = Math.max(...H_values);
@@ -12,9 +14,9 @@ export const slopeParametersSelection = (L_values: number[], H_values: number[])
 
   const options = {
     damping: 1.5,
-    initialValues: [1, 1], // Начальные приближения для a и b
+    initialValues: [0, 1], // Initial approximations for a and b
     gradientDifference: 1e-6,
-    maxIterations: 100,
+    maxIterations: 1000,
     errorTolerance: 1e-6,
   };
 
@@ -24,6 +26,8 @@ export const slopeParametersSelection = (L_values: number[], H_values: number[])
   };
 
   const fittedParams = levenbergMarquardt(coordinates, logFunc, options);
+
+  console.log(fittedParams);
 
   return fittedParams.parameterValues;
 };
