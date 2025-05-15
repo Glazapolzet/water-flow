@@ -218,13 +218,13 @@ export const MapDisplay = () => {
       minLength: minLength,
     });
 
-    const { distances, elevations } = makeFlowLineDistanceElevationData(flowLines);
+    const { distances, elevations } = makeFlowLineDistanceElevationData(flowLines.features[0]);
     const logisticFunctionParameters = slopeParametersSelection(distances, elevations);
 
     console.log({ distances, elevations });
     console.log({ logisticFunctionParameters });
 
-    addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
+    addFeaturesToLayer(drawLayer, flowLines.features[0], { style: flowLinesStyle });
 
     setMaxZValuePoint(maxZValuePoint);
     setMinZValuePoint(minZValuePoint);

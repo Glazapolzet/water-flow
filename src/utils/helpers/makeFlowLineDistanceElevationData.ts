@@ -1,16 +1,13 @@
-import { FeatureCollection, GeoJsonProperties, LineString } from 'geojson';
+import { Feature, GeoJsonProperties, LineString } from 'geojson';
 
-export const makeFlowLineDistanceElevationData = (
-  featureCollection: FeatureCollection<LineString, GeoJsonProperties>,
-) => {
+export const makeFlowLineDistanceElevationData = (feature: Feature<LineString, GeoJsonProperties>) => {
   // Проверяем, что есть хотя бы одна линия
-  if (!featureCollection.features || featureCollection.features.length === 0) {
+  if (!feature || feature.geometry.coordinates.length === 0) {
     return { distances: [], elevations: [] };
   }
 
   // Берем первую линию из коллекции (предполагаем, что она одна)
-  const lineString = featureCollection.features[0];
-  const coordinates = lineString.geometry.coordinates;
+  const coordinates = feature.geometry.coordinates;
 
   // Инициализируем массивы
   const distances = [0]; // Первая точка - расстояние 0
