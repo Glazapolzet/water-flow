@@ -45,6 +45,14 @@ import {
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
+  // const data = [
+  //   { id: 1, name: 'Alice', age: 25 },
+  //   { id: 2, name: 'Bob', age: 30 },
+  //   { id: 3, name: 'Charlie', age: 35 },
+  // ];
+
+  // const { exportToCsv } = useCsvExport();
+
   const mapRef = useRef<Map | undefined>(undefined);
 
   const [points, setPoints] = useState<FeatureCollection<Point> | undefined>(undefined);
@@ -208,6 +216,7 @@ export const MapDisplay = () => {
 
   return (
     <>
+      {/* <button onClick={() => exportToCsv(data, 'users.csv')}>export</button> */}
       <Marker
         mapRef={mapRef}
         position={maxZValuePoint?.geometry.coordinates}
