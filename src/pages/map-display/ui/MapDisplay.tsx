@@ -158,8 +158,6 @@ export const MapDisplay = () => {
     const elevationData = await getPointsElevationData(points);
     const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });
 
-    const pointsMatrix = new MatrixHelper(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
-
     const isolines = makeIsolines({
       points: pointsWithZValue,
       breaksDelta: isolinesDelta,
@@ -181,6 +179,8 @@ export const MapDisplay = () => {
     if (!maxZValuePoint || !minZValuePoint) {
       return;
     }
+
+    const pointsMatrix = new MatrixHelper(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
 
     const flowAccumulation = calculateFlowAccumulation(pointsMatrix.getZmatrix(), {
       threshold: threshold,
