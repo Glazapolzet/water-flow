@@ -150,7 +150,7 @@ export const MapDisplay = () => {
     const elevationData = await getPointsElevationData(points);
     const pointsWithZValue = addZValueToEachPoint(points, elevationData.height, { zProperty: Z_PROPERTY_NAME });
 
-    const mhlpr = new MatrixHelper(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
+    const pointsMatrix = new MatrixHelper(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
 
     const isolines = makeIsolines({
       points: pointsWithZValue,
@@ -174,7 +174,7 @@ export const MapDisplay = () => {
       return;
     }
 
-    const flowAccumulation = calculateFlowAccumulation(mhlpr.getZmatrix(), {
+    const flowAccumulation = calculateFlowAccumulation(pointsMatrix.getZmatrix(), {
       threshold: threshold,
       exponent: exponent,
     });
@@ -183,9 +183,14 @@ export const MapDisplay = () => {
     // console.table(mhlpr.getZmatrix());
     // console.table(flowAccumulation);
 
-    const flowLines = transformFlowAccumulationToFlowLines(mhlpr.getZmatrix(), mhlpr.getXYmatrix(), flowAccumulation, {
-      minLength: minLength,
-    });
+    const flowLines = transformFlowAccumulationToFlowLines(
+      pointsMatrix.getZmatrix(),
+      pointsMatrix.getXYmatrix(),
+      flowAccumulation,
+      {
+        minLength: minLength,
+      },
+    );
 
     const { distances, elevations } = makeFlowLineDistanceElevationData(flowLines.features[0]);
     const logisticFunctionParameters = slopeParametersSelection(distances, elevations);
