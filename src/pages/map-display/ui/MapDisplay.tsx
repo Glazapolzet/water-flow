@@ -238,6 +238,7 @@ export const MapDisplay = () => {
         <SettingsPanel
           title={SETTINGS_PANEL_CONFIG.title}
           mainSettings={{
+            tabName: SETTINGS_PANEL_CONFIG.mainSettings.tabName,
             activeLayer: {
               ...SETTINGS_PANEL_CONFIG.mainSettings.activeLayer,
               onChange: (event: ChangeEvent<HTMLSelectElement>) => setActiveLayer(event.target.value),
@@ -263,6 +264,7 @@ export const MapDisplay = () => {
             },
           }}
           flowLineSettings={{
+            tabName: SETTINGS_PANEL_CONFIG.flowLineSettings.tabName,
             threshold: {
               ...SETTINGS_PANEL_CONFIG.flowLineSettings.threshold,
               onChange: (_valueAsString: string, valueAsNumber: number) => setThreshold(valueAsNumber),
@@ -277,6 +279,7 @@ export const MapDisplay = () => {
             },
           }}
           wParametersSettings={{
+            tabName: SETTINGS_PANEL_CONFIG.wParametersSettings.tabName,
             alpha: {
               ...SETTINGS_PANEL_CONFIG.wParametersSettings.alpha,
               onChange: (_valueAsString: string, valueAsNumber: number) => setAlpha(valueAsNumber),

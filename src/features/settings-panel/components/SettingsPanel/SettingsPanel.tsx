@@ -9,9 +9,9 @@ import styles from './SettingsPanel.module.scss';
 
 export type TSettingsPanel = {
   title: string;
-  mainSettings: TMainSettings;
-  flowLineSettings: TFlowLineSettings;
-  wParametersSettings: TWParametersSettings;
+  mainSettings: TMainSettings & { tabName: string };
+  flowLineSettings: TFlowLineSettings & { tabName: string };
+  wParametersSettings: TWParametersSettings & { tabName: string };
   clearButton: SettingsButton;
   confirmButton: SettingsButton;
 };
@@ -24,6 +24,10 @@ export const SettingsPanel: FC<TSettingsPanel> = ({
   clearButton,
   confirmButton,
 }) => {
+  const { tabName: mainSettingsTabName, ...mainSettingsProps } = mainSettings;
+  const { tabName: flowLineSettingsTabName, ...flowLineSettingsProps } = flowLineSettings;
+  const { tabName: wParametersSettingsTabName, ...wParametersSettingsProps } = wParametersSettings;
+
   const { title: clearButtonTitle, ...clearButtonProps } = clearButton;
   const { title: confirmButtonTitle, ...confirmButtonProps } = confirmButton;
 
@@ -36,23 +40,23 @@ export const SettingsPanel: FC<TSettingsPanel> = ({
       <Stack spacing={10} direction={'column'} className={styles.optionsContainer}>
         <Tabs variant={'solid-rounded'} colorScheme="teal">
           <TabList flexWrap={'wrap'} width={'100%'}>
-            <Tab>Основные</Tab>
-            <Tab>Анализ склона</Tab>
-            <Tab>Параметры для расчета W</Tab>
+            <Tab>{mainSettingsTabName}</Tab>
+            <Tab>{flowLineSettingsTabName}</Tab>
+            <Tab>{wParametersSettingsTabName}</Tab>
             <Tab>Параметры для расчета L</Tab>
           </TabList>
           <TabPanels marginTop={3}>
             <TabPanel padding={0}>
-              <MainSettings {...mainSettings} />
+              <MainSettings {...mainSettingsProps} />
             </TabPanel>
             <TabPanel padding={0}>
-              <FlowLineSettings {...flowLineSettings} />
+              <FlowLineSettings {...flowLineSettingsProps} />
             </TabPanel>
             <TabPanel padding={0}>
-              <WParametersSettings {...wParametersSettings} />
+              <WParametersSettings {...wParametersSettingsProps} />
             </TabPanel>
             <TabPanel padding={0}>
-              <FlowLineSettings {...flowLineSettings} />
+              <FlowLineSettings {...flowLineSettingsProps} />
             </TabPanel>
           </TabPanels>
         </Tabs>

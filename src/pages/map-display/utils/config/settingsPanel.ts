@@ -80,7 +80,57 @@ const KeOptions = [
   };
 });
 
+const MAIN_SETTINGS_TAB_CONFIG = {
+  tabName: 'Основные',
+  activeLayer: {
+    title: 'Активный слой',
+    options: activeLayerOptions,
+  },
+  selectionArea: {
+    title: 'Область выделения',
+    options: selectionAreaOptions,
+  },
+  splineIsolines: {
+    title: 'Сглаживать изолинии',
+  },
+  isolinesDelta: {
+    title: 'Частота изолиний (м.)',
+    defaultValue: 10,
+    min: 10,
+    step: 5,
+  },
+  pointsDelta: {
+    title: 'Частота точек (м.)',
+    defaultValue: 10,
+    min: 10,
+    step: 5,
+  },
+};
+
+const FLOW_LINE_SETTINGS_TAB_CONFIG = {
+  tabName: 'Линии тока',
+  threshold: {
+    title: 'Порог аккумуляции потока',
+    defaultValue: 0,
+    min: 0,
+    step: 10,
+  },
+  exponent: {
+    title: 'Экспонента (p)',
+    defaultValue: 1.1,
+    min: 1,
+    step: 0.1,
+  },
+  minLength: {
+    title: 'Минимальная длина линий тока',
+    defaultValue: 10,
+    min: 1,
+    step: 1,
+  },
+};
+
 const W_PARAMETERS_SETTINGS_TAB_CONFIG = {
+  tabName: 'Параметры для расчета Wт',
   alpha: {
     title: 'α',
     defaultValue: 0.0065,
@@ -110,53 +160,6 @@ const W_PARAMETERS_SETTINGS_TAB_CONFIG = {
     defaultValue: 1.5,
     min: 0,
     step: 0.1,
-  },
-};
-
-const FLOW_LINE_SETTINGS_TAB_CONFIG = {
-  threshold: {
-    title: 'Порог аккумуляции потока',
-    defaultValue: 0,
-    min: 0,
-    step: 10,
-  },
-  exponent: {
-    title: 'Экспонента (p)',
-    defaultValue: 1.1,
-    min: 1,
-    step: 0.1,
-  },
-  minLength: {
-    title: 'Минимальная длина линий тока',
-    defaultValue: 10,
-    min: 1,
-    step: 1,
-  },
-};
-
-const MAIN_SETTINGS_TAB_CONFIG = {
-  activeLayer: {
-    title: 'Активный слой',
-    options: activeLayerOptions,
-  },
-  selectionArea: {
-    title: 'Область выделения',
-    options: selectionAreaOptions,
-  },
-  splineIsolines: {
-    title: 'Сглаживать изолинии',
-  },
-  isolinesDelta: {
-    title: 'Частота изолиний (м.)',
-    defaultValue: 10,
-    min: 10,
-    step: 5,
-  },
-  pointsDelta: {
-    title: 'Частота точек (м.)',
-    defaultValue: 10,
-    min: 10,
-    step: 5,
   },
 };
 
