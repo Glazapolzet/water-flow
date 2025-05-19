@@ -19,11 +19,12 @@ export type TWParametersSettings = {
   WLimit: SettingsNumber;
 };
 
-export const WParametersSettings: FC<TWParametersSettings> = ({ alpha, Kt, Km, Ke, WLimit }) => {
+export const WParametersSettings: FC<TWParametersSettings> = ({ alpha, Kt, Km, Ke, h, WLimit }) => {
   const { title: alphaTitle, ...alphaProps } = alpha;
   const { title: KtTitle, ...KtProps } = Kt;
   const { title: KmTitle, ...KmProps } = Km;
   const { title: KeTitle, ...KeProps } = Ke;
+  const { title: hTitle, ...hProps } = h;
   const { title: WLimitTitle, ...WLimitProps } = WLimit;
 
   return (
@@ -62,6 +63,19 @@ export const WParametersSettings: FC<TWParametersSettings> = ({ alpha, Kt, Km, K
         titleProps={{ size: 'xs' }}
         Component={
           <SelectWithOptions borderColor={'gray.400'} borderWidth={'1px'} size={'md'} variant={'filled'} {...KeProps} />
+        }
+      />
+
+      <TitledComponent
+        title={hTitle}
+        Component={
+          <NumberInput variant={'filled'} focusBorderColor={'teal.200'} {...hProps}>
+            <NumberInputField borderColor={'gray.400'} borderWidth={'1px'} />
+            <NumberInputStepper>
+              <NumberIncrementStepper />
+              <NumberDecrementStepper />
+            </NumberInputStepper>
+          </NumberInput>
         }
       />
 

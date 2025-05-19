@@ -151,9 +151,9 @@ const W_PARAMETERS_SETTINGS_TAB_CONFIG = {
   },
   h: {
     title: 'Слой стока h для севооборота',
-    defaultValue: 1,
+    defaultValue: 50,
     min: 0,
-    step: 0.1,
+    step: 5,
   },
   WLimit: {
     title: 'Величина предельно допустимого среднегодового смыва W∂ (т/га)',
