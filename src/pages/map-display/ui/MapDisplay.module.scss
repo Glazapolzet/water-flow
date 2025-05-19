@@ -2,6 +2,7 @@
   width: 100%;
   display: grid;
   grid-template-columns: minmax(10%, 350px) minmax(70%, auto);
+  grid-template-rows: 100vh;
   column-gap: 20px;
   padding: 30px;
 }

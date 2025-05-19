@@ -32,7 +32,7 @@ export const SettingsPanel: FC<TSettingsPanel> = ({
   const { title: confirmButtonTitle, ...confirmButtonProps } = confirmButton;
 
   return (
-    <Stack align={'start'} direction={'column'} divider={<StackDivider borderColor={'white'} />}>
+    <Stack overflowY={'scroll'} align={'start'} direction={'column'} divider={<StackDivider borderColor={'white'} />}>
       <Heading as={'h2'} size={'lg'}>
         {title}
       </Heading>
