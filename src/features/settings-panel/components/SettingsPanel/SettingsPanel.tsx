@@ -39,13 +39,21 @@ export const SettingsPanel: FC<TSettingsPanel> = ({
 
       <Stack spacing={10} direction={'column'} className={styles.optionsContainer}>
         <Tabs variant={'solid-rounded'} colorScheme="teal">
-          <TabList flexWrap={'wrap'} width={'100%'}>
-            <Tab>{mainSettingsTabName}</Tab>
-            <Tab>{flowLineSettingsTabName}</Tab>
-            <Tab>{wParametersSettingsTabName}</Tab>
-            <Tab>Параметры для расчета L</Tab>
+          <TabList flexWrap={'wrap'} width={'100%'} gap={2}>
+            <Tab bg={'gray.100'} color={'black'} _selected={{ color: 'white', bg: 'teal.500' }}>
+              {mainSettingsTabName}
+            </Tab>
+            <Tab bg={'gray.100'} color={'black'} _selected={{ color: 'white', bg: 'teal.500' }}>
+              {flowLineSettingsTabName}
+            </Tab>
+            <Tab bg={'gray.100'} color={'black'} _selected={{ color: 'white', bg: 'teal.500' }}>
+              {wParametersSettingsTabName}
+            </Tab>
+            <Tab bg={'gray.100'} color={'black'} _selected={{ color: 'white', bg: 'teal.500' }}>
+              Параметры для расчета L
+            </Tab>
           </TabList>
-          <TabPanels marginTop={3}>
+          <TabPanels marginTop={5}>
             <TabPanel padding={0}>
               <MainSettings {...mainSettingsProps} />
             </TabPanel>

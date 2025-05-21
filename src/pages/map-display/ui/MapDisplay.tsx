@@ -208,10 +208,10 @@ export const MapDisplay = () => {
 
     console.log({ alpha, Kt, Km, Ke, h, WLimit });
 
-    addFeaturesToLayer(drawLayer, flowLines.features[0], { style: flowLinesStyle });
+    addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
 
-    setMaxZValuePoint(maxZValuePoint);
-    setMinZValuePoint(minZValuePoint);
+    // setMaxZValuePoint(maxZValuePoint);
+    // setMinZValuePoint(minZValuePoint);
   };
 
   return (

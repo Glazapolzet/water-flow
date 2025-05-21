@@ -43,30 +43,6 @@ export const WParametersSettings: FC<TWParametersSettings> = ({ alpha, Kt, Km, K
       />
 
       <TitledComponent
-        title={KtTitle}
-        titleProps={{ size: 'xs' }}
-        Component={
-          <SelectWithOptions borderColor={'gray.400'} borderWidth={'1px'} size={'md'} variant={'filled'} {...KtProps} />
-        }
-      />
-
-      <TitledComponent
-        title={KmTitle}
-        titleProps={{ size: 'xs' }}
-        Component={
-          <SelectWithOptions borderColor={'gray.400'} borderWidth={'1px'} size={'md'} variant={'filled'} {...KmProps} />
-        }
-      />
-
-      <TitledComponent
-        title={KeTitle}
-        titleProps={{ size: 'xs' }}
-        Component={
-          <SelectWithOptions borderColor={'gray.400'} borderWidth={'1px'} size={'md'} variant={'filled'} {...KeProps} />
-        }
-      />
-
-      <TitledComponent
         title={hTitle}
         Component={
           <NumberInput variant={'filled'} focusBorderColor={'teal.200'} {...hProps}>
@@ -76,6 +52,30 @@ export const WParametersSettings: FC<TWParametersSettings> = ({ alpha, Kt, Km, K
               <NumberDecrementStepper />
             </NumberInputStepper>
           </NumberInput>
+        }
+      />
+
+      <TitledComponent
+        title={KtTitle}
+        titleProps={{ size: 'sm' }}
+        Component={
+          <SelectWithOptions borderColor={'gray.400'} borderWidth={'1px'} size={'md'} variant={'filled'} {...KtProps} />
+        }
+      />
+
+      <TitledComponent
+        title={KmTitle}
+        titleProps={{ size: 'sm' }}
+        Component={
+          <SelectWithOptions borderColor={'gray.400'} borderWidth={'1px'} size={'md'} variant={'filled'} {...KmProps} />
+        }
+      />
+
+      <TitledComponent
+        title={KeTitle}
+        titleProps={{ size: 'sm' }}
+        Component={
+          <SelectWithOptions borderColor={'gray.400'} borderWidth={'1px'} size={'md'} variant={'filled'} {...KeProps} />
         }
       />
 

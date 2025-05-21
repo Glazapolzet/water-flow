@@ -94,13 +94,13 @@ const MAIN_SETTINGS_TAB_CONFIG = {
     title: 'Сглаживать изолинии',
   },
   isolinesDelta: {
-    title: 'Частота изолиний (м.)',
+    title: 'Частота изолиний (м)',
     defaultValue: 10,
     min: 10,
     step: 5,
   },
   pointsDelta: {
-    title: 'Частота точек (м.)',
+    title: 'Частота точек (м)',
     defaultValue: 10,
     min: 10,
     step: 5,
@@ -150,7 +150,7 @@ const W_PARAMETERS_SETTINGS_TAB_CONFIG = {
     options: KeOptions,
   },
   h: {
-    title: 'Слой стока h для севооборота',
+    title: 'Слой стока h для севооборота (мм)',
     defaultValue: 50,
     min: 0,
     step: 5,
