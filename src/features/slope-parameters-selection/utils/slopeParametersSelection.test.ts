@@ -13,11 +13,27 @@ test('should find correct parameters for known logistic curve', () => {
   const L_values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
   const H_values = L_values.map(logisticFunc);
 
-  console.log(L_values, H_values);
+  console.table(
+    L_values.map((L) => ({
+      Li: L,
+    })),
+  );
+  console.table(
+    H_values.map((H) => ({
+      Hi: H,
+    })),
+  );
 
   const { a, b, hMax, hMin, error } = slopeParametersSelection(L_values, H_values, H_max, H_min);
 
-  console.log({ a, b, hMax, hMin, error });
+  console.log(
+    '\nрезультат подбора параметров: \n a: %d,\n b: %d,\n hMax: %d,\n hMin: %d,\n error: %d',
+    a,
+    b,
+    hMax,
+    hMin,
+    error,
+  );
 
   // Проверяем с некоторой погрешностью
   expect(a).toBeCloseTo(knownA, 1);

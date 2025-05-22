@@ -3,6 +3,7 @@ import { Heading, Stack, StackDivider, Tab, TabList, TabPanel, TabPanels, Tabs }
 import { FC } from 'react';
 import { SettingsButton } from '../../types';
 import { FlowLineSettings, TFlowLineSettings } from '../FlowLineSettings/FlowLineSettings';
+import { LParametersSettings, TLParametersSettings } from '../LParametersSettings/LParametersSettings';
 import { MainSettings, TMainSettings } from '../MainSettings/MainSettings';
 import { TWParametersSettings, WParametersSettings } from '../WParametersSettings/WParametersSettings';
 import styles from './SettingsPanel.module.scss';
@@ -12,6 +13,7 @@ export type TSettingsPanel = {
   mainSettings: TMainSettings & { tabName: string };
   flowLineSettings: TFlowLineSettings & { tabName: string };
   wParametersSettings: TWParametersSettings & { tabName: string };
+  lParametersSettings: TLParametersSettings & { tabName: string };
   clearButton: SettingsButton;
   confirmButton: SettingsButton;
 };
@@ -21,12 +23,14 @@ export const SettingsPanel: FC<TSettingsPanel> = ({
   mainSettings,
   flowLineSettings,
   wParametersSettings,
+  lParametersSettings,
   clearButton,
   confirmButton,
 }) => {
   const { tabName: mainSettingsTabName, ...mainSettingsProps } = mainSettings;
   const { tabName: flowLineSettingsTabName, ...flowLineSettingsProps } = flowLineSettings;
   const { tabName: wParametersSettingsTabName, ...wParametersSettingsProps } = wParametersSettings;
+  const { tabName: lParametersSettingsTabName, ...lParametersSettingsProps } = lParametersSettings;
 
   const { title: clearButtonTitle, ...clearButtonProps } = clearButton;
   const { title: confirmButtonTitle, ...confirmButtonProps } = confirmButton;
@@ -50,7 +54,7 @@ export const SettingsPanel: FC<TSettingsPanel> = ({
               {wParametersSettingsTabName}
             </Tab>
             <Tab bg={'gray.100'} color={'black'} _selected={{ color: 'white', bg: 'teal.500' }}>
-              Параметры для расчета L
+              {lParametersSettingsTabName}
             </Tab>
           </TabList>
           <TabPanels marginTop={5}>
@@ -64,7 +68,7 @@ export const SettingsPanel: FC<TSettingsPanel> = ({
               <WParametersSettings {...wParametersSettingsProps} />
             </TabPanel>
             <TabPanel padding={0}>
-              <FlowLineSettings {...flowLineSettingsProps} />
+              <LParametersSettings {...lParametersSettingsProps} />
             </TabPanel>
           </TabPanels>
         </Tabs>

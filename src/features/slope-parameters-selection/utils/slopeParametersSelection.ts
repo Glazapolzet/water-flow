@@ -14,7 +14,6 @@ export const slopeParametersSelection = (
   deltaH = 10,
   minDeltaH = 0.1,
 ): OptimizationResult => {
-  // Инициализация параметров
   const I2 = 0; // Индекс начальной точки для оптимизации
   const N2 = H_values.length - 1; // Индекс конечной точки для оптимизации
 

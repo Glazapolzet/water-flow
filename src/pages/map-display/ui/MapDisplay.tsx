@@ -80,6 +80,9 @@ export const MapDisplay = () => {
   const [h, setH] = useState<number>(DEFAULT_SETTINGS.h);
   const [WLimit, setWLimit] = useState<number>(DEFAULT_SETTINGS.WLimit);
 
+  const [Lv, setLv] = useState<number>(DEFAULT_SETTINGS.Lv);
+  const [Lp, setLp] = useState<number>(DEFAULT_SETTINGS.Lp);
+
   const { handleDrawStart, handleDrawEnd, isDrawStart, isDrawEnd, geometry } = useDrawHandlers();
 
   const clearLayer = () => {
@@ -203,7 +206,7 @@ export const MapDisplay = () => {
     const { distances, elevations } = makeFlowLineDistanceElevationData(flowLines.features[0]);
     const logisticFunctionParameters = slopeParametersSelection(distances, elevations);
 
-    console.log({ distances, elevations });
+    console.log({ flowLines });
     console.log({ logisticFunctionParameters });
 
     console.log({ alpha, Kt, Km, Ke, h, WLimit });
@@ -306,6 +309,19 @@ export const MapDisplay = () => {
             WLimit: {
               ...SETTINGS_PANEL_CONFIG.wParametersSettings.WLimit,
               onChange: (_valueAsString: string, valueAsNumber: number) => setWLimit(valueAsNumber),
+            },
+          }}
+          lParametersSettings={{
+            tabName: SETTINGS_PANEL_CONFIG.lParametersSettings.tabName,
+            Lv: {
+              ...SETTINGS_PANEL_CONFIG.lParametersSettings.Lv,
+              onChange: (event: ChangeEvent<HTMLSelectElement>) => setLv(Number(event.target.value)),
+              value: Lv,
+            },
+            Lp: {
+              ...SETTINGS_PANEL_CONFIG.lParametersSettings.Lp,
+              onChange: (event: ChangeEvent<HTMLSelectElement>) => setLp(Number(event.target.value)),
+              value: Lp,
             },
           }}
           clearButton={{

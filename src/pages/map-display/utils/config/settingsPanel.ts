@@ -80,6 +80,36 @@ const KeOptions = [
   };
 });
 
+const LvOptions = [
+  { name: 'Дп, Сл (100)', value: 100 },
+  { name: 'Чв, Чоп (90)', value: 90 },
+  { name: 'Чоб (60)', value: 60 },
+  { name: 'Чо (50)', value: 50 },
+  { name: 'Кт, К (40)', value: 40 },
+  { name: 'Кс (40)', value: 40 },
+].map((option) => {
+  return {
+    id: option.name,
+    value: option.value,
+    children: option.name,
+  };
+});
+
+const LpOptions = [
+  { name: 'Дп, Сл (600)', value: 600 },
+  { name: 'Чв, Чоп (600)', value: 600 },
+  { name: 'Чоб (500)', value: 500 },
+  { name: 'Чо (400)', value: 400 },
+  { name: 'Кт, К (350)', value: 350 },
+  { name: 'Кс (250)', value: 250 },
+].map((option) => {
+  return {
+    id: option.name,
+    value: option.value,
+    children: option.name,
+  };
+});
+
 const MAIN_SETTINGS_TAB_CONFIG = {
   tabName: 'Основные',
   activeLayer: {
@@ -163,11 +193,26 @@ const W_PARAMETERS_SETTINGS_TAB_CONFIG = {
   },
 };
 
+const L_PARAMETERS_SETTINGS_TAB_CONFIG = {
+  tabName: 'Параметры для расчета Lмп',
+  Lv: {
+    title:
+      'Cуммарная ширина прилегающих к верхней и нижней опушкам лесополосы участков, в пределах которых темпы восстановления почвы превышают ее смыв, м',
+    options: LvOptions,
+  },
+  Lp: {
+    title:
+      'Расстояние между основными лесными полосами на территории с отсутствием эрозии и эрозией, не превышающей допустимых величин, м',
+    options: LpOptions,
+  },
+};
+
 export const SETTINGS_PANEL_CONFIG: TSettingsPanel = {
   title: 'Настройки',
   mainSettings: MAIN_SETTINGS_TAB_CONFIG,
   flowLineSettings: FLOW_LINE_SETTINGS_TAB_CONFIG,
   wParametersSettings: W_PARAMETERS_SETTINGS_TAB_CONFIG,
+  lParametersSettings: L_PARAMETERS_SETTINGS_TAB_CONFIG,
   confirmButton: {
     title: 'Рассчитать область',
   },
@@ -188,4 +233,6 @@ export const DEFAULT_SETTINGS = {
   Ke: KeOptions[0].value as number,
   h: SETTINGS_PANEL_CONFIG.wParametersSettings.h.defaultValue as number,
   WLimit: SETTINGS_PANEL_CONFIG.wParametersSettings.WLimit.defaultValue as number,
+  Lv: LvOptions[0].value as number,
+  Lp: LpOptions[0].value as number,
 };
