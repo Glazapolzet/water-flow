@@ -1,2 +1,2 @@
 export { makeBreaks } from './helpers/makeBreaks';
-export { makeSplinedIsolines } from './helpers/makeSplinedIsolines';
+export { splineIsolines } from './helpers/splineIsolines';

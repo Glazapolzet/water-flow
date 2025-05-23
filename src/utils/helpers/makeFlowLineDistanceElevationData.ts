@@ -9,9 +9,8 @@ export const makeFlowLineDistanceElevationData = (feature: Feature<LineString, G
   // Берем первую линию из коллекции (предполагаем, что она одна)
   const coordinates = feature.geometry.coordinates;
 
-  // Инициализируем массивы
   const distances = [0]; // Первая точка - расстояние 0
-  const elevations = [coordinates[0][2]]; // Высота первой точки
+  const elevations = [coordinates[0][2]];
 
   // Если только одна точка, возвращаем массивы с одним элементом
   if (coordinates.length === 1) {

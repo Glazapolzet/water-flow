@@ -2,7 +2,7 @@ import bezierSpline from '@turf/bezier-spline';
 import { lineString, multiLineString } from '@turf/helpers';
 import { FeatureCollection, GeoJsonProperties, MultiLineString } from 'geojson';
 
-export const makeSplinedIsolines = (
+export const splineIsolines = (
   isolines: FeatureCollection<MultiLineString, GeoJsonProperties>,
   options?: {
     resolution?: number;
