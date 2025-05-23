@@ -32,6 +32,7 @@ import {
   makePointsFromBBox,
   MatrixHelper,
 } from '@/utils/helpers';
+import { useCsvExport } from '@/utils/hooks';
 import { featureCollection } from '@turf/helpers';
 import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';
@@ -55,7 +56,7 @@ export const MapDisplay = () => {
   //   { id: 3, name: 'Charlie', age: 35 },
   // ];
 
-  // const { exportToCsv } = useCsvExport();
+  useCsvExport();
 
   const mapRef = useRef<Map | undefined>(undefined);
 
@@ -204,24 +205,21 @@ export const MapDisplay = () => {
     );
 
     const { distances, elevations } = makeFlowLineDistanceElevationData(flowLines.features[0]);
-    const { a, b, error } = slopeParametersSelection(distances, elevations);
-
-    // const testFlowLine = featureCollection([flowLines.features[0]]);
-
-    console.log({ a, b, error });
-    // console.log({ testFlowLine });
-    console.log({ alpha, Kt, Km, Ke, h, WLimit, Lv, Lp });
+    const { a, b } = slopeParametersSelection(distances, elevations);
 
     const erosionPoints = calculateErosionProtectionPoints(
       flowLines,
       { a, b },
       { alpha, Kt, Km, Ke, h, WLimit, Lv, Lp },
+      { zProperty: Z_PROPERTY_NAME },
     );
 
     console.log({ erosionPoints });
 
-    addFeaturesToLayer(drawLayer, erosionPoints, { style: erosionPointsStyle(treeIcon, 2) });
     addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
+    addFeaturesToLayer(drawLayer, erosionPoints, { style: erosionPointsStyle(treeIcon, 2) });
+
+    // const csvData = erosionPoints.features.map((feature) => {});
 
     // setMaxZValuePoint(maxZValuePoint);
     // setMinZValuePoint(minZValuePoint);

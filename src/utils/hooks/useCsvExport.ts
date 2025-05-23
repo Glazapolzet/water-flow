@@ -1,6 +1,6 @@
 import Papa from 'papaparse';
 
-const useCsvExport = () => {
+export const useCsvExport = () => {
   const exportToCsv = (data: any[], filename: string) => {
     const csv = Papa.unparse(data);
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -16,5 +16,3 @@ const useCsvExport = () => {
 
   return { exportToCsv };
 };
-
-export default useCsvExport;

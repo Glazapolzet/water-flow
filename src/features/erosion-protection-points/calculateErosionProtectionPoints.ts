@@ -18,7 +18,7 @@ interface ErosionParameters {
 }
 
 type ProtectionPointProps = {
-  elevation: number;
+  [key: string]: number;
   distanceFromStart: number;
 };
 
@@ -26,10 +26,11 @@ export function calculateErosionProtectionPoints(
   flowLines: FeatureCollection<LineString>,
   slopeParams: SlopeParameters,
   erosionParams: ErosionParameters,
-  step = 10,
+  options?: { zProperty?: string; step?: number },
 ): FeatureCollection<Point, ProtectionPointProps> {
   const { a, b } = slopeParams;
   const { alpha, Kt, Km, Ke, h, WLimit, Lv, Lp } = erosionParams;
+  const { zProperty = 'zValue', step = 10 } = options ?? {};
 
   const protectionPoints: Feature<Point, ProtectionPointProps>[] = [];
 
@@ -105,11 +106,10 @@ export function calculateErosionProtectionPoints(
             coordinates: [
               prevCoord[0] + (currentCoord[0] - prevCoord[0]) * (step / segmentLength),
               prevCoord[1] + (currentCoord[1] - prevCoord[1]) * (step / segmentLength),
-              currentH,
             ],
           },
           properties: {
-            elevation: currentH,
+            [zProperty]: currentH,
             distanceFromStart: accumulatedDistance,
           },
         });
