@@ -1,5 +1,5 @@
 import { FeatureLike } from 'ol/Feature';
-import { Circle, Fill, Stroke, Style } from 'ol/style';
+import { Circle, Fill, Icon, Stroke, Style } from 'ol/style';
 import { StyleFunction } from 'ol/style/Style';
 
 export const baseStyle = new Style({
@@ -62,3 +62,34 @@ export const flowLinesStyle = new Style({
     width: 2,
   }),
 });
+
+export function erosionPointsStyle(
+  svgSrc: string | ((feature: FeatureLike) => string),
+  scale: number | ((feature: FeatureLike) => number) = 1,
+  rotation: number | ((feature: FeatureLike) => number) = 0,
+  anchor: [number, number] | ((feature: FeatureLike) => [number, number]) = [0.5, 0.5],
+  displacement: [number, number] | ((feature: FeatureLike) => [number, number]) = [0, 0],
+): StyleFunction {
+  return function (feature: FeatureLike): Style {
+    // Получаем URL SVG (может быть функцией или строкой)
+    const src = typeof svgSrc === 'function' ? svgSrc(feature) : svgSrc;
+
+    // Получаем параметры стиля (могут быть функциями или значениями)
+    const featureScale = typeof scale === 'function' ? scale(feature) : scale;
+    const featureRotation = typeof rotation === 'function' ? rotation(feature) : rotation;
+    const featureAnchor = typeof anchor === 'function' ? anchor(feature) : anchor;
+    const featureDisplacement = typeof displacement === 'function' ? displacement(feature) : displacement;
+
+    return new Style({
+      image: new Icon({
+        src: src,
+        scale: featureScale,
+        rotation: featureRotation,
+        anchor: featureAnchor,
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'fraction',
+        displacement: featureDisplacement,
+      }),
+    });
+  };
+}

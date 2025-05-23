@@ -1,1 +1,1 @@
-export { flowLinesStyle, isolinesStyle } from './styles';
+export { erosionPointsStyle, flowLinesStyle, isolinesStyle } from './styles';

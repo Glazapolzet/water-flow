@@ -2,12 +2,13 @@ import { Feature, FeatureCollection } from 'geojson';
 import GeoJSON from 'ol/format/GeoJSON';
 import VectorLayer from 'ol/layer/Vector';
 import { Style } from 'ol/style';
+import { StyleFunction } from 'ol/style/Style';
 
 // Функция для добавления изолиний на слой
 export const addFeaturesToLayer = (
   layer: VectorLayer,
   features: FeatureCollection | Feature,
-  options?: { style?: Style },
+  options?: { style?: Style | StyleFunction },
 ) => {
   const { style } = options ?? {};
   const g = new GeoJSON();

@@ -8,6 +8,7 @@ import { SettingsPanel } from '@/features/settings-panel';
 import {
   drawInteractions,
   drawLayer,
+  erosionPointsStyle,
   flowLinesStyle,
   interactions,
   isolinesStyle,
@@ -15,6 +16,7 @@ import {
 } from '@/utils/map-config';
 
 import markerIcon from '@/assets/icons/map-marker.svg';
+import treeIcon from '@/assets/icons/tree.svg';
 import { Marker } from '@/components';
 import { calculateErosionProtectionPoints } from '@/features/erosion-protection-points';
 import { calculateFlowAccumulation, transformFlowAccumulationToFlowLines } from '@/features/flow-lines';
@@ -218,6 +220,7 @@ export const MapDisplay = () => {
 
     console.log({ erosionPoints });
 
+    addFeaturesToLayer(drawLayer, featureCollection(erosionPoints), { style: erosionPointsStyle(treeIcon, 2) });
     addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
 
     setMaxZValuePoint(maxZValuePoint);
