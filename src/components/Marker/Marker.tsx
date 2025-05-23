@@ -1,5 +1,4 @@
 import closeIcon from '@/assets/icons/cross.svg';
-import markerIcon from '@/assets/icons/map-marker.svg';
 import { Map, Overlay } from 'ol';
 import { memo, useEffect, useRef } from 'react';
 import styles from './Marker.module.scss';
@@ -8,9 +7,10 @@ interface Marker {
   mapRef: React.MutableRefObject<Map | undefined>;
   position: number[] | undefined;
   title: string;
+  icon: string;
 }
 
-const Component = function ({ mapRef, position, title }: Marker) {
+const Component = function ({ mapRef, position, title, icon }: Marker) {
   const markerRef = useRef<HTMLDivElement>(null);
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -65,7 +65,7 @@ const Component = function ({ mapRef, position, title }: Marker) {
       </div>
 
       <div ref={markerRef} className={styles.marker} onClick={handleMarkerClick}>
-        <img src={markerIcon} className={styles.markerIcon} alt={'marker'} />
+        <img src={icon} className={styles.markerIcon} alt={'marker'} />
       </div>
     </div>
   );

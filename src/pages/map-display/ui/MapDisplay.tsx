@@ -14,6 +14,7 @@ import {
   rasterLayers,
 } from '@/utils/map-config';
 
+import markerIcon from '@/assets/icons/map-marker.svg';
 import { Marker } from '@/components';
 import { calculateFlowAccumulation, transformFlowAccumulationToFlowLines } from '@/features/flow-lines';
 import { makeIsolines } from '@/features/isolines';
@@ -190,10 +191,6 @@ export const MapDisplay = () => {
       exponent: exponent,
     });
 
-    // console.table(mhlpr.getXYmatrix());
-    // console.table(mhlpr.getZmatrix());
-    // console.table(flowAccumulation);
-
     const flowLines = transformFlowAccumulationToFlowLines(
       pointsMatrix.getZmatrix(),
       pointsMatrix.getXYmatrix(),
@@ -213,14 +210,15 @@ export const MapDisplay = () => {
 
     addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
 
-    // setMaxZValuePoint(maxZValuePoint);
-    // setMinZValuePoint(minZValuePoint);
+    setMaxZValuePoint(maxZValuePoint);
+    setMinZValuePoint(minZValuePoint);
   };
 
   return (
     <>
       {/* <button onClick={() => exportToCsv(data, 'users.csv')}>export</button> */}
       <Marker
+        icon={markerIcon}
         mapRef={mapRef}
         position={maxZValuePoint?.geometry.coordinates}
         title={`Верхняя граница: ${maxZValuePoint?.properties?.[`${Z_PROPERTY_NAME}`]}м
@@ -229,6 +227,7 @@ export const MapDisplay = () => {
         }`}
       />
       <Marker
+        icon={markerIcon}
         mapRef={mapRef}
         position={minZValuePoint?.geometry.coordinates}
         title={`Нижняя граница: ${minZValuePoint?.properties?.[`${Z_PROPERTY_NAME}`]}м
