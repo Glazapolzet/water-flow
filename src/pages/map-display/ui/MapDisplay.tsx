@@ -17,7 +17,7 @@ import {
 
 import markerIcon from '@/assets/icons/map-marker.svg';
 import treeIcon from '@/assets/icons/tree.svg';
-import { Marker } from '@/components';
+import { HideableButton, Marker } from '@/components';
 import { calculateErosionProtectionPoints } from '@/features/erosion-protection-points';
 import { calculateFlowAccumulation, transformFlowAccumulationToFlowLines } from '@/features/flow-lines';
 import { makeIsolines } from '@/features/isolines';
@@ -33,11 +33,12 @@ import {
   MatrixHelper,
 } from '@/utils/helpers';
 import { useCsvExport } from '@/utils/hooks';
+import bbox from '@turf/bbox';
+import bboxPolygon from '@turf/bbox-polygon';
 import { featureCollection } from '@turf/helpers';
 import { toStringHDMS } from 'ol/coordinate';
 import { toLonLat } from 'ol/proj';
 import {
-  addIsolinesToLayer,
   DEFAULT_SETTINGS,
   getPointsElevationData,
   MAP_BASE_CONFIG,
@@ -50,13 +51,10 @@ import {
 import styles from './MapDisplay.module.scss';
 
 export const MapDisplay = () => {
-  // const data = [
-  //   { id: 1, name: 'Alice', age: 25 },
-  //   { id: 2, name: 'Bob', age: 30 },
-  //   { id: 3, name: 'Charlie', age: 35 },
-  // ];
-
-  useCsvExport();
+  const { exportToCsv } = useCsvExport();
+  const [csvProtectionPointsData, setCsvProtectionPointsData] = useState<
+    { coordinates: number[]; elevation: number; area: number[] }[]
+  >([]);
 
   const mapRef = useRef<Map | undefined>(undefined);
 
@@ -179,7 +177,8 @@ export const MapDisplay = () => {
 
     const cleanIsolines = featureCollection<MultiLineString>(cleanEmptyFeatures(isolines.features));
 
-    addIsolinesToLayer(drawLayer, cleanIsolines, { addBbox: true, style: isolinesStyle });
+    addFeaturesToLayer(drawLayer, cleanIsolines, { style: isolinesStyle });
+    addFeaturesToLayer(drawLayer, bboxPolygon(bbox(isolines)));
 
     const maxZValuePoint = findFeatureWithMaxZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
     const minZValuePoint = findFeatureWithMinZValue<Point>(pointsWithZValue, { zProperty: Z_PROPERTY_NAME });
@@ -219,7 +218,19 @@ export const MapDisplay = () => {
     addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
     addFeaturesToLayer(drawLayer, erosionPoints, { style: erosionPointsStyle(treeIcon, 2) });
 
-    // const csvData = erosionPoints.features.map((feature) => {});
+    const csvData = erosionPoints.features.map((feature) => {
+      const { geometry: pointGeometry, properties } = feature;
+      const [x, y] = toLonLat(pointGeometry.coordinates);
+      const [startX, startY, endX, endY] = bbox(points);
+
+      return {
+        coordinates: [x, y],
+        elevation: properties[`${Z_PROPERTY_NAME}`],
+        area: [...toLonLat([startX, startY]), ...toLonLat([endX, endY])],
+      };
+    });
+
+    setCsvProtectionPointsData(csvData);
 
     // setMaxZValuePoint(maxZValuePoint);
     // setMinZValuePoint(minZValuePoint);
@@ -227,7 +238,22 @@ export const MapDisplay = () => {
 
   return (
     <>
-      {/* <button onClick={() => exportToCsv(data, 'users.csv')}>export</button> */}
+      <HideableButton
+        colorScheme={'teal'}
+        opacity={'1'}
+        bgColor={'teal.200'}
+        position={'absolute'}
+        top={'5%'}
+        right={'3%'}
+        zIndex={'9999'}
+        {...{
+          isVisible: csvProtectionPointsData.length !== 0,
+          onClick: () => exportToCsv(csvProtectionPointsData, 'protectionPoints.csv'),
+        }}
+      >
+        Выгрузить результат
+      </HideableButton>
+
       <Marker
         icon={markerIcon}
         mapRef={mapRef}
