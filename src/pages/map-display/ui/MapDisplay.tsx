@@ -16,6 +16,7 @@ import {
 
 import markerIcon from '@/assets/icons/map-marker.svg';
 import { Marker } from '@/components';
+import { calculateErosionProtectionPoints } from '@/features/erosion-protection-points';
 import { calculateFlowAccumulation, transformFlowAccumulationToFlowLines } from '@/features/flow-lines';
 import { makeIsolines } from '@/features/isolines';
 import { slopeParametersSelection } from '@/features/slope-parameters-selection';
@@ -201,12 +202,21 @@ export const MapDisplay = () => {
     );
 
     const { distances, elevations } = makeFlowLineDistanceElevationData(flowLines.features[0]);
-    const logisticFunctionParameters = slopeParametersSelection(distances, elevations);
+    const { a, b, error } = slopeParametersSelection(distances, elevations);
 
-    console.log({ flowLines });
-    console.log({ logisticFunctionParameters });
+    const testFlowLine = featureCollection([flowLines.features[0]]);
 
-    console.log({ alpha, Kt, Km, Ke, h, WLimit });
+    console.log({ a, b, error });
+    console.log({ testFlowLine });
+    console.log({ alpha, Kt, Km, Ke, h, WLimit, Lv, Lp });
+
+    const erosionPoints = calculateErosionProtectionPoints(
+      testFlowLine,
+      { a, b },
+      { alpha, Kt, Km, Ke, h, WLimit, Lv, Lp },
+    );
+
+    console.log({ erosionPoints });
 
     addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
 

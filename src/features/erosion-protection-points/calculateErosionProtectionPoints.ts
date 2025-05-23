@@ -7,13 +7,13 @@ interface SlopeParameters {
 
 interface ErosionParameters {
   alpha: number;
-  kT: number;
-  kM: number;
-  kE: number;
+  Kt: number;
+  Km: number;
+  Ke: number;
   h: number;
-  wThreshold: number;
-  lV: number;
-  lP: number;
+  WLimit: number;
+  Lv: number;
+  Lp: number;
 }
 
 interface ProtectionPoint {
@@ -35,7 +35,7 @@ export function calculateErosionProtectionPoints(
   step = 10,
 ): ProtectionPoint[] {
   const { a, b } = slopeParams;
-  const { alpha, kT, kM, kE, h, wThreshold, lV, lP } = erosionParams;
+  const { alpha, Kt, Km, Ke, h, WLimit, Lv, Lp } = erosionParams;
 
   const protectionPoints: ProtectionPoint[] = [];
 
@@ -45,10 +45,10 @@ export function calculateErosionProtectionPoints(
     if (coordinates.length < 2) continue;
 
     // Начальные параметры для линии тока
-    let hMax = coordinates[0][2]; // Начальная высота (Z-координата)
-    const hMin = coordinates[coordinates.length - 1][2]; // Минимальная высота
+    let Hmax = coordinates[0][2]; // Начальная высота (Z-координата)
+    const Hmin = coordinates[coordinates.length - 1][2]; // Минимальная высота
     let lPrev = 0;
-    let hPrev = hMax;
+    let hPrev = Hmax;
     let accumulatedDistance = 0;
 
     // Проходим по всем точкам линии тока
@@ -72,35 +72,35 @@ export function calculateErosionProtectionPoints(
       const currentH = prevCoord[2] + (currentCoord[2] - prevCoord[2]) * (step / segmentLength);
 
       // Расчет параметров для текущей точки
-      const deltaH = hMax - hMin;
+      const deltaH = Hmax - Hmin;
       const c = Math.exp(a);
       const phi = Math.exp(-b * accumulatedDistance);
       const phi1 = (b * c * phi) / deltaH;
       const P = deltaH / (1 + c * phi);
 
       // Расчет текущего смыва
-      const wCurrent =
-        alpha * kT * kM * kE * Math.pow(h, 0.95) * accumulatedDistance * Math.pow(phi1 * Math.pow(P, 2), 1.5);
+      const Wcurrent =
+        alpha * Kt * Km * Ke * Math.pow(h, 0.95) * accumulatedDistance * Math.pow(phi1 * Math.pow(P, 2), 1.5);
 
-      if (wCurrent > wThreshold) {
+      if (Wcurrent > WLimit) {
         // Расчет средней крутизны склона между текущей и предыдущей точкой
         const slopeAngle = Math.atan((hPrev - currentH) / (accumulatedDistance - lPrev));
 
         // Расчет L_ci
-        const lCi = lP * (1 - 3 * Math.tan(slopeAngle));
+        const Lci = Lp * (1 - 3 * Math.tan(slopeAngle));
 
         // Расчет L_mp
-        let lMp = accumulatedDistance + lV;
+        let Lmp = accumulatedDistance + Lv;
 
-        if (lMp <= lCi && lMp < lP) {
-          lMp = lCi;
-        } else if (lMp > lCi && lMp >= lP) {
-          lMp = lP;
+        if (Lmp <= Lci && Lmp < Lp) {
+          Lmp = Lci;
+        } else if (Lmp > Lci && Lmp >= Lp) {
+          Lmp = Lp;
         }
 
         // Если достигли максимального расстояния без превышения порога
-        if (lP === 400 && wCurrent <= wThreshold) {
-          lMp = 400;
+        if (Lp === 400 && Wcurrent <= WLimit) {
+          Lmp = 400;
         }
 
         // Добавление точки в результат
@@ -121,7 +121,7 @@ export function calculateErosionProtectionPoints(
         });
 
         // Обновление параметров для следующей итерации
-        hMax = currentH;
+        Hmax = currentH;
         lPrev = accumulatedDistance;
         hPrev = currentH;
       }
