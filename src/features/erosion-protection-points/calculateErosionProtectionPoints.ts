@@ -1,4 +1,5 @@
-import { FeatureCollection, LineString, Position } from 'geojson';
+import { featureCollection } from '@turf/helpers';
+import { Feature, FeatureCollection, LineString, Point } from 'geojson';
 
 interface SlopeParameters {
   a: number;
@@ -16,28 +17,21 @@ interface ErosionParameters {
   Lp: number;
 }
 
-interface ProtectionPoint {
-  type: 'Feature';
-  geometry: {
-    type: 'Point';
-    coordinates: Position;
-  };
-  properties: {
-    elevation: number;
-    distanceFromStart: number;
-  };
-}
+type ProtectionPointProps = {
+  elevation: number;
+  distanceFromStart: number;
+};
 
 export function calculateErosionProtectionPoints(
   flowLines: FeatureCollection<LineString>,
   slopeParams: SlopeParameters,
   erosionParams: ErosionParameters,
   step = 10,
-): ProtectionPoint[] {
+): FeatureCollection<Point, ProtectionPointProps> {
   const { a, b } = slopeParams;
   const { alpha, Kt, Km, Ke, h, WLimit, Lv, Lp } = erosionParams;
 
-  const protectionPoints: ProtectionPoint[] = [];
+  const protectionPoints: Feature<Point, ProtectionPointProps>[] = [];
 
   // Обрабатываем каждую линию тока
   for (const feature of flowLines.features) {
@@ -128,5 +122,5 @@ export function calculateErosionProtectionPoints(
     }
   }
 
-  return protectionPoints;
+  return featureCollection(protectionPoints);
 }

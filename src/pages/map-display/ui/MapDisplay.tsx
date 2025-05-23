@@ -220,7 +220,7 @@ export const MapDisplay = () => {
 
     console.log({ erosionPoints });
 
-    addFeaturesToLayer(drawLayer, featureCollection(erosionPoints), { style: erosionPointsStyle(treeIcon, 2) });
+    addFeaturesToLayer(drawLayer, erosionPoints, { style: erosionPointsStyle(treeIcon, 2) });
     addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
 
     // setMaxZValuePoint(maxZValuePoint);
