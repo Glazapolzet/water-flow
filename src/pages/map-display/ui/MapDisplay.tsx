@@ -206,14 +206,14 @@ export const MapDisplay = () => {
     const { distances, elevations } = makeFlowLineDistanceElevationData(flowLines.features[0]);
     const { a, b, error } = slopeParametersSelection(distances, elevations);
 
-    const testFlowLine = featureCollection([flowLines.features[0]]);
+    // const testFlowLine = featureCollection([flowLines.features[0]]);
 
     console.log({ a, b, error });
-    console.log({ testFlowLine });
+    // console.log({ testFlowLine });
     console.log({ alpha, Kt, Km, Ke, h, WLimit, Lv, Lp });
 
     const erosionPoints = calculateErosionProtectionPoints(
-      testFlowLine,
+      flowLines,
       { a, b },
       { alpha, Kt, Km, Ke, h, WLimit, Lv, Lp },
     );
@@ -223,8 +223,8 @@ export const MapDisplay = () => {
     addFeaturesToLayer(drawLayer, featureCollection(erosionPoints), { style: erosionPointsStyle(treeIcon, 2) });
     addFeaturesToLayer(drawLayer, flowLines, { style: flowLinesStyle });
 
-    setMaxZValuePoint(maxZValuePoint);
-    setMinZValuePoint(minZValuePoint);
+    // setMaxZValuePoint(maxZValuePoint);
+    // setMinZValuePoint(minZValuePoint);
   };
 
   return (

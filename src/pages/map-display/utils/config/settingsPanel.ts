@@ -85,8 +85,7 @@ const LvOptions = [
   { name: 'Чв, Чоп (90)', value: 90 },
   { name: 'Чоб (60)', value: 60 },
   { name: 'Чо (50)', value: 50 },
-  { name: 'Кт, К (40)', value: 40 },
-  { name: 'Кс (40)', value: 40 },
+  { name: 'Кт, К, Кс (40)', value: 40 },
 ].map((option) => {
   return {
     id: option.name,
@@ -96,8 +95,7 @@ const LvOptions = [
 });
 
 const LpOptions = [
-  { name: 'Дп, Сл (600)', value: 600 },
-  { name: 'Чв, Чоп (600)', value: 600 },
+  { name: 'Дп, Сл, Чв, Чоп (600)', value: 600 },
   { name: 'Чоб (500)', value: 500 },
   { name: 'Чо (400)', value: 400 },
   { name: 'Кт, К (350)', value: 350 },
