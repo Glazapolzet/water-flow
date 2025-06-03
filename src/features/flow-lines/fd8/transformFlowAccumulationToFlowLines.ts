@@ -3,18 +3,16 @@ import { directions } from './directions';
 
 type FlowGrid = number[][];
 type ElevationGrid = number[][];
-type CoordinatesGrid = Position[][]; // [x, y] на каждой позиции
+type CoordinatesGrid = Position[][];
 type FlowDirection = { dx: number; dy: number } | null;
 
-/**
- * Преобразует сетку аккумуляции в линии стока (GeoJSON)
- */
+// Преобразует сетку аккумуляции в линии стока
 export function transformFlowAccumulationToFlowLines(
   elevationGrid: ElevationGrid,
   coordinatesGrid: CoordinatesGrid,
   flowGrid: FlowGrid,
   options: {
-    threshold?: number; // Порог для "русла" (default: 5% от max)
+    threshold?: number; // Порог для "русла"
     minLength?: number; // Минимальная длина линии (ячейки)
   } = {},
 ): FeatureCollection<LineString> {
@@ -49,9 +47,6 @@ export function transformFlowAccumulationToFlowLines(
   };
 }
 
-/**
- * Трассирует одну линию стока
- */
 function traceFlowLine(
   startY: number,
   startX: number,
@@ -74,11 +69,9 @@ function traceFlowLine(
     if (visited.has(cellKey)) break;
     visited.add(cellKey);
 
-    // Получаем направление потока
     const direction = getFlowDirection(y, x, elevationGrid, coordinatesGrid);
     if (!direction) break; // Локальный минимум
 
-    // Переходим к следующей ячейке
     y += direction.dy;
     x += direction.dx;
 
@@ -89,9 +82,7 @@ function traceFlowLine(
   return line;
 }
 
-/**
- * Определяет направление стока для ячейки (FD8)
- */
+// Определяет направление стока для ячейки (FD8)
 function getFlowDirection(
   y: number,
   x: number,
@@ -126,9 +117,6 @@ function getFlowDirection(
   return bestDir;
 }
 
-/**
- * Преобразует массив координат в GeoJSON Feature
- */
 function lineToFeature(coords: Position[]): Feature<LineString> {
   return {
     type: 'Feature',

@@ -1,22 +1,6 @@
 import { featureCollection } from '@turf/helpers';
 import { Feature, FeatureCollection, LineString, Point } from 'geojson';
 
-interface SlopeParameters {
-  a: number;
-  b: number;
-}
-
-interface ErosionParameters {
-  alpha: number;
-  Kt: number;
-  Km: number;
-  Ke: number;
-  h: number;
-  WLimit: number;
-  Lv: number;
-  Lp: number;
-}
-
 type ProtectionPointProps = {
   [key: string]: number;
   distanceFromStart: number;
@@ -24,8 +8,20 @@ type ProtectionPointProps = {
 
 export function calculateErosionProtectionPoints(
   flowLines: FeatureCollection<LineString>,
-  slopeParams: SlopeParameters,
-  erosionParams: ErosionParameters,
+  slopeParams: {
+    a: number;
+    b: number;
+  },
+  erosionParams: {
+    alpha: number;
+    Kt: number;
+    Km: number;
+    Ke: number;
+    h: number;
+    WLimit: number;
+    Lv: number;
+    Lp: number;
+  },
   options?: { zProperty?: string; step?: number },
 ): FeatureCollection<Point, ProtectionPointProps> {
   const { a, b } = slopeParams;
@@ -34,14 +30,13 @@ export function calculateErosionProtectionPoints(
 
   const protectionPoints: Feature<Point, ProtectionPointProps>[] = [];
 
-  // Обрабатываем каждую линию тока
   for (const feature of flowLines.features) {
     const coordinates = feature.geometry.coordinates;
     if (coordinates.length < 2) continue;
 
     // Начальные параметры для линии тока
-    let Hmax = coordinates[0][2]; // Начальная высота (Z-координата)
-    const Hmin = coordinates[coordinates.length - 1][2]; // Минимальная высота
+    let Hmax = coordinates[0][2];
+    const Hmin = coordinates[coordinates.length - 1][2];
     let lPrev = 0;
     let hPrev = Hmax;
     let accumulatedDistance = 0;
@@ -84,7 +79,7 @@ export function calculateErosionProtectionPoints(
         // Расчет L_ci
         const Lci = Lp * (1 - 3 * Math.tan(slopeAngle));
 
-        // Расчет L_mp
+        // Расчет L_мп
         let Lmp = accumulatedDistance + Lv;
 
         if (Lmp <= Lci && Lmp < Lp) {
@@ -93,7 +88,7 @@ export function calculateErosionProtectionPoints(
           Lmp = Lp;
         }
 
-        // Если достигли максимального расстояния без превышения порога
+        // Если достигли максимального расстояния == 400 без превышения порога смыва
         if (Lp === 400 && Wcurrent <= WLimit) {
           Lmp = 400;
         }

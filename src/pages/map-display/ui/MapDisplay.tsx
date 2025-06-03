@@ -142,11 +142,6 @@ export const MapDisplay = () => {
     mapRef.current = map;
 
     interactions.getArray().forEach((interaction) => map.addInteraction(interaction));
-
-    // map.on('click', (event) => {
-    //   const clickedCoordinate = event.coordinate;
-    //   console.log('Clicked Coordinate:', clickedCoordinate);
-    // });
   };
 
   const handleClearButtonClick = async () => {
@@ -232,8 +227,8 @@ export const MapDisplay = () => {
 
     setCsvProtectionPointsData(csvData);
 
-    // setMaxZValuePoint(maxZValuePoint);
-    // setMinZValuePoint(minZValuePoint);
+    setMaxZValuePoint(maxZValuePoint);
+    setMinZValuePoint(minZValuePoint);
   };
 
   return (
